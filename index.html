@@ -104,6 +104,13 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
     <sc-if value="{{ tabDiscover }}" hint-placeholder-val="{{ true }}">
       <div style="flex:1; display:flex; flex-direction:column; background-color:#fff7f2; background-image:radial-gradient(#f2d3c6 1px, transparent 1px); background-size:24px 24px; overflow:hidden;">
         <div style="padding:14px 20px 2px; font:italic 400 18px/1.35 'Serrif VF',Georgia,serif; color:#451212; text-align:center;">{{ greeting }}</div>
+        <sc-if value="{{ showNudge }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; align-items:center; gap:8px; margin:10px 16px 0; background:#ffffff; border:1px solid #f2d3c6; padding:8px 12px;">
+            <i class="ri-user-add-line" style="font-size:14px; color:#c0361c; flex:none;"></i>
+            <button onClick="{{ nudgeGo }}" style="flex:1; text-align:left; background:none; border:none; cursor:pointer; font:400 12.5px 'Saans',sans-serif; color:#451212; padding:0;">Create an account to keep your taste file everywhere.</button>
+            <button onClick="{{ nudgeDismiss }}" aria-label="Dismiss" style="background:none; border:none; cursor:pointer; padding:2px; flex:none;"><i class="ri-close-line" style="font-size:16px; color:#676c79;"></i></button>
+          </div>
+        </sc-if>
         <div style="display:flex; justify-content:center; gap:8px; padding:12px 16px 0; flex-wrap:wrap;">
           <sc-for list="{{ catChips }}" as="cc" hint-placeholder-count="5">
             <button onClick="{{ cc.go }}" style="{{ cc.style }}">{{ cc.label }}</button>
@@ -281,8 +288,24 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
           </sc-for>
         </div>
         <sc-if value="{{ signedOut }}" hint-placeholder-val="{{ false }}">
-          <button onClick="{{ doSignIn }}" style="display:flex; align-items:center; justify-content:center; gap:9px; width:100%; margin-top:22px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:14px; cursor:pointer;"><i class="ri-google-fill" style="font-size:16px;"></i>Continue with Google</button>
-          <div style="font:400 12px/1.5 'Saans',sans-serif; color:#676c79; margin-top:8px;">Sign in to keep your taste file, saves and reviews when the social features land.</div>
+          <div style="border:1px solid #451212; margin-top:22px; padding:16px 14px;">
+            <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Your account</div>
+            <div style="font:400 12.5px/1.5 'Saans',sans-serif; color:#676c79; margin:6px 0 12px;">Keep your taste file, saves and reviews on every device. Add friends. Judge their taste.</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+              <sc-for list="{{ authTabs }}" as="at" hint-placeholder-count="2">
+                <button onClick="{{ at.go }}" style="{{ at.style }}">{{ at.label }}</button>
+              </sc-for>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <sc-if value="{{ authSignup }}" hint-placeholder-val="{{ true }}">
+                <input value="{{ authUser }}" onChange="{{ onAuthUser }}" placeholder="Pick a handle (a–z, 0–9, _)" autocomplete="username" autocapitalize="none" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+              </sc-if>
+              <input value="{{ authEmail }}" onChange="{{ onAuthEmail }}" placeholder="Email" autocomplete="email" autocapitalize="none" inputmode="email" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+              <input value="{{ authPassword }}" onChange="{{ onAuthPassword }}" onKeyDown="{{ onAuthKey }}" type="password" placeholder="Password (8+ characters)" autocomplete="current-password" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+            </div>
+            <button onClick="{{ authSubmit }}" style="width:100%; margin-top:10px; font:500 15px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:14px; cursor:pointer;" style-hover="background:#c22f1a;">{{ authSubmitLabel }}</button>
+            <button onClick="{{ doSignIn }}" style="display:flex; align-items:center; justify-content:center; gap:9px; width:100%; margin-top:8px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:13px; cursor:pointer;"><i class="ri-google-fill" style="font-size:16px;"></i>Continue with Google</button>
+          </div>
         </sc-if>
         <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex; align-items:center; gap:10px; margin-top:22px; border:1px solid #f2d3c6; padding:13px 14px;">
@@ -292,6 +315,36 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
               <div style="font:400 12px 'Saans',sans-serif; color:#676c79;">{{ userSub }}</div>
             </div>
             <button onClick="{{ doSignOut }}" style="font:500 9px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; border:none; color:#852952; cursor:pointer; padding:6px;">Sign out</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:24px;">
+            <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;">
+              <i class="ri-group-line" style="font-size:14px;"></i>Friends
+            </div>
+            <div style="display:flex; gap:8px;">
+              <input value="{{ frDraft }}" onChange="{{ onFrDraft }}" onKeyDown="{{ onFrKey }}" placeholder="Add a friend by handle" autocapitalize="none" style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none;">
+              <button onClick="{{ doAddFriend }}" aria-label="Send friend request" style="width:44px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-user-add-line" style="font-size:18px; color:#fff5ee;"></i></button>
+            </div>
+            <sc-if value="{{ frAny }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px solid #f2d3c6; margin-top:10px;">
+                <sc-for list="{{ frRows }}" as="fr" hint-placeholder-count="2">
+                  <div style="display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid #f2d3c6;">
+                    <div onClick="{{ fr.open }}" style="flex:1; min-width:0; cursor:pointer;">
+                      <div style="font:700 14px 'Saans',sans-serif; color:#451212;">{{ fr.label }}</div>
+                      <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ fr.sub }}</div>
+                    </div>
+                    <sc-if value="{{ fr.canAccept }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ fr.accept }}" style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:8px 12px; cursor:pointer; flex:none;">Accept</button>
+                    </sc-if>
+                    <button onClick="{{ fr.remove }}" aria-label="Remove" style="border:none; background:none; cursor:pointer; padding:6px; flex:none;"><i class="ri-close-line" style="font-size:16px; color:#676c79;"></i></button>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ frEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="font:400 12px/1.5 'Saans',sans-serif; color:#676c79; margin-top:8px;">No friends yet. Your handle is @{{ myHandle }} — hand it out at parties.</div>
+            </sc-if>
           </div>
         </sc-if>
         <sc-if value="{{ savedAny }}" hint-placeholder-val="{{ false }}">
@@ -331,6 +384,61 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             </sc-for>
           </div>
           <div style="font:400 13px/1.55 'Saans',sans-serif; color:#676c79; margin-top:14px;">The deck re-filters live. Morning + sunny = pastries. Rain = museums. Night = decisions you'll defend later.</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- friend sheet (z below the detail sheet so tapped places open above it) -->
+    <sc-if value="{{ fvOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; z-index:55; background:#fff7f2; display:flex; flex-direction:column;">
+        <div style="padding:18px 20px 0; flex:none;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <div style="flex:1; min-width:0;">
+              <div style="font:500 9.5px 'Saans Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#c0361c;">@{{ fvHandle }}</div>
+              <div style="font:400 28px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin-top:6px;">{{ fvName }}</div>
+            </div>
+            <button onClick="{{ fvClose }}" aria-label="Close friend view" style="width:38px; height:38px; flex:none; border-radius:50%; border:1px solid #451212; background:#fff7f2; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-close-line" style="font-size:20px; color:#451212;"></i></button>
+          </div>
+          <div style="border-bottom:1px solid #451212; margin-top:14px;"></div>
+        </div>
+        <div style="flex:1; overflow:auto; padding:16px 20px 24px;">
+          <sc-if value="{{ fvLoading }}" hint-placeholder-val="{{ false }}">
+            <div style="text-align:center; font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; padding:12px; border:1px dashed #f2d3c6;">Rifling through their folder…</div>
+          </sc-if>
+          <sc-if value="{{ fvHasHearts }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;"><i class="ri-folder-heart-line" style="font-size:14px;"></i>Saved for later</div>
+            <div style="border:1px solid #f2d3c6; margin-bottom:18px;">
+              <sc-for list="{{ fvHearts }}" as="fh" hint-placeholder-count="2">
+                <div onClick="{{ fh.open }}" style="display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #f2d3c6; cursor:pointer;">
+                  <div style="flex:1; min-width:0;">
+                    <div style="font:700 15px 'Saans',sans-serif; color:#451212;">{{ fh.name }}</div>
+                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ fh.meta }}</div>
+                  </div>
+                  <i class="ri-arrow-right-s-line" style="font-size:18px; color:#d1401f; flex:none;"></i>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ fvHasLikes }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;"><i class="ri-heart-3-line" style="font-size:14px;"></i>Swiped right on</div>
+            <div style="border:1px solid #f2d3c6;">
+              <sc-for list="{{ fvLikes }}" as="fl" hint-placeholder-count="2">
+                <div onClick="{{ fl.open }}" style="display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #f2d3c6; cursor:pointer;">
+                  <div style="flex:1; min-width:0;">
+                    <div style="font:700 15px 'Saans',sans-serif; color:#451212;">{{ fl.name }}</div>
+                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ fl.meta }}</div>
+                  </div>
+                  <i class="ri-arrow-right-s-line" style="font-size:18px; color:#d1401f; flex:none;"></i>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ fvEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px dashed #f2d3c6; padding:26px 20px; text-align:center; background:#ffffff;">
+              <div style="font:400 20px/1.2 'Serrif VF',Georgia,serif; color:#451212; margin-bottom:6px;">Nothing saved yet</div>
+              <div style="font:400 13px/1.5 'Saans',sans-serif; color:#676c79;">They haven’t swiped on anything. Peer pressure them.</div>
+            </div>
+          </sc-if>
         </div>
       </div>
     </sc-if>
@@ -379,6 +487,12 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
               <div style="font:italic 400 14.5px/1.5 'Serrif VF',Georgia,serif; color:#38100c; margin-top:5px;">{{ dMyText }}</div>
             </div>
           </sc-if>
+          <sc-for list="{{ dFriendReviews }}" as="frv" hint-placeholder-count="1">
+            <div style="border:1px solid #f2d3c6; background:#ffffff; padding:12px 14px; margin-bottom:10px;">
+              <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.04em; color:#c0361c;">{{ frv.head }}</div>
+              <div style="font:italic 400 14.5px/1.5 'Serrif VF',Georgia,serif; color:#38100c; margin-top:5px;">{{ frv.text }}</div>
+            </div>
+          </sc-for>
           <sc-if value="{{ dRevEdit }}" hint-placeholder-val="{{ false }}">
             <div style="border:1px solid #451212; background:#ffffff; padding:12px 14px; margin-bottom:10px;">
               <div style="display:flex; gap:4px; margin-bottom:9px;">
@@ -614,6 +728,7 @@ function restoreState() {
       name: typeof s.name === 'string' ? s.name.slice(0, 40) : '',
       myReviews: s.myReviews || {},
       gplaces: s.gplaces || {},
+      acctNudge: s.acctNudge !== false,
     };
   } catch (e) { return {}; }
 }
@@ -635,7 +750,10 @@ class Component extends DCLogic {
     photos: {}, live: {}, pulse: [], hearts: {}, detail: null, details: {}, resy: {},
     myReviews: {}, revEdit: false, revText: '', revStars: 5,
     gplaces: {},
-    user: null, authReady: false,
+    user: null, authReady: false, username: '',
+    authMode: 'signup', authEmail: '', authPassword: '', authUser: '', authBusy: false,
+    acctNudge: true,
+    friends: [], frIn: [], frOut: [], frDraft: '', friendView: null, friendReviews: {},
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -651,6 +769,7 @@ class Component extends DCLogic {
         myReviews: S.myReviews,
         // keep only the dynamic places the user has acted on
         gplaces: Object.fromEntries(Object.entries(S.gplaces).filter(([id]) => S.swiped[id] === 'like' || S.hearts[id] || S.myReviews[id])),
+        acctNudge: S.acctNudge,
       }));
     } catch (e) {}
   }
@@ -712,7 +831,7 @@ class Component extends DCLogic {
     clearInterval(this._wx);
   }
 
-  // Supabase Google sign-in: dormant until SUPABASE_URL/SUPABASE_ANON_KEY are configured.
+  // Supabase accounts: dormant until SUPABASE_URL/SUPABASE_ANON_KEY are configured.
   initAuth() {
     fetch('/api/config')
       .then(r => (r.ok ? r.json() : null))
@@ -723,14 +842,20 @@ class Component extends DCLogic {
           this.setState({ authReady: true });
           const applySession = (session) => {
             const u = session && session.user;
-            if (!u) return this.setState({ user: null });
+            if (!u) {
+              this._syncedFor = null;
+              this._profSig = null;
+              this._frevReq = {};
+              return this.setState({ user: null, username: '', friends: [], frIn: [], frOut: [], friendView: null, friendReviews: {} });
+            }
             const meta = u.user_metadata || {};
             const fullName = meta.full_name || meta.name || '';
             this.setState(s => ({
-              user: { email: u.email, name: fullName, avatar: meta.avatar_url || null },
-              // adopt the Google name if the taste file doesn't have one yet
+              user: { id: u.id, email: u.email, name: fullName, avatar: meta.avatar_url || null },
+              // adopt the account name if the taste file doesn't have one yet
               name: s.name || fullName.split(' ')[0] || '',
             }));
+            this.syncDown(u.id);
           };
           this._sb.auth.getSession().then(({ data }) => applySession(data.session));
           this._sb.auth.onAuthStateChange((_e, session) => applySession(session));
@@ -747,6 +872,237 @@ class Component extends DCLogic {
   signOut() {
     if (!this._sb) return;
     this._sb.auth.signOut().then(() => this.showToast('Signed out. The concierge misses you already.'));
+  }
+
+  signUpEmail() {
+    if (!this._sb || this.state.authBusy) return;
+    const email = this.state.authEmail.trim();
+    const password = this.state.authPassword;
+    const username = this.state.authUser.trim().toLowerCase().replace(/^@/, '');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return this.showToast('That email looks suspicious.');
+    if (password.length < 8) return this.showToast('Password: eight characters minimum.');
+    if (!/^[a-z0-9_]{3,20}$/.test(username)) return this.showToast('Handle: 3\u201320 letters, numbers or _.');
+    this.setState({ authBusy: true });
+    this._sb.auth.signUp({ email, password, options: { data: { username, full_name: this.state.name || '' } } })
+      .then(({ data, error }) => {
+        this.setState({ authBusy: false });
+        if (error) return this.showToast(error.message);
+        this.setState({ authEmail: '', authPassword: '', authUser: '' });
+        if (!data.session) return this.showToast('Check your inbox to confirm, then log in.');
+        this.showToast('Enchant\u00e9. Your taste file is now immortal.');
+      });
+  }
+
+  signInEmail() {
+    if (!this._sb || this.state.authBusy) return;
+    this.setState({ authBusy: true });
+    this._sb.auth.signInWithPassword({ email: this.state.authEmail.trim(), password: this.state.authPassword })
+      .then(({ error }) => {
+        this.setState({ authBusy: false });
+        if (error) return this.showToast(error.message);
+        this.setState({ authEmail: '', authPassword: '' });
+        this.showToast('Welcome back. The deck remembers.');
+      });
+  }
+
+  // ---- server sync: Supabase mirrors the local state once signed in ----
+  uid() { return this.state.user && this.state.user.id; }
+
+  placeSnapshot(id) {
+    return id && id.indexOf('g_') === 0 ? (this.state.gplaces[id] || null) : null;
+  }
+
+  dbPush(table, row) {
+    const uid = this.uid();
+    if (!this._sb || !uid) return;
+    this._sb.from(table).upsert({ user_id: uid, ...row }).then(({ error }) => {
+      if (error) console.warn('whim sync', table, error.message);
+    });
+  }
+
+  dbDrop(table, place_id) {
+    const uid = this.uid();
+    if (!this._sb || !uid) return;
+    this._sb.from(table).delete().match({ user_id: uid, place_id }).then(({ error }) => {
+      if (error) console.warn('whim sync', table, error.message);
+    });
+  }
+
+  pushProfile(force) {
+    const uid = this.uid();
+    if (!this._sb || !uid) return;
+    const S = this.state;
+    const row = {
+      ob_step: S.obStep, ob_answers: S.obAnswers, quiz_answers: S.quizAnswers,
+      plan_status: S.planStatus, swipe_count: S.swipeCount, display_name: S.name || '',
+    };
+    const sig = JSON.stringify(row);
+    if (!force && sig === this._profSig) return;
+    this._profSig = sig;
+    this._sb.from('profiles').update({ ...row, updated_at: new Date().toISOString() }).eq('user_id', uid)
+      .then(({ error }) => { if (error) console.warn('whim sync profiles', error.message); });
+  }
+
+  async syncDown(uid) {
+    if (!this._sb || this._syncedFor === uid) return;
+    this._syncedFor = uid;
+    const sb = this._sb;
+    const [prof, sw, ht, rv] = await Promise.all([
+      sb.from('profiles').select('*').eq('user_id', uid).maybeSingle(),
+      sb.from('swipes').select('place_id,direction,place').eq('user_id', uid),
+      sb.from('hearts').select('place_id,place,created_at').eq('user_id', uid),
+      sb.from('reviews').select('place_id,stars,text,created_at').eq('user_id', uid),
+    ]);
+    if (prof.error || !prof.data) { this._syncedFor = null; return; }
+    const p = prof.data;
+    const rows = { sw: sw.data || [], ht: ht.data || [], rv: rv.data || [] };
+    const S = this.state;
+    const serverFresh = p.ob_step < 0 && !rows.sw.length && !rows.ht.length && !rows.rv.length;
+    const localHasData = S.obStep >= 0 || Object.keys(S.swiped).length > 0 || Object.keys(S.hearts).length > 0 || Object.keys(S.myReviews).length > 0;
+    const next = { username: p.username || '' };
+
+    if (serverFresh && localHasData) {
+      // first sign-in from a device with history: the local file becomes the account
+      this.pushProfile(true);
+      const up = (t, list) => { if (list.length) sb.from(t).upsert(list).then(({ error }) => { if (error) console.warn('whim sync', t, error.message); }); };
+      up('swipes', Object.entries(S.swiped).map(([place_id, direction]) => ({ user_id: uid, place_id, direction, place: this.placeSnapshot(place_id) })));
+      up('hearts', Object.entries(S.hearts).map(([place_id, at]) => ({ user_id: uid, place_id, place: this.placeSnapshot(place_id), created_at: new Date(at).toISOString() })));
+      up('reviews', Object.entries(S.myReviews).map(([place_id, r]) => ({ user_id: uid, place_id, stars: r.stars || 5, text: r.text, created_at: new Date(r.at || Date.now()).toISOString() })));
+    } else {
+      // the server copy wins; local-only rows are adopted and pushed up
+      const swiped = { ...S.swiped }, hearts = { ...S.hearts }, myReviews = { ...S.myReviews }, gplaces = { ...S.gplaces };
+      rows.sw.forEach(r => { swiped[r.place_id] = r.direction; if (r.place) gplaces[r.place_id] = { ...r.place, id: r.place_id }; });
+      rows.ht.forEach(r => { hearts[r.place_id] = Date.parse(r.created_at) || Date.now(); if (r.place) gplaces[r.place_id] = { ...r.place, id: r.place_id }; });
+      rows.rv.forEach(r => { myReviews[r.place_id] = { text: r.text, stars: r.stars, at: Date.parse(r.created_at) || Date.now() }; });
+      Object.keys(S.swiped).forEach(id => { if (!rows.sw.some(r => r.place_id === id)) this.dbPush('swipes', { place_id: id, direction: S.swiped[id], place: this.placeSnapshot(id) }); });
+      Object.keys(S.hearts).forEach(id => { if (!rows.ht.some(r => r.place_id === id)) this.dbPush('hearts', { place_id: id, place: this.placeSnapshot(id) }); });
+      Object.keys(S.myReviews).forEach(id => { if (!rows.rv.some(r => r.place_id === id)) this.dbPush('reviews', { place_id: id, stars: S.myReviews[id].stars || 5, text: S.myReviews[id].text }); });
+      Object.assign(next, { swiped, hearts, myReviews, gplaces, swipeCount: Math.max(S.swipeCount, p.swipe_count || 0) });
+      if (p.ob_step >= 0) {
+        Object.assign(next, {
+          obStep: p.ob_step,
+          obAnswers: Array.isArray(p.ob_answers) ? p.ob_answers : [],
+          quizAnswers: p.quiz_answers || {},
+          planStatus: p.plan_status === 'approved' ? 'approved' : 'draft',
+        });
+      }
+      if (p.display_name && !S.name) next.name = p.display_name.split(' ')[0];
+      // seed the signature so the debounced profile push doesn't fire a no-op
+      this._profSig = JSON.stringify({
+        ob_step: next.obStep ?? S.obStep, ob_answers: next.obAnswers ?? S.obAnswers, quiz_answers: next.quizAnswers ?? S.quizAnswers,
+        plan_status: next.planStatus ?? S.planStatus, swipe_count: next.swipeCount ?? S.swipeCount, display_name: (next.name ?? S.name) || '',
+      });
+    }
+    this.setState(next);
+    this.loadFriends();
+  }
+
+  // ---- friends ----
+  async loadFriends() {
+    const uid = this.uid();
+    if (!this._sb || !uid) return;
+    const { data, error } = await this._sb.from('friendships')
+      .select('requester,addressee,status')
+      .or(`requester.eq.${uid},addressee.eq.${uid}`);
+    if (error || !data) return;
+    const others = [...new Set(data.map(f => (f.requester === uid ? f.addressee : f.requester)))];
+    const profiles = {};
+    if (others.length) {
+      const res = await this._sb.from('profiles').select('user_id,username,display_name').in('user_id', others);
+      (res.data || []).forEach(pr => { profiles[pr.user_id] = pr; });
+    }
+    const info = (id) => ({ id, username: (profiles[id] || {}).username || 'unknown', displayName: (profiles[id] || {}).display_name || '' });
+    this.setState({
+      friends: data.filter(f => f.status === 'accepted').map(f => info(f.requester === uid ? f.addressee : f.requester)),
+      frIn: data.filter(f => f.status === 'pending' && f.addressee === uid).map(f => info(f.requester)),
+      frOut: data.filter(f => f.status === 'pending' && f.requester === uid).map(f => info(f.addressee)),
+    });
+  }
+
+  addFriend() {
+    const uid = this.uid();
+    const q = (this.state.frDraft || '').trim().toLowerCase().replace(/^@/, '');
+    if (!this._sb || !uid || !q) return;
+    if (q === this.state.username) return this.showToast('That\u2019s you. Bold, but no.');
+    if (this.state.friends.some(f => f.username === q)) return this.showToast('Already friends.');
+    if (this.state.frOut.some(f => f.username === q)) return this.showToast('Patience. Request pending.');
+    if (this.state.frIn.some(f => f.username === q)) return this.showToast('They already asked \u2014 accept below.');
+    this._sb.rpc('find_profile', { q }).then(({ data, error }) => {
+      const hit = data && data[0];
+      if (error || !hit) return this.showToast('No one by that handle.');
+      this._sb.from('friendships').insert({ requester: uid, addressee: hit.user_id }).then(({ error: e2 }) => {
+        if (e2) return this.showToast(e2.code === '23505' ? 'A request already exists between you.' : e2.message);
+        this.setState({ frDraft: '' });
+        this.showToast(`Request sent to @${hit.username}.`);
+        this.loadFriends();
+      });
+    });
+  }
+
+  acceptFriend(id) {
+    const uid = this.uid();
+    if (!this._sb || !uid) return;
+    this._sb.from('friendships').update({ status: 'accepted' }).match({ requester: id, addressee: uid })
+      .then(({ error }) => {
+        if (error) return this.showToast(error.message);
+        this.showToast('Friends. The concierge approves.');
+        this.loadFriends();
+      });
+  }
+
+  removeFriend(id) {
+    const uid = this.uid();
+    if (!this._sb || !uid) return;
+    this._sb.from('friendships').delete()
+      .or(`and(requester.eq.${uid},addressee.eq.${id}),and(requester.eq.${id},addressee.eq.${uid})`)
+      .then(({ error }) => {
+        if (error) return this.showToast(error.message);
+        this.loadFriends();
+      });
+  }
+
+  async openFriend(f) {
+    if (!this._sb) return;
+    this.setState({ friendView: { ...f, loading: true, hearts: [], likes: [] } });
+    const [ht, sw] = await Promise.all([
+      this._sb.from('hearts').select('place_id,place,created_at').eq('user_id', f.id),
+      this._sb.from('swipes').select('place_id,place').eq('user_id', f.id).eq('direction', 'like'),
+    ]);
+    const gplaces = { ...this.state.gplaces };
+    [...(ht.data || []), ...(sw.data || [])].forEach(r => { if (r.place && !gplaces[r.place_id]) gplaces[r.place_id] = { ...r.place, id: r.place_id }; });
+    this.setState({
+      gplaces,
+      friendView: {
+        ...f, loading: false,
+        hearts: (ht.data || []).sort((x, y) => Date.parse(x.created_at) - Date.parse(y.created_at)).map(r => r.place_id),
+        likes: (sw.data || []).map(r => r.place_id),
+      },
+    });
+  }
+
+  closeFriend() { this.setState({ friendView: null }); }
+
+  // a friend's review of a place, shown on its detail sheet
+  ensureFriendReviews(id) {
+    const uid = this.uid();
+    if (!this._sb || !uid) return;
+    this._frevReq = this._frevReq || {};
+    if (this._frevReq[id]) return;
+    this._frevReq[id] = true;
+    this._sb.from('reviews').select('user_id,stars,text').eq('place_id', id).neq('user_id', uid)
+      .then(({ data }) => {
+        if (data && data.length) this.setState(s => ({ friendReviews: { ...s.friendReviews, [id]: data } }));
+      });
+  }
+
+  friendRow(id) {
+    const p = this.findPlace(id);
+    if (!p) return null;
+    return {
+      name: p.name,
+      meta: `${p.kind} \u00b7 ${this.distFor(p).dist}`,
+      open: () => this.openDetail(id),
+    };
   }
 
   initLocation() {
@@ -883,6 +1239,7 @@ class Component extends DCLogic {
     if (!p) return;
     this.setState({ detail: { id } });
     this.ensureDetails(p);
+    this.ensureFriendReviews(id);
   }
 
   closeDetail() {
@@ -906,10 +1263,12 @@ class Component extends DCLogic {
   saveReview(id) {
     const text = (this.state.revText || '').trim().slice(0, 500);
     if (!text) return;
+    const stars = this.state.revStars || 5;
     this.setState(s => ({
-      myReviews: { ...s.myReviews, [id]: { text, stars: s.revStars, at: Date.now() } },
+      myReviews: { ...s.myReviews, [id]: { text, stars, at: Date.now() } },
       revEdit: false, revText: '', revStars: 5,
     }));
+    this.dbPush('reviews', { place_id: id, stars, text });
     this.showToast('Filed. Your public awaits.');
   }
 
@@ -919,6 +1278,7 @@ class Component extends DCLogic {
       delete myReviews[id];
       return { myReviews, revEdit: false };
     });
+    this.dbDrop('reviews', id);
     this.showToast('Retracted. Very diplomatic.');
   }
 
@@ -947,6 +1307,8 @@ class Component extends DCLogic {
       else { hearts[id] = Date.now(); }
       return { hearts };
     });
+    if (was) this.dbDrop('hearts', id);
+    else this.dbPush('hearts', { place_id: id, place: this.placeSnapshot(id) });
     this.showToast(was ? 'Unsaved. Cold, but fine.' : 'Saved for later. The folder knows.');
   }
 
@@ -971,6 +1333,8 @@ class Component extends DCLogic {
       else swiped[id] = 'like';
       return { swiped, planStatus: liked ? s.planStatus : 'draft' };
     });
+    if (liked) this.dbDrop('swipes', id);
+    else this.dbPush('swipes', { place_id: id, direction: 'like', place: this.placeSnapshot(id) });
     this.showToast(liked ? 'Out of the plan.' : 'In the plan. The concierge is drafting.');
   }
 
@@ -978,7 +1342,7 @@ class Component extends DCLogic {
     const el = document.querySelector('[data-chat-scroll]');
     if (el) el.scrollTop = el.scrollHeight;
     clearTimeout(this._persistT);
-    this._persistT = setTimeout(() => this.persist(), 250);
+    this._persistT = setTimeout(() => { this.persist(); this.pushProfile(); }, 250);
   }
 
   showToast(msg) {
@@ -1035,9 +1399,12 @@ class Component extends DCLogic {
   getDeck(ctx) {
     const { swiped, quizAnswers } = this.state;
     const T = this.getTaste();
+    // an explicit category pick relaxes the time/weather gate — show the whole
+    // category, float the right-now spots, and label the rest
+    const catActive = this.state.cat !== 'all';
+    const fitsNow = p => p.times.includes(ctx.timeOfDay) && (p.weather === 'any' || p.weather === ctx.weather);
     const places = PLACES.filter(p =>
-      p.times.includes(ctx.timeOfDay) &&
-      (p.weather === 'any' || p.weather === ctx.weather) &&
+      (catActive || fitsNow(p)) &&
       !swiped[p.id] &&
       !(T.noGluten && (p.kind === 'Boulangerie' || p.kind === 'Crêperie' || p.id === 'p20')) &&
       !(T.noMuseums && p.kind === 'Museum') &&
@@ -1047,20 +1414,19 @@ class Component extends DCLogic {
     this._seed = this._seed || Math.floor(Math.random() * 1e9);
     const jit = (id) => ((strHash(id + this._seed) % 1000) / 1000 - 0.5) * 2.4;
     const deck = places
-      .map(p => ({ ...p, ...this.distFor(p), score: this.scorePlace(p, T) }))
+      .map(p => ({ ...p, ...this.distFor(p), score: this.scorePlace(p, T) + (catActive && fitsNow(p) ? 3 : 0), notNow: catActive && !fitsNow(p) }))
       .sort((a, b) => (b.score + jit(b.id)) - (a.score + jit(a.id)) || a.km - b.km || a.slot - b.slot);
 
     // wildcards: fresh Google Maps finds, rotated per session
     const wilds = Object.values(this.state.gplaces)
       .filter(p =>
         p.wild && !swiped[p.id] &&
-        p.times.includes(ctx.timeOfDay) &&
-        (p.weather === 'any' || p.weather === ctx.weather) &&
+        (catActive || fitsNow(p)) &&
         !(T.noGluten && p.kind === 'Boulangerie') &&
         !(T.noMuseums && (p.kind === 'Museum' || p.kind === 'Gallery')) &&
         (this.state.cat === 'all' || (this.state.cat === 'family' ? !!p.kids : p.accent === this.state.cat))
       )
-      .map(p => ({ ...p, ...this.distFor(p), score: this.scorePlace(p, T) }))
+      .map(p => ({ ...p, ...this.distFor(p), score: this.scorePlace(p, T), notNow: catActive && !fitsNow(p) }))
       .filter(p => p.km < 3.5)
       .sort((a, b) => strHash(a.id + this._seed) - strHash(b.id + this._seed))
       .slice(0, 3);
@@ -1140,6 +1506,7 @@ class Component extends DCLogic {
       return;
     }
     this.setState(s => ({ swiped: { ...s.swiped, [id]: dir }, swipeCount: s.swipeCount + 1, planStatus: dir === 'like' ? 'draft' : s.planStatus }));
+    this.dbPush('swipes', { place_id: id, direction: dir, place: this.placeSnapshot(id) });
     if (dir === 'like') this.showToast('Liked. The concierge is drafting.');
   }
 
@@ -1265,10 +1632,13 @@ class Component extends DCLogic {
           atStyle: { font: "500 10px 'Saans Mono', monospace", color: a.ink, width: 40, flex: 'none', paddingTop: 3 },
           metaStyle: { font: "500 9px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, marginTop: 4 },
           xStyle: { fontSize: 16, color: a.ink, opacity: 0.6 },
-          remove: () => this.setState(s => {
-            const sw = { ...s.swiped }; delete sw[p.id];
-            return { swiped: sw };
-          }),
+          remove: () => {
+            this.setState(s => {
+              const sw = { ...s.swiped }; delete sw[p.id];
+              return { swiped: sw };
+            });
+            this.dbDrop('swipes', p.id);
+          },
         };
       }) : [],
       planHasStops: approved,
@@ -1286,7 +1656,7 @@ class Component extends DCLogic {
     const S = this.state;
     const id = S.detail && S.detail.id;
     const p = id ? this.findPlace(id) : null;
-    if (!p) return { detailOpen: false, dPhotos: [], dReviews: [], dHasPhotos: false, dNoPhotos: false, dSwipeHint: '', dLoadingReviews: false, dNoReviews: '', dBookable: false, dResyIdle: false, dResyLoading: false, dResySlots: [], dResyNone: false, dResyUrl: null, dSimilar: [], dMyReview: false, dRevButton: false, dRevEdit: false };
+    if (!p) return { detailOpen: false, dPhotos: [], dReviews: [], dHasPhotos: false, dNoPhotos: false, dSwipeHint: '', dLoadingReviews: false, dNoReviews: '', dBookable: false, dResyIdle: false, dResyLoading: false, dResySlots: [], dResyNone: false, dResyUrl: null, dSimilar: [], dMyReview: false, dRevButton: false, dRevEdit: false, dFriendReviews: [] };
 
     const dd = S.details[p.id];
     const live = S.live[p.id];
@@ -1346,6 +1716,13 @@ class Component extends DCLogic {
       })),
       dRevSave: () => this.saveReview(p.id),
       dRevCancel: () => this.setState({ revEdit: false }),
+      dFriendReviews: (S.friendReviews[p.id] || []).map(rv => {
+        const fr = S.friends.find(f => f.id === rv.user_id);
+        return {
+          head: `${'★'.repeat(rv.stars)}${'☆'.repeat(5 - rv.stars)}  @${fr ? fr.username : 'a friend'}`,
+          text: `\u201c${rv.text}\u201d`,
+        };
+      }),
       dSimilar: PLACES.concat(Object.values(S.gplaces))
         .filter(x => x.id !== p.id)
         .map(x => ({ x, d: haversineKm({ lat: p.lat, lng: p.lng }, { lat: x.lat, lng: x.lng }) }))
@@ -1420,7 +1797,7 @@ class Component extends DCLogic {
         isQuiz,
         name: c.name, kind: c.kind, dist: c.dist, blurb: c.blurb, icon: c.icon,
         // 2b: time-dash meta line
-        meta: isQuiz ? '' : `${ctx.clock} — ${c.wild ? 'Wildcard · ' : ''}${c.kind} · ${c.dist}${c.score >= 2 ? ' · Very you' : ''}${openBit}`,
+        meta: isQuiz ? '' : `${ctx.clock} — ${c.wild ? 'Wildcard · ' : ''}${c.kind} · ${c.dist}${c.notNow ? ` · A ${c.times[0]} thing` : (c.score >= 2 ? ' · Very you' : '')}${openBit}`,
         rating: isQuiz ? '' : ((live && live.rating) || c.grating || fallback[0]),
         reviews: isQuiz ? '' : (live && live.ratings != null ? `${fmtCount(live.ratings)} Google reviews` : (c.wild ? `${fmtCount(c.greviews)} Google reviews` : `${fallback[1]} reviews`)),
         gmaps: isQuiz ? null : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' Paris')}`,
@@ -1507,6 +1884,9 @@ class Component extends DCLogic {
 
     const geoBit = S.geo === 'ok' ? ' · Near you' : S.geo === 'far' ? ' · From afar' : '';
 
+    const fvHearts = ((S.friendView && S.friendView.hearts) || []).map(id => this.friendRow(id)).filter(Boolean);
+    const fvLikes = ((S.friendView && S.friendView.likes) || []).map(id => this.friendRow(id)).filter(Boolean);
+
     return {
       appName,
       showSplash, showQuiz, showApp: booted,
@@ -1576,6 +1956,8 @@ class Component extends DCLogic {
           Object.entries(s.swiped).forEach(([id, v]) => { if (v === 'like') keep[id] = v; });
           return { swiped: keep };
         });
+        const uid = this.uid();
+        if (this._sb && uid) this._sb.from('swipes').delete().match({ user_id: uid, direction: 'nope' }).then(() => {});
         this.showToast('Fresh deck. Your likes are safe.');
       },
       swipeLike: () => this.swipeTop('like'),
@@ -1630,9 +2012,43 @@ class Component extends DCLogic {
       signedOut: S.authReady && !S.user,
       signedIn: !!S.user,
       userLine: S.user ? `${S.user.name || S.user.email}` : '',
-      userSub: S.user ? S.user.email : '',
+      userSub: S.user ? (S.username ? `@${S.username} · ${S.user.email}` : S.user.email) : '',
       doSignIn: () => this.signIn(),
       doSignOut: () => this.signOut(),
+      authTabs: [['signup', 'Create account'], ['signin', 'Log in']].map(([k, label]) => ({
+        label, go: () => this.setState({ authMode: k }), style: ctlBtn(S.authMode === k),
+      })),
+      authSignup: S.authMode === 'signup',
+      authEmail: S.authEmail, onAuthEmail: (e) => this.setState({ authEmail: e.target.value }),
+      authPassword: S.authPassword, onAuthPassword: (e) => this.setState({ authPassword: e.target.value }),
+      authUser: S.authUser, onAuthUser: (e) => this.setState({ authUser: e.target.value }),
+      onAuthKey: (e) => { if (e.key === 'Enter') (S.authMode === 'signup' ? this.signUpEmail() : this.signInEmail()); },
+      authSubmit: () => (S.authMode === 'signup' ? this.signUpEmail() : this.signInEmail()),
+      authSubmitLabel: S.authBusy ? 'Un moment…' : (S.authMode === 'signup' ? 'Create account' : 'Log in'),
+      showNudge: S.acctNudge && S.authReady && !S.user && booted,
+      nudgeGo: () => this.setState({ tab: 'you' }),
+      nudgeDismiss: () => this.setState({ acctNudge: false }),
+      frDraft: S.frDraft,
+      onFrDraft: (e) => this.setState({ frDraft: e.target.value }),
+      onFrKey: (e) => { if (e.key === 'Enter') this.addFriend(); },
+      doAddFriend: () => this.addFriend(),
+      myHandle: S.username || '…',
+      frAny: (S.frIn.length + S.friends.length + S.frOut.length) > 0,
+      frEmpty: !!S.user && (S.frIn.length + S.friends.length + S.frOut.length) === 0,
+      frRows: [
+        ...S.frIn.map(f => ({ label: `@${f.username}`, sub: f.displayName ? `${f.displayName} · wants in` : 'wants in', canAccept: true, accept: () => this.acceptFriend(f.id), open: () => {}, remove: () => this.removeFriend(f.id) })),
+        ...S.friends.map(f => ({ label: `@${f.username}`, sub: f.displayName || 'friend', canAccept: false, accept: null, open: () => this.openFriend(f), remove: () => this.removeFriend(f.id) })),
+        ...S.frOut.map(f => ({ label: `@${f.username}`, sub: 'request pending', canAccept: false, accept: null, open: () => {}, remove: () => this.removeFriend(f.id) })),
+      ],
+      fvOpen: !!S.friendView,
+      fvHandle: S.friendView ? S.friendView.username : '',
+      fvName: S.friendView ? (S.friendView.displayName || `@${S.friendView.username}`) : '',
+      fvLoading: !!(S.friendView && S.friendView.loading),
+      fvClose: () => this.closeFriend(),
+      fvHearts, fvLikes,
+      fvHasHearts: fvHearts.length > 0,
+      fvHasLikes: fvLikes.length > 0,
+      fvEmpty: !!(S.friendView && !S.friendView.loading && !fvHearts.length && !fvLikes.length),
       youCalib: `${S.obAnswers.length} questions · ${S.swipeCount} swipes`,
       tastePills: pills.length ? pills : ['Blank slate', 'Mysterious', 'Jury\u2019s out'],
       youStats: [
@@ -1644,6 +2060,8 @@ class Component extends DCLogic {
       ],
       resetTaste: () => {
         try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+        const uid = this.uid();
+        if (this._sb && uid) this._sb.from('swipes').delete().eq('user_id', uid).then(() => {});
         this.setState({ swiped: {}, quizAnswers: {}, swipeCount: 0, obAnswers: [], obStep: -1, planStatus: 'draft', tab: 'discover' });
         this.showToast('Taste file shredded.');
       },

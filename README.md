@@ -30,6 +30,31 @@ one-liners, empty pulse.
 | `APIFY_TOKEN` | City pulse | ⬜ not yet set — from apify.com → Settings → API tokens. First data appears after the first run (cron at 06:00 UTC, or hit `/api/pulse?refresh=1` once) |
 | `CRON_SECRET` | Optional | If set, `?refresh=1` requires the Vercel cron's bearer token |
 | `APIFY_ACTOR` | Optional | Defaults to `apify~instagram-hashtag-scraper` |
+| `SUPABASE_URL` | Accounts & friends | ⬜ not yet set — project URL from Supabase → Settings → API |
+| `SUPABASE_ANON_KEY` | Accounts & friends | ⬜ not yet set — public anon key; safe to expose, RLS guards the data |
+
+## Accounts & friends (Supabase)
+
+Optional — without the two env vars the app stays a local-only guest
+experience. Signed in, the taste file, likes/plan, saved places and reviews
+sync across devices (`profiles`, `swipes`, `hearts`, `reviews`,
+`friendships` tables), and you can add friends by @handle and browse their
+saves, likes and reviews.
+
+One-time setup (~10 min):
+
+1. Create a project at supabase.com (pick an EU region — the app is Paris-first).
+2. SQL editor → paste and run `supabase/schema.sql` (tables, signup trigger, RLS).
+3. Auth → Sign In / Up: keep Email enabled; for instant signup while
+   prototyping, turn **off** "Confirm email". Optionally configure the Google
+   provider to activate the "Continue with Google" button.
+4. Settings → API: copy the project URL + anon key into `SUPABASE_URL` /
+   `SUPABASE_ANON_KEY` (Vercel env vars, plus `.env.local` for `vercel dev`),
+   then redeploy.
+
+Guest data is adopted into the account on first sign-in; after that the server
+copy wins and other devices sync down. "Wipe my taste file" clears the server
+copy too.
 
 ## Develop & deploy
 
