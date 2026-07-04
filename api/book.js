@@ -1,12 +1,13 @@
-// Real-time table availability via the clearpath/resy-api Apify actor.
-// GET ?name=<restaurant>&date=YYYY-MM-DD&party=N
-// Runs the actor synchronously (run-sync-get-dataset-items) with a tight
-// maxItems, returns bookable slots + the Resy URL. Availability is cached
-// briefly at the edge; pricing is per restaurant scraped, so keep maxItems low.
+// Table lookup via TheFork (clearpath/thefork-scraper on Apify) — Paris-native
+// booking coverage. Returns the restaurant's direct TheFork page, rating on
+// TheFork's 10-scale, average price, and bookability.
+// GET ?name=<restaurant>
+// (The earlier Resy integration returned found:false for nearly all of Paris —
+// Resy barely operates here; TheFork is the local standard.)
 
 export const maxDuration = 120; // actor runs take tens of seconds
 
-const ACTOR = 'clearpath~resy-api';
+const ACTOR = 'clearpath~thefork-scraper';
 
 export default async function handler(req, res) {
   const token = process.env.APIFY_TOKEN;
@@ -14,8 +15,6 @@ export default async function handler(req, res) {
 
   const name = String(req.query.name || '').slice(0, 80);
   if (!name) return res.status(400).json({ ok: false, reason: 'bad_params' });
-  const party = Math.min(20, Math.max(1, parseInt(req.query.party, 10) || 2));
-  const date = /^\d{4}-\d{2}-\d{2}$/.test(req.query.date || '') ? req.query.date : undefined;
 
   try {
     const r = await fetch(
@@ -24,12 +23,11 @@ export default async function handler(req, res) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          city: 'Paris',
-          query: name,
-          maxItems: 3,
-          includeAvailability: true,
-          partySize: party,
-          ...(date ? { date } : {}),
+          startUrls: [{ url: `https://www.thefork.fr/search?queryText=${encodeURIComponent(name)}` }],
+          maxRestaurants: 3,
+          maxReviews: 0,
+          maxPhotos: 0,
+          language: 'en',
         }),
       }
     );
@@ -39,33 +37,21 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, found: false });
     }
 
-    // Resy's Paris inventory is thin and the actor fuzzy-matches across cities;
-    // only accept results actually in Paris, and prefer a real name match.
-    const inParis = items.filter((i) =>
-      /paris/i.test(String(i.locality || '')) || String(i.country || '').toLowerCase() === 'france'
-    );
+    const inParis = items.filter((i) => /paris/i.test(String(i.locality || i.formatted_address || '')));
     const low = name.toLowerCase();
     const hit = inParis.find((i) => String(i.name || '').toLowerCase().includes(low)) || inParis[0];
     if (!hit) return res.status(200).json({ ok: true, found: false });
 
-    const slots = (Array.isArray(hit.slots) ? hit.slots : [])
-      .map((s) => (typeof s === 'string' ? s : (s.time || s.start || s.label || s.dateTime || null)))
-      .filter(Boolean)
-      .map((s) => {
-        const m = String(s).match(/(\d{1,2}:\d{2})/);
-        return m ? m[1] : String(s).slice(0, 12);
-      })
-      .slice(0, 6);
-
-    res.setHeader('Cache-Control', 's-maxage=900, stale-while-revalidate=1800');
+    res.setHeader('Cache-Control', 's-maxage=43200, stale-while-revalidate=604800');
     return res.status(200).json({
       ok: true,
       found: true,
       match: hit.name || null,
-      url: hit.url || hit.canonicalUrl || null,
-      slots,
-      rating: hit.rating ?? null,
-      cuisine: Array.isArray(hit.cuisine) ? hit.cuisine.slice(0, 2) : [],
+      url: hit.url || null,
+      bookable: hit.is_bookable !== false,
+      rating: hit.thefork_rating != null ? Number(hit.thefork_rating).toFixed(1) : null, // /10
+      price: hit.avg_price != null ? `${hit.avg_price}${hit.avg_price_currency === 'EUR' ? '€' : ''}` : null,
+      cuisine: hit.cuisine || null,
     });
   } catch (e) {
     return res.status(200).json({ ok: false, reason: 'fetch_failed' });

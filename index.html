@@ -513,22 +513,19 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             <button onClick="{{ dRevOpen }}" style="display:block; width:100%; text-align:center; font:500 13px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; color:#d1401f; border:1px dashed #f2d3c6; padding:11px; cursor:pointer; margin-bottom:10px;">Write your review</button>
           </sc-if>
           <sc-if value="{{ dResyIdle }}" hint-placeholder-val="{{ false }}">
-            <button onClick="{{ dResyCheck }}" style="display:block; width:100%; text-align:center; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:12px; cursor:pointer; margin-bottom:6px;">Check tonight’s tables <span style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#c0361c;">Resy</span></button>
+            <button onClick="{{ dResyCheck }}" style="display:block; width:100%; text-align:center; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:12px; cursor:pointer; margin-bottom:6px;">Find me a table <span style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#c0361c;">TheFork</span></button>
           </sc-if>
           <sc-if value="{{ dResyLoading }}" hint-placeholder-val="{{ false }}">
-            <div style="text-align:center; font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; padding:12px; border:1px dashed #f2d3c6; margin-bottom:6px;">Interrogating Resy… takes a moment.</div>
+            <div style="text-align:center; font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; padding:12px; border:1px dashed #f2d3c6; margin-bottom:6px;">Interrogating TheFork… takes a moment.</div>
           </sc-if>
           <sc-if value="{{ dResyUrl }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px; align-items:center;">
-              <span style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Tonight on Resy:</span>
-              <sc-for list="{{ dResySlots }}" as="sl" hint-placeholder-count="3">
-                <a href="{{ sl.href }}" target="_blank" rel="noopener" style="font:500 13px 'Saans Mono',monospace; background:#e8432c; color:#fff5ee; padding:8px 12px; text-decoration:none; border-radius:58px;">{{ sl.label }}</a>
-              </sc-for>
-              <a href="{{ dResyUrl }}" target="_blank" rel="noopener" style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#d1401f; text-decoration:none; border-bottom:1px solid #d1401f; padding-bottom:1px;">Open Resy</a>
-            </div>
+            <a href="{{ dResyUrl }}" target="_blank" rel="noopener" style="display:block; text-align:center; font:500 14px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:13px; text-decoration:none; margin-bottom:4px;">Book {{ dResyMatch }} <span style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; opacity:.85;">TheFork</span></a>
+            <sc-if value="{{ dResyInfo }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center; font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#c0361c; margin-bottom:8px;">{{ dResyInfo }}</div>
+            </sc-if>
           </sc-if>
           <sc-if value="{{ dResyNone }}" hint-placeholder-val="{{ false }}">
-            <div style="font:italic 400 13.5px 'Serrif VF',Georgia,serif; color:#676c79; margin-bottom:6px;">Nothing on Resy for tonight. Try the fallbacks below — or just show up and flirt with the maître d’.</div>
+            <div style="font:italic 400 13.5px 'Serrif VF',Georgia,serif; color:#676c79; margin-bottom:6px;">TheFork doesn’t list this one. Try the links below — or just show up and flirt with the maître d’.</div>
           </sc-if>
           <sc-if value="{{ dBookable }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex; gap:10px; margin-bottom:6px;">
@@ -548,6 +545,20 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
               <div style="font:italic 400 14.5px/1.5 'Serrif VF',Georgia,serif; color:#38100c; margin-top:6px;">{{ rv.text }}</div>
             </div>
           </sc-for>
+          <sc-if value="{{ dAo }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ dAo }}" target="_blank" rel="noopener" style="display:block; font:500 10px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#5b21b6; text-decoration:none; border:1px dashed #c4b5fd; padding:10px 12px; margin-top:12px;">Read the full story on Atlas Obscura →</a>
+          </sc-if>
+          <sc-if value="{{ dRedditAny }}" hint-placeholder-val="{{ false }}">
+            <div style="border-top:1px solid #451212; margin-top:16px; padding-top:14px;">
+              <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#c0361c;">The internet says</div>
+              <sc-for list="{{ dReddit }}" as="rd" hint-placeholder-count="2">
+                <a href="{{ rd.url }}" target="_blank" rel="noopener" style="display:block; text-decoration:none; border:1px solid #f2d3c6; background:#ffffff; padding:10px 12px; margin-top:8px;">
+                  <div style="font:700 13.5px/1.35 'Saans',sans-serif; color:#451212;">{{ rd.title }}</div>
+                  <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:4px;">{{ rd.meta }}</div>
+                </a>
+              </sc-for>
+            </div>
+          </sc-if>
           <sc-if value="{{ dSimilarAny }}" hint-placeholder-val="{{ false }}">
             <div style="border-top:1px solid #451212; margin-top:16px; padding-top:14px;">
               <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#c0361c;">Similar, nearby</div>
@@ -775,7 +786,8 @@ class Component extends DCLogic {
     myReviews: {}, revEdit: false, revText: '', revStars: 5,
     gplaces: {},
     user: null, authReady: false,
-    seen: {}, username: '',
+    seen: {},
+    reddit: {}, username: '',
     authMode: 'signup', authEmail: '', authPassword: '', authUser: '', authBusy: false,
     acctNudge: true,
     friends: [], frIn: [], frOut: [], frDraft: '', friendView: null, friendReviews: {},
@@ -1271,6 +1283,30 @@ class Component extends DCLogic {
       .forEach(t => calls.push({ url: `/api/discover?ll=${ll}&d=${day}&q=${encodeURIComponent(t.q)}`, meta: t }));
 
     calls.forEach(({ url, meta }) => this.fetchWildcards(url, meta));
+
+    // Atlas Obscura layer for the hidden-gem and macabre crowd
+    if ((T.offPath || T.macabre) && !this._aoLoaded) {
+      this._aoLoaded = true;
+      fetch('/api/oddities')
+        .then(r => (r.ok ? r.json() : null))
+        .then(j => {
+          if (!j || !j.ok) return;
+          const gplaces = { ...this.state.gplaces };
+          j.places.forEach(g => {
+            const id = 'ao_' + strHash(g.name);
+            const hasLoc = g.lat != null && g.lng != null;
+            gplaces[id] = {
+              id, name: g.name, kind: 'Oddity', icon: 'ri-ghost-line', accent: 'indigo',
+              times: ['morning', 'afternoon'], weather: 'any', kids: false,
+              area: g.category || 'Atlas Obscura', lat: hasLoc ? g.lat : PARIS.lat, lng: hasLoc ? g.lng : PARIS.lng,
+              blurb: g.blurb || 'An oddity the guidebooks skip. Whim doesn’t.',
+              slot: 50 + (strHash(id) % 40), wild: true, noLive: !hasLoc, aoUrl: g.url,
+            };
+          });
+          this.setState({ gplaces });
+        })
+        .catch(() => {});
+    }
   }
 
   fetchWildcards(url, override) {
@@ -1312,6 +1348,7 @@ class Component extends DCLogic {
     if (!p) return;
     this.setState({ detail: { id } });
     this.ensureDetails(p);
+    this.ensureReddit(p);
     this.ensureFriendReviews(id);
   }
 
@@ -1372,6 +1409,18 @@ class Component extends DCLogic {
     }
   }
 
+  ensureReddit(p) {
+    this._redditReq = this._redditReq || {};
+    if (p.noLive || this._redditReq[p.id] || this.state.reddit && this.state.reddit[p.id]) return;
+    this._redditReq[p.id] = true;
+    fetch(`/api/reddit?q=${encodeURIComponent(p.name)}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => {
+        if (j && j.ok) this.setState(s => ({ reddit: { ...(s.reddit || {}), [p.id]: j.threads } }));
+      })
+      .catch(() => {});
+  }
+
   toggleHeart(id) {
     const was = !!this.state.hearts[id];
     this.setState(s => {
@@ -1392,7 +1441,7 @@ class Component extends DCLogic {
     fetch(`/api/book?name=${encodeURIComponent(p.fsq || p.name)}&date=${today}&party=2`)
       .then(r => (r.ok ? r.json() : null))
       .then(j => {
-        const val = j && j.ok ? { found: j.found, url: j.url, slots: j.slots || [] } : { error: true };
+        const val = j && j.ok ? { found: j.found, url: j.url, match: j.match, rating: j.rating, price: j.price, bookable: j.bookable } : { error: true };
         this.setState(s => ({ resy: { ...s.resy, [p.id]: val } }));
       })
       .catch(() => this.setState(s => ({ resy: { ...s.resy, [p.id]: { error: true } } })));
@@ -1514,6 +1563,7 @@ class Component extends DCLogic {
     if (T.sweetTooth && (p.kind === 'Ice cream' || p.kind === 'Boulangerie' || p.kind === 'Pâtisserie' || p.kind === 'Crêperie')) s += 2;
     if (T.artContemporary && (p.id === 'p35' || p.kind === 'Gallery')) s += 3;
     if (T.artImpressionist && p.id === 'p6') s += 3;
+    if (T.offPath && p.kind === 'Oddity') s += 2;
     if (T.macabre && (p.id === 'p31' || p.kind === 'Oddity')) s += 3;
     if (T.noMacabre && (p.id === 'p31' || p.kind === 'Oddity')) s -= 4;
     if (T.electro && p.kind === 'Club') s += 3;
@@ -1804,7 +1854,7 @@ class Component extends DCLogic {
     const S = this.state;
     const id = S.detail && S.detail.id;
     const p = id ? this.findPlace(id) : null;
-    if (!p) return { detailOpen: false, dPhotos: [], dReviews: [], dHasPhotos: false, dNoPhotos: false, dSwipeHint: '', dLoadingReviews: false, dNoReviews: '', dBookable: false, dResyIdle: false, dResyLoading: false, dResySlots: [], dResyNone: false, dResyUrl: null, dSimilar: [], dMyReview: false, dRevButton: false, dRevEdit: false, dFriendReviews: [] };
+    if (!p) return { detailOpen: false, dPhotos: [], dReviews: [], dHasPhotos: false, dNoPhotos: false, dSwipeHint: '', dLoadingReviews: false, dNoReviews: '', dBookable: false, dResyIdle: false, dResyLoading: false, dResySlots: [], dResyNone: false, dResyUrl: null, dSimilar: [], dMyReview: false, dRevButton: false, dRevEdit: false, dFriendReviews: [], dReddit: [], dAo: null, dRedditAny: false };
 
     const dd = S.details[p.id];
     const live = S.live[p.id];
@@ -1893,6 +1943,13 @@ class Component extends DCLogic {
           };
         }),
       get dSimilarAny() { return this.dSimilar.length > 0; },
+      dReddit: ((S.reddit || {})[p.id] || []).map(t => ({
+        title: t.title,
+        meta: `r/${t.sub} · ${t.ups} upvotes`,
+        url: t.url,
+      })),
+      dAo: p.aoUrl || null,
+      get dRedditAny() { return this.dReddit.length > 0; },
       dShare: () => this.shareCard(p.id),
       dHeart: () => this.toggleHeart(p.id),
       dPlan: () => this.togglePlan(p.id),
@@ -1902,12 +1959,12 @@ class Component extends DCLogic {
       dBookable: ['Bistro', 'Café', 'Wine bar', 'Cocktail bar', 'Bar', 'Crêperie'].includes(p.kind),
       dResyIdle: ['Bistro', 'Café', 'Wine bar', 'Cocktail bar', 'Bar', 'Crêperie'].includes(p.kind) && !S.resy[p.id],
       dResyLoading: !!(S.resy[p.id] && S.resy[p.id].loading),
-      dResySlots: (S.resy[p.id] && S.resy[p.id].found && S.resy[p.id].slots || []).map(t => ({
-        label: t,
-        href: S.resy[p.id].url || '#',
-      })),
-      dResyUrl: (S.resy[p.id] && S.resy[p.id].url) || null,
-      dResyNone: !!(S.resy[p.id] && !S.resy[p.id].loading && (S.resy[p.id].error || !S.resy[p.id].found || !(S.resy[p.id].slots || []).length)),
+      dResyUrl: (S.resy[p.id] && S.resy[p.id].found && S.resy[p.id].bookable !== false && S.resy[p.id].url) || null,
+      dResyMatch: (S.resy[p.id] && S.resy[p.id].match) || p.name,
+      dResyInfo: S.resy[p.id] && S.resy[p.id].found
+        ? [S.resy[p.id].rating ? `${S.resy[p.id].rating}/10 on TheFork` : null, S.resy[p.id].price ? `~${S.resy[p.id].price} a head` : null].filter(Boolean).join(' · ')
+        : '',
+      dResyNone: !!(S.resy[p.id] && !S.resy[p.id].loading && (S.resy[p.id].error || !S.resy[p.id].found || S.resy[p.id].bookable === false || !S.resy[p.id].url)),
       dResyCheck: () => this.checkResy(p),
       dBookFork: `https://www.thefork.fr/search?queryText=${encodeURIComponent(p.name)}`,
       dBookOT: `https://www.opentable.com/s?term=${encodeURIComponent(p.name + ' Paris')}&covers=2`,
