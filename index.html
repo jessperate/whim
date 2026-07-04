@@ -135,8 +135,8 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
                 </div>
                 <div style="{{ card.bodyStyle }}">
                   <div style="{{ card.kickerStyle }}">{{ card.meta }}</div>
-                  <div style="font:400 30px/1.02 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212;">{{ card.name }}</div>
-                  <div style="font:italic 400 17px/1.45 'Serrif VF',Georgia,serif; color:#38100c; margin-top:9px;">{{ card.blurb }}</div>
+                  <div style="font:400 clamp(23px, 6.5vw, 30px)/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ card.name }}</div>
+                  <div style="font:italic 400 16px/1.42 'Serrif VF',Georgia,serif; color:#38100c; margin-top:8px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; min-height:0;">{{ card.blurb }}</div>
                   <div style="{{ card.footStyle }}">
                     <i class="ri-star-fill" style="{{ card.footIconStyle }}"></i>
                     <span style="font:500 13px 'Saans Mono',monospace; color:#451212;">{{ card.rating }}</span>
@@ -2183,13 +2183,13 @@ class Component extends DCLogic {
         },
         showIcon: !isQuiz && !S.photos[c.id],
         artStyle: a ? (S.photos[c.id] ? {
-          height: '44%', flex: 'none', position: 'relative', overflow: 'hidden',
+          height: '38%', flex: 'none', position: 'relative', overflow: 'hidden',
           borderBottom: '1px solid #451212',
           backgroundColor: a.bg,
           backgroundImage: `url("${S.photos[c.id]}")`,
           backgroundSize: 'cover', backgroundPosition: 'center',
         } : {
-          height: '44%', flex: 'none', position: 'relative', overflow: 'hidden',
+          height: '38%', flex: 'none', position: 'relative', overflow: 'hidden',
           borderBottom: '1px solid #451212',
           backgroundColor: a.bg,
           backgroundImage: `radial-gradient(${a.dot} 1.5px, transparent 1.5px)`,
@@ -2202,9 +2202,9 @@ class Component extends DCLogic {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         } : null,
         artIcon: a ? { fontSize: 38, color: a.ink } : null,
-        bodyStyle: a ? { flex: 1, display: 'flex', flexDirection: 'column', padding: '16px 18px 14px', background: a.body } : null,
-        kickerStyle: a ? { font: "500 9px 'Saans Mono', monospace", letterSpacing: '.12em', textTransform: 'uppercase', color: a.ink, marginBottom: 8 } : null,
-        footStyle: a ? { marginTop: 'auto', borderTop: `1px solid ${a.ink}`, paddingTop: 10, display: 'flex', alignItems: 'center', gap: 7 } : null,
+        bodyStyle: a ? { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', padding: '14px 18px 12px', background: a.body } : null,
+        kickerStyle: a ? { font: "500 9px 'Saans Mono', monospace", letterSpacing: '.1em', textTransform: 'uppercase', color: a.ink, marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 'none' } : null,
+        footStyle: a ? { marginTop: 'auto', flex: 'none', borderTop: `1px solid ${a.ink}`, paddingTop: 10, display: 'flex', alignItems: 'center', gap: 7 } : null,
         footIconStyle: a ? { fontSize: 12, color: a.ink } : null,
         linkStyle: a ? { marginLeft: 'auto', font: "500 9px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, background: 'none', border: 'none', cursor: 'pointer', borderBottom: `1px solid ${a.ink}`, padding: '0 0 1px' } : null,
       };
