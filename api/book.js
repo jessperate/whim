@@ -40,7 +40,8 @@ export default async function handler(req, res) {
   }
 
   const name = String(req.query.name || '').slice(0, 80);
-  if (!name) return res.status(400).json({ ok: false, reason: 'bad_params' });
+  const listMode = req.query.feed || req.query.peek;
+  if (!name && !listMode) return res.status(400).json({ ok: false, reason: 'bad_params' });
 
   try {
     const r = await fetch(`https://api.apify.com/v2/acts/${ACTOR}/runs/last/dataset/items?token=${token}&status=SUCCEEDED&limit=500`);
@@ -51,7 +52,16 @@ export default async function handler(req, res) {
     }
 
     if (req.query.peek) {
-      return res.status(200).json({ count: items.length, names: items.slice(0, 20).map(i => `${i.name} [${i.locality}]`) });
+      const num = (v) => (v == null ? null : Number(v));
+      const rats = items.map(i => num(i.thefork_rating)).filter(v => v != null);
+      return res.status(200).json({
+        count: items.length,
+        withRating: rats.length,
+        ratingRange: rats.length ? [Math.min(...rats), Math.max(...rats)] : null,
+        withLat: items.filter(i => i.latitude != null).length,
+        bookable: items.filter(i => i.is_bookable !== false).length,
+        sample: items[0] ? { name: items[0].name, rating: items[0].thefork_rating, lat: items[0].latitude, book: items[0].is_bookable, price: items[0].avg_price } : null,
+      });
     }
     if (req.query.feed) {
       const feed = items
