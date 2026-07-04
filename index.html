@@ -336,9 +336,27 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
             <button onClick="{{ dHeart }}" style="{{ dHeartStyle }}"><i class="{{ dHeartIcon }}" style="font-size:16px;"></i>{{ dHeartLabel }}</button>
             <button onClick="{{ dPlan }}" style="{{ dPlanStyle }}">{{ dPlanLabel }}</button>
           </div>
+          <sc-if value="{{ dResyIdle }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ dResyCheck }}" style="display:block; width:100%; text-align:center; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#002910; border:1px solid #002910; border-radius:58px; padding:12px; cursor:pointer; margin-bottom:6px;">Check tonight’s tables <span style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#057a28;">Resy</span></button>
+          </sc-if>
+          <sc-if value="{{ dResyLoading }}" hint-placeholder-val="{{ false }}">
+            <div style="text-align:center; font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; padding:12px; border:1px dashed #d4e8da; margin-bottom:6px;">Interrogating Resy… takes a moment.</div>
+          </sc-if>
+          <sc-if value="{{ dResyUrl }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px; align-items:center;">
+              <span style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28;">Tonight on Resy:</span>
+              <sc-for list="{{ dResySlots }}" as="sl" hint-placeholder-count="3">
+                <a href="{{ sl.href }}" target="_blank" rel="noopener" style="font:500 13px 'Saans Mono',monospace; background:#00ff64; color:#002910; padding:8px 12px; text-decoration:none; border-radius:58px;">{{ sl.label }}</a>
+              </sc-for>
+              <a href="{{ dResyUrl }}" target="_blank" rel="noopener" style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#008c44; text-decoration:none; border-bottom:1px solid #008c44; padding-bottom:1px;">Open Resy</a>
+            </div>
+          </sc-if>
+          <sc-if value="{{ dResyNone }}" hint-placeholder-val="{{ false }}">
+            <div style="font:italic 400 13.5px 'Serrif VF',Georgia,serif; color:#676c79; margin-bottom:6px;">Nothing on Resy for tonight. Try the fallbacks below — or just show up and flirt with the maître d’.</div>
+          </sc-if>
           <sc-if value="{{ dBookable }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex; gap:10px; margin-bottom:6px;">
-              <a href="{{ dBookFork }}" target="_blank" rel="noopener" style="flex:1.4; text-align:center; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#002910; border:1px solid #002910; border-radius:58px; padding:12px 6px; text-decoration:none;">Book a table <span style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#057a28;">TheFork</span></a>
+              <a href="{{ dBookFork }}" target="_blank" rel="noopener" style="flex:1.4; text-align:center; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#002910; border:1px solid #d4e8da; border-radius:58px; padding:12px 6px; text-decoration:none;">Book a table <span style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#057a28;">TheFork</span></a>
               <a href="{{ dBookOT }}" target="_blank" rel="noopener" style="flex:1; text-align:center; font:500 13px 'Saans',sans-serif; background:#ffffff; color:#676c79; border:1px solid #d4e8da; border-radius:58px; padding:12px 6px; text-decoration:none;">OpenTable</a>
             </div>
           </sc-if>
@@ -513,7 +531,7 @@ class Component extends DCLogic {
     ],
     chatDraft: '', replyIx: 0,
     toast: '',
-    photos: {}, live: {}, pulse: [], hearts: {}, detail: null, details: {},
+    photos: {}, live: {}, pulse: [], hearts: {}, detail: null, details: {}, resy: {},
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -689,6 +707,19 @@ class Component extends DCLogic {
       return { hearts };
     });
     this.showToast(was ? 'Unsaved. Cold, but fine.' : 'Saved for later. The folder knows.');
+  }
+
+  checkResy(p) {
+    if (this.state.resy[p.id] && !this.state.resy[p.id].error) return;
+    this.setState(s => ({ resy: { ...s.resy, [p.id]: { loading: true } } }));
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());
+    fetch(`/api/book?name=${encodeURIComponent(p.fsq || p.name)}&date=${today}&party=2`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => {
+        const val = j && j.ok ? { found: j.found, url: j.url, slots: j.slots || [] } : { error: true };
+        this.setState(s => ({ resy: { ...s.resy, [p.id]: val } }));
+      })
+      .catch(() => this.setState(s => ({ resy: { ...s.resy, [p.id]: { error: true } } })));
   }
 
   togglePlan(id) {
@@ -967,7 +998,7 @@ class Component extends DCLogic {
     const S = this.state;
     const id = S.detail && S.detail.id;
     const p = id ? PLACES.find(x => x.id === id) : null;
-    if (!p) return { detailOpen: false, dPhotos: [], dReviews: [], dHasPhotos: false, dNoPhotos: false, dSwipeHint: '', dLoadingReviews: false, dNoReviews: '', dBookable: false };
+    if (!p) return { detailOpen: false, dPhotos: [], dReviews: [], dHasPhotos: false, dNoPhotos: false, dSwipeHint: '', dLoadingReviews: false, dNoReviews: '', dBookable: false, dResyIdle: false, dResyLoading: false, dResySlots: [], dResyNone: false, dResyUrl: null };
 
     const dd = S.details[p.id];
     const live = S.live[p.id];
@@ -1017,6 +1048,15 @@ class Component extends DCLogic {
       dMaps: (dd && dd.gmaps) || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + ' Paris')}`,
       // Paris = TheFork territory; OpenTable as the fallback for visitors who live in that app
       dBookable: ['Bistro', 'Café', 'Wine bar', 'Cocktail bar', 'Bar', 'Crêperie'].includes(p.kind),
+      dResyIdle: ['Bistro', 'Café', 'Wine bar', 'Cocktail bar', 'Bar', 'Crêperie'].includes(p.kind) && !S.resy[p.id],
+      dResyLoading: !!(S.resy[p.id] && S.resy[p.id].loading),
+      dResySlots: (S.resy[p.id] && S.resy[p.id].found && S.resy[p.id].slots || []).map(t => ({
+        label: t,
+        href: S.resy[p.id].url || '#',
+      })),
+      dResyUrl: (S.resy[p.id] && S.resy[p.id].url) || null,
+      dResyNone: !!(S.resy[p.id] && !S.resy[p.id].loading && (S.resy[p.id].error || !S.resy[p.id].found || !(S.resy[p.id].slots || []).length)),
+      dResyCheck: () => this.checkResy(p),
       dBookFork: `https://www.thefork.fr/search?queryText=${encodeURIComponent(p.name)}`,
       dBookOT: `https://www.opentable.com/s?term=${encodeURIComponent(p.name + ' Paris')}&covers=2`,
     };
