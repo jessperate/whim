@@ -19,7 +19,7 @@
 html, body { height:100%; }
 body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; overscroll-behavior:none; }
 #whim-app { height:100dvh; }
-@media (min-width:480px) {
+@media (min-width:800px) {
   #whim-app { height:min(880px, 94dvh); max-width:430px; margin:3dvh auto 0; border:1px solid rgba(0,41,16,.18); box-shadow:0 24px 70px rgba(0,13,5,.14); }
 }
 @keyframes whim-toast { from { opacity:0; transform:translate(-50%,8px); } to { opacity:1; transform:translate(-50%,0); } }
@@ -106,7 +106,7 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
                   <div style="{{ card.footStyle }}">
                     <i class="ri-star-fill" style="{{ card.footIconStyle }}"></i>
                     <span style="font:500 13px 'Saans Mono',monospace; color:#002910;">{{ card.rating }}</span>
-                    <span style="font:400 13px 'Saans',sans-serif; color:#01200d; opacity:.65;">{{ card.reviews }}</span>
+                    <span style="font:400 13px 'Saans',sans-serif; color:#01200d; opacity:.65;">{{ card.reviews }} Google reviews</span>
                     <a href="{{ card.gmaps }}" target="_blank" style="{{ card.linkStyle }}">Read them</a>
                   </div>
                 </div>
@@ -239,7 +239,7 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
 
         <!-- demo controls (was the desktop sidebar) -->
         <div style="border-top:1px solid #d4e8da; margin-top:26px; padding-top:18px;">
-          <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; margin-bottom:14px;">Context overrides</div>
+          <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; margin-bottom:14px;">Demo controls</div>
           <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79; margin-bottom:8px;">Time of day</div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
             <sc-for list="{{ timeOpts }}" as="o" hint-placeholder-count="4">
@@ -272,45 +272,28 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;appName&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Whim&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Branding&quot;}, &quot;skipOnboarding&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;}, &quot;sassLevel&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;full&quot;, &quot;polite&quot;], &quot;default&quot;: &quot;full&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Copy&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;appName&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Whim&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Branding&quot;}, &quot;skipOnboarding&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;}, &quot;sassLevel&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;full&quot;, &quot;polite&quot;], &quot;default&quot;: &quot;full&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Copy&quot;}}">
 const PLACES = [
-  // fields: lat/lng power real distances; fsq overrides the Foursquare lookup name; noLive skips live ratings.
-  { id:'p1', name:'Du Pain et des Idées', kind:'Boulangerie', icon:'ri-cake-2-line', area:'Canal Saint-Martin', lat:48.8710, lng:2.3628, blurb:'Reddit\u2019s eternal answer to \u201cbest bakery?\u201d The pistachio escargot has ended relationships.', times:['morning'], weather:'any', accent:'pink', slot:1 },
-  { id:'p2', name:'Boulangerie Utopie', kind:'Boulangerie', icon:'ri-cake-3-line', area:'11e', lat:48.8664, lng:2.3702, blurb:'The internet\u2019s favorite underdog bakery. The charcoal-sesame baguette has a fan club.', times:['morning'], weather:'any', accent:'pink', slot:2 },
-  { id:'p3', name:'La Fontaine de Belleville', kind:'Café', icon:'ri-cup-line', area:'10e', lat:48.8749, lng:2.3705, blurb:'Actually good coffee, zinc counter, locals debating nothing. Peak Paris.', times:['morning'], weather:'any', accent:'pink', slot:3 },
-  { id:'p21', name:'Café de Flore', kind:'Café', icon:'ri-cup-fill', area:'6e', lat:48.8542, lng:2.3326, blurb:'Sartre\u2019s old office, now a \u20ac7 espresso. You\u2019re paying for the ghosts and the people-watching.', times:['morning','afternoon'], weather:'any', accent:'pink', slot:4 },
-  { id:'p29', name:'Breizh Café', kind:'Crêperie', icon:'ri-donut-chart-line', area:'Le Marais', lat:48.8609, lng:2.3623, blurb:'Buckwheat crêpes that make the street carts look like a prank.', times:['morning','afternoon'], weather:'any', accent:'pink', slot:5 },
-  { id:'p30', name:'Marché des Enfants Rouges', kind:'Market', icon:'ri-store-3-line', area:'3e', lat:48.8626, lng:2.3618, blurb:'The oldest covered market in Paris. Come hungry, leave with opinions.', times:['morning','afternoon'], weather:'any', accent:'pink', slot:6 },
-  { id:'p5', name:'Sainte-Chapelle', kind:'Landmark', icon:'ri-building-4-line', area:'Île de la Cité', lat:48.8554, lng:2.3450, blurb:'1,113 stained-glass panels. The one line every forum agrees is worth it.', times:['morning','afternoon'], weather:'rainy', accent:'indigo', slot:7 },
-  { id:'p6', name:'Musée de l\u2019Orangerie', kind:'Museum', icon:'ri-gallery-line', area:'1er', lat:48.8638, lng:2.3226, blurb:'Monet\u2019s water lilies, wall to wall, minus the Louvre crowds. The connoisseur\u2019s pick.', times:['morning','afternoon'], weather:'rainy', accent:'indigo', slot:8 },
-  { id:'p22', name:'Musée Rodin', kind:'Museum', icon:'ri-artboard-line', area:'7e', lat:48.8555, lng:2.3158, blurb:'The Thinker, a rose garden, and the least exhausting great museum in Paris.', times:['morning','afternoon'], weather:'any', accent:'indigo', slot:9 },
-  { id:'p23', name:'Musée Carnavalet', kind:'Museum', icon:'ri-ancient-pavilion-line', area:'Le Marais', lat:48.8577, lng:2.3626, blurb:'Paris\u2019s own attic \u2014 free entry, zero guilt if you bail after an hour.', times:['morning','afternoon'], weather:'rainy', accent:'indigo', slot:10 },
-  { id:'p4', name:'Canal Saint-Martin stroll', kind:'Walk', icon:'ri-walk-line', area:'10e', lat:48.8720, lng:2.3654, blurb:'Lock bridges, quiche picnics, effortlessly cool locals. Bring sunglasses.', times:['morning','afternoon'], weather:'sunny', accent:'green', slot:11, noLive:true },
-  { id:'p7', name:'Marché d\u2019Aligre', kind:'Market', icon:'ri-store-2-line', area:'12e', lat:48.8493, lng:2.3785, blurb:'Chaotic flea stalls, cheap produce, zero tourists. A local-thread legend.', times:['morning','afternoon'], weather:'any', accent:'pink', slot:12 },
-  { id:'p8', name:'L\u2019As du Fallafel', kind:'Street food', icon:'ri-restaurant-2-line', area:'Le Marais', lat:48.8571, lng:2.3590, blurb:'The falafel with a permanent line. Lenny Kravitz is a regular, allegedly.', times:['afternoon'], weather:'any', accent:'pink', slot:13 },
-  { id:'p24', name:'Place des Vosges', kind:'Garden', icon:'ri-community-line', area:'Le Marais', lat:48.8556, lng:2.3655, blurb:'The oldest square in Paris. Sit under the arcades and act like you own a duplex here.', times:['morning','afternoon'], weather:'sunny', accent:'green', slot:14, noLive:true },
-  { id:'p9', name:'Coulée Verte', kind:'Walk', icon:'ri-leaf-line', area:'12e', lat:48.8496, lng:2.3714, blurb:'An elevated park on old rail tracks. The High Line copied Paris, not the other way around.', times:['afternoon'], weather:'sunny', accent:'green', slot:15, noLive:true },
-  { id:'p10', name:'Jardin du Luxembourg', kind:'Garden', icon:'ri-plant-line', area:'6e', lat:48.8462, lng:2.3372, blurb:'Steal a green chair by the fountain. It\u2019s tradition.', times:['afternoon'], weather:'sunny', accent:'green', slot:16 },
-  { id:'p33', name:'Berthillon', kind:'Ice cream', icon:'ri-cake-line', area:'Île Saint-Louis', lat:48.8517, lng:2.3568, blurb:'The ice cream old Parisians cross the city for. Salted caramel. Thank me later.', times:['afternoon'], weather:'sunny', accent:'pink', slot:17 },
-  { id:'p11', name:'Shakespeare and Company', kind:'Bookshop', icon:'ri-book-open-line', area:'5e', lat:48.8526, lng:2.3471, blurb:'Buy a book you\u2019ll never finish. The stamp alone is worth it.', times:['afternoon'], weather:'rainy', accent:'indigo', slot:18 },
-  { id:'p31', name:'Père Lachaise wander', kind:'Walk', icon:'ri-ancient-gate-line', area:'20e', lat:48.8614, lng:2.3933, blurb:'Jim Morrison, Oscar Wilde, and the best gothic strolling in Europe.', times:['morning','afternoon'], weather:'any', accent:'green', slot:19, noLive:true },
-  { id:'p32', name:'Galerie Vivienne', kind:'Passage', icon:'ri-door-open-line', area:'2e', lat:48.8666, lng:2.3397, blurb:'A glass-roofed passage from 1823. Rain is great here \u2014 you get to be smug and dry.', times:['afternoon'], weather:'rainy', accent:'indigo', slot:20, noLive:true },
-  { id:'p25', name:'Parc des Buttes-Chaumont', kind:'Park', icon:'ri-mountain-line', area:'19e', lat:48.8809, lng:2.3819, blurb:'Cliffs, a temple, suspicious hills. The locals\u2019 park \u2014 tourists never make it this far.', times:['afternoon'], weather:'sunny', accent:'green', slot:21, noLive:true },
-  { id:'p12', name:'Montmartre wander', kind:'Walk', icon:'ri-landscape-line', area:'18e', lat:48.8867, lng:2.3431, blurb:'Hills, artists, and one very smug basilica view.', times:['afternoon'], weather:'sunny', accent:'green', slot:22, noLive:true },
-  { id:'p35', name:'Palais de Tokyo', kind:'Museum', icon:'ri-shapes-line', area:'16e', lat:48.8642, lng:2.2968, blurb:'Contemporary art in raw concrete, open till midnight. Weird in the best way.', times:['afternoon','evening'], weather:'any', accent:'indigo', slot:23 },
-  { id:'p16', name:'Sunset at Sacré-Cœur', kind:'Viewpoint', icon:'ri-sun-foggy-line', area:'18e', lat:48.8863, lng:2.3430, blurb:'The city turns gold and everyone forgets their phone. Almost.', times:['evening'], weather:'sunny', accent:'green', slot:24, fsq:'Basilique du Sacré-Cœur' },
-  { id:'p13', name:'Le Baron Rouge', kind:'Wine bar', icon:'ri-goblet-line', area:'Bastille', lat:48.8503, lng:2.3778, blurb:'Wine from barrels, oysters on car hoods. Every \u201cwhere do locals drink\u201d thread, answered.', times:['evening'], weather:'any', accent:'yellow', slot:25 },
-  { id:'p14', name:'Le Comptoir Général', kind:'Bar', icon:'ri-door-open-line', area:'Canal Saint-Martin', lat:48.8709, lng:2.3660, blurb:'A hidden canal-side bar full of oddities. Weird, wonderful, word-of-mouth famous.', times:['evening'], weather:'any', accent:'yellow', slot:26 },
-  { id:'p26', name:'Le Mary Céleste', kind:'Bar', icon:'ri-goblet-fill', area:'Le Marais', lat:48.8618, lng:2.3646, blurb:'Oysters and cocktails at a round bar built for eavesdropping.', times:['evening'], weather:'any', accent:'yellow', slot:27 },
-  { id:'p28', name:'Septime', kind:'Bistro', icon:'ri-restaurant-line', area:'11e', lat:48.8531, lng:2.3810, blurb:'The reservation everyone claims they can get. If you land one, cancel everything else.', times:['evening'], weather:'any', accent:'pink', slot:28 },
-  { id:'p15', name:'Bouillon Pigalle', kind:'Bistro', icon:'ri-restaurant-line', area:'9e', lat:48.8823, lng:2.3379, blurb:'Steak frites at 1998 prices. The line moves, trust.', times:['evening'], weather:'any', accent:'pink', slot:29 },
-  { id:'p27', name:'Candelaria', kind:'Bar', icon:'ri-key-line', area:'3e', lat:48.8629, lng:2.3629, blurb:'Tacos in front, speakeasy behind an unmarked door. Yes, that door.', times:['evening','night'], weather:'any', accent:'yellow', slot:30 },
-  { id:'p36', name:'Pont Alexandre III at night', kind:'Landmark', icon:'ri-bridge-line', area:'8e', lat:48.8639, lng:2.3136, blurb:'The most dramatic bridge in Paris. Gold statues, zero chill.', times:['evening','night'], weather:'any', accent:'yellow', slot:31, noLive:true },
-  { id:'p17', name:'Caveau de la Huchette', kind:'Jazz club', icon:'ri-music-2-line', area:'5e', lat:48.8527, lng:2.3464, blurb:'Swing dancing in a medieval cellar. Yes, really.', times:['night'], weather:'any', accent:'indigo', slot:32 },
-  { id:'p18', name:'38Riv Jazz Club', kind:'Jazz club', icon:'ri-music-line', area:'4e', lat:48.8561, lng:2.3556, blurb:'A tiny vaulted jazz cave. Regulars go three times in eleven days. It\u2019s that kind of place.', times:['night'], weather:'any', accent:'indigo', slot:33 },
-  { id:'p34', name:'Little Red Door', kind:'Cocktail bar', icon:'ri-door-closed-line', area:'3e', lat:48.8637, lng:2.3639, blurb:'World\u2019s-50-Best cocktails behind, yes, a little red door.', times:['night'], weather:'any', accent:'yellow', slot:34 },
-  { id:'p19', name:'Eiffel sparkle run', kind:'Landmark', icon:'ri-flashlight-line', area:'7e', lat:48.8584, lng:2.2945, blurb:'It glitters on the hour. Cynics have cried.', times:['night'], weather:'any', accent:'yellow', slot:35, fsq:'Tour Eiffel' },
-  { id:'p20', name:'Crêpe au Nutella, standing', kind:'Street food', icon:'ri-donut-chart-line', area:'120m away, always', lat:48.8590, lng:2.3600, blurb:'The official dessert of poor decisions after midnight.', times:['night'], weather:'any', accent:'pink', slot:36, noLive:true, fixedDist:'120m' },
+  { id:'p1', name:'Du Pain et des Idées', kind:'Boulangerie', icon:'ri-cake-2-line', area:'Canal Saint-Martin', dist:'400m', km:0.4, blurb:'Reddit’s eternal answer to “best bakery?” The pistachio escargot has ended relationships.', times:['morning'], weather:'any', accent:'pink', at:'8:30', slot:1 },
+  { id:'p2', name:'Boulangerie Utopie', kind:'Boulangerie', icon:'ri-cake-3-line', area:'11e', dist:'1.4km', km:1.4, blurb:'The internet’s favorite underdog bakery. The charcoal-sesame baguette has a fan club.', times:['morning'], weather:'any', accent:'pink', at:'9:15', slot:2 },
+  { id:'p3', name:'La Fontaine de Belleville', kind:'Café', icon:'ri-cup-line', area:'10e', dist:'900m', km:0.9, blurb:'Actually good coffee, zinc counter, locals debating nothing. Peak Paris.', times:['morning'], weather:'any', accent:'pink', at:'10:00', slot:3 },
+  { id:'p4', name:'Canal Saint-Martin stroll', kind:'Walk', icon:'ri-walk-line', area:'10e', dist:'500m', km:0.5, blurb:'Lock bridges, quiche picnics, effortlessly cool locals. Bring sunglasses.', times:['morning','afternoon'], weather:'sunny', accent:'green', at:'11:00', slot:4 },
+  { id:'p5', name:'Sainte-Chapelle', kind:'Landmark', icon:'ri-building-4-line', area:'Île de la Cité', dist:'1.6km', km:1.6, blurb:'1,113 stained-glass panels. The one line every forum agrees is worth it.', times:['morning','afternoon'], weather:'rainy', accent:'indigo', at:'10:00', slot:2 },
+  { id:'p6', name:'Musée de l’Orangerie', kind:'Museum', icon:'ri-gallery-line', area:'1er', dist:'2.0km', km:2.0, blurb:'Monet’s water lilies, wall to wall, minus the Louvre crowds. The connoisseur’s pick.', times:['morning','afternoon'], weather:'rainy', accent:'indigo', at:'11:30', slot:3 },
+  { id:'p7', name:'Marché d’Aligre', kind:'Market', icon:'ri-store-2-line', area:'12e', dist:'1.3km', km:1.3, blurb:'Chaotic flea stalls, cheap produce, zero tourists. A local-thread legend.', times:['morning','afternoon'], weather:'any', accent:'pink', at:'12:30', slot:5 },
+  { id:'p8', name:'L’As du Fallafel', kind:'Street food', icon:'ri-restaurant-2-line', area:'Le Marais', dist:'350m', km:0.35, blurb:'The falafel with a permanent line. Lenny Kravitz is a regular, allegedly.', times:['afternoon'], weather:'any', accent:'pink', at:'13:30', slot:6 },
+  { id:'p9', name:'Coulée Verte', kind:'Walk', icon:'ri-leaf-line', area:'12e', dist:'1.5km', km:1.5, blurb:'An elevated park on old rail tracks. The High Line copied Paris, not the other way around.', times:['afternoon'], weather:'sunny', accent:'green', at:'15:00', slot:7 },
+  { id:'p10', name:'Jardin du Luxembourg', kind:'Garden', icon:'ri-plant-line', area:'6e', dist:'1.5km', km:1.5, blurb:'Steal a green chair by the fountain. It’s tradition.', times:['afternoon'], weather:'sunny', accent:'green', at:'15:30', slot:8 },
+  { id:'p11', name:'Shakespeare and Company', kind:'Bookshop', icon:'ri-book-open-line', area:'5e', dist:'1.8km', km:1.8, blurb:'Buy a book you’ll never finish. The stamp alone is worth it.', times:['afternoon'], weather:'rainy', accent:'indigo', at:'16:00', slot:9 },
+  { id:'p12', name:'Montmartre wander', kind:'Walk', icon:'ri-landscape-line', area:'18e', dist:'3.4km', km:3.4, blurb:'Hills, artists, and one very smug basilica view.', times:['afternoon'], weather:'sunny', accent:'green', at:'16:30', slot:10 },
+  { id:'p13', name:'Le Baron Rouge', kind:'Wine bar', icon:'ri-goblet-line', area:'Bastille', dist:'1.1km', km:1.1, blurb:'Wine from barrels, oysters on car hoods. Every “where do locals drink” thread, answered.', times:['evening'], weather:'any', accent:'yellow', at:'19:00', slot:11 },
+  { id:'p14', name:'Le Comptoir Général', kind:'Bar', icon:'ri-door-open-line', area:'Canal Saint-Martin', dist:'600m', km:0.6, blurb:'A hidden canal-side bar full of oddities. Weird, wonderful, word-of-mouth famous.', times:['evening'], weather:'any', accent:'yellow', at:'19:30', slot:12 },
+  { id:'p15', name:'Bouillon Pigalle', kind:'Bistro', icon:'ri-restaurant-line', area:'9e', dist:'2.4km', km:2.4, blurb:'Steak frites at 1998 prices. The line moves, trust.', times:['evening'], weather:'any', accent:'pink', at:'20:30', slot:13 },
+  { id:'p16', name:'Sunset at Sacré-Cœur', kind:'Viewpoint', icon:'ri-sun-foggy-line', area:'18e', dist:'3.4km', km:3.4, blurb:'The city turns gold and everyone forgets their phone. Almost.', times:['evening'], weather:'sunny', accent:'green', at:'21:00', slot:14 },
+  { id:'p17', name:'Caveau de la Huchette', kind:'Jazz club', icon:'ri-music-2-line', area:'5e', dist:'1.9km', km:1.9, blurb:'Swing dancing in a medieval cellar. Yes, really.', times:['night'], weather:'any', accent:'indigo', at:'22:00', slot:15 },
+  { id:'p18', name:'38Riv Jazz Club', kind:'Jazz club', icon:'ri-music-line', area:'4e', dist:'800m', km:0.8, blurb:'A tiny vaulted jazz cave. Regulars go three times in eleven days. It’s that kind of place.', times:['night'], weather:'any', accent:'indigo', at:'22:30', slot:16 },
+  { id:'p19', name:'Eiffel sparkle run', kind:'Landmark', icon:'ri-flashlight-line', area:'7e', dist:'2.8km', km:2.8, blurb:'It glitters on the hour. Cynics have cried.', times:['night'], weather:'any', accent:'yellow', at:'23:00', slot:17 },
+  { id:'p20', name:'Crêpe au Nutella, standing', kind:'Street food', icon:'ri-donut-chart-line', area:'120m away, always', dist:'120m', km:0.12, blurb:'The official dessert of poor decisions after midnight.', times:['night'], weather:'any', accent:'pink', at:'23:30', slot:18 },
 ];
 
 const QUIZ = [
@@ -345,54 +328,33 @@ const ACCENTS = {
   yellow: { bg:'#EEFF8C', dot:'#8a9a1e', ink:'#5c6a0a', chip:'#fbffe0', body:'#EEFF8C' },
 };
 
-// Baked-in fallbacks, shown until live Foursquare data arrives (or when no API key is set).
 const RATINGS = {
   p1:['4.8','8.9k'], p2:['4.8','2.4k'], p3:['4.6','2.3k'], p4:['4.7','3.1k'], p5:['4.8','61k'],
   p6:['4.7','34k'], p7:['4.5','6.7k'], p8:['4.4','11k'], p9:['4.7','12k'], p10:['4.7','108k'],
   p11:['4.7','9.2k'], p12:['4.7','5.4k'], p13:['4.7','4.6k'], p14:['4.3','7.8k'], p15:['4.5','33k'],
   p16:['4.8','19k'], p17:['4.5','3.9k'], p18:['4.8','1.1k'], p19:['4.7','380k'], p20:['4.6','2.0k'],
-  p21:['4.2','40k'], p22:['4.7','33k'], p23:['4.6','13k'], p24:['4.7','28k'], p25:['4.7','27k'],
-  p26:['4.3','1.2k'], p27:['4.3','2.9k'], p28:['4.6','1.4k'], p29:['4.5','4.4k'], p30:['4.4','6.1k'],
-  p31:['4.7','22k'], p32:['4.6','3.2k'], p33:['4.6','4.3k'], p34:['4.5','1.6k'], p35:['4.2','12k'],
-  p36:['4.8','9.4k'],
 };
 
-// Shown only when /api/concierge is unreachable or no key is configured.
-const OFFLINE = [
-  'The concierge has stepped out for a cigarette. Ask again in a moment.',
-  'Radio silence from the concierge desk. Connection issues, not indifference.',
-  'The concierge is between opinions. Try once more.',
+const REPLIES = [
+  'Noted. Filed under “excellent taste”.',
+  'Bold. Adjusting your plan accordingly.',
+  'Say less. Adding a detour.',
+  'That’s the spirit. Paris rewards the shameless.',
 ];
-
-const PARIS = { lat: 48.8590, lng: 2.3600 }; // Marais-ish anchor, used when location is unavailable
-
-function haversineKm(a, b) {
-  const d = Math.PI / 180, R = 6371;
-  const dLat = (b.lat - a.lat) * d, dLng = (b.lng - a.lng) * d;
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * d) * Math.cos(b.lat * d) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
-}
-
-function fmtCount(n) {
-  if (n == null) return null;
-  return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
-}
 
 class Component extends DCLogic {
   state = {
     obStep: -1, obAnswers: [],
     tab: 'discover',
-    // live context; overrides come from the You-tab demo controls
-    timeOverride: null, weatherOverride: null,
-    userLoc: null, geo: 'pending', tempC: null, weatherCode: null, weatherLive: null,
+    timeOfDay: 'morning', weather: 'sunny',
     swiped: {}, quizAnswers: {}, swipeCount: 0, cat: 'all',
     planStatus: 'draft', shuffleIx: 0,
     chat: [
-      { who:'bot', text:'Bonjour. I\u2019m your concierge. Tell me what you\u2019re craving and I\u2019ll pretend I didn\u2019t already know.' },
+      { who:'bot', text:'Bonjour. I’m your concierge. Tell me what you’re craving and I’ll pretend I didn’t already know.' },
     ],
     chatDraft: '', replyIx: 0,
     toast: '',
-    photos: {}, live: {},
+    photos: {},
   };
 
   componentDidMount() {
@@ -400,9 +362,9 @@ class Component extends DCLogic {
       p1: ['fr', 'Du Pain et des Idées'],
       p4: ['en', 'Canal Saint-Martin'],
       p5: ['en', 'Sainte-Chapelle'],
-      p6: ['en', 'Musée de l\u2019Orangerie'],
-      p7: ['en', 'Marché d\u2019Aligre'],
-      p8: ['en', 'L\u2019As du Fallafel'],
+      p6: ['en', 'Musée de l’Orangerie'],
+      p7: ['en', 'Marché d’Aligre'],
+      p8: ['en', 'L’As du Fallafel'],
       p9: ['en', 'Coulée verte René-Dumont'],
       p10: ['en', 'Jardin du Luxembourg'],
       p11: ['en', 'Shakespeare and Company (bookstore)'],
@@ -412,17 +374,6 @@ class Component extends DCLogic {
       p17: ['en', 'Caveau de la Huchette'],
       p19: ['en', 'Eiffel Tower'],
       p20: ['en', 'Crêpe'],
-      p21: ['en', 'Café de Flore'],
-      p22: ['en', 'Musée Rodin'],
-      p23: ['en', 'Musée Carnavalet'],
-      p24: ['en', 'Place des Vosges'],
-      p25: ['en', 'Parc des Buttes-Chaumont'],
-      p30: ['fr', 'Marché des Enfants-Rouges'],
-      p31: ['en', 'Père Lachaise Cemetery'],
-      p32: ['fr', 'Galerie Vivienne'],
-      p33: ['en', 'Berthillon'],
-      p35: ['en', 'Palais de Tokyo'],
-      p36: ['en', 'Pont Alexandre III'],
     };
     Object.entries(WIKI).forEach(([id, [lang, title]]) => {
       fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, '_'))}`)
@@ -433,90 +384,6 @@ class Component extends DCLogic {
         })
         .catch(() => {});
     });
-
-    this.initLocation();
-    // re-render every minute so the clock and time-of-day stay honest
-    this._tick = setInterval(() => this.setState({}), 60000);
-    // weather goes stale politely
-    this._wx = setInterval(() => this.state.userLoc && this.refreshWeather(this.state.userLoc), 30 * 60000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this._tick);
-    clearInterval(this._wx);
-  }
-
-  initLocation() {
-    const apply = (loc, geo) => {
-      this.setState({ userLoc: loc, geo });
-      this.refreshWeather(loc);
-    };
-    if (!navigator.geolocation) return apply(PARIS, 'unavailable');
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        if (haversineKm(loc, PARIS) > 30) {
-          apply(PARIS, 'far');
-          this.showToast('Not in Paris? Pretending you\u2019re in the Marais.');
-        } else {
-          apply(loc, 'ok');
-        }
-      },
-      () => apply(PARIS, 'denied'),
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
-    );
-  }
-
-  refreshWeather(loc) {
-    const q = `latitude=${loc.lat.toFixed(3)}&longitude=${loc.lng.toFixed(3)}&current=temperature_2m,weather_code&timezone=Europe%2FParis`;
-    fetch(`https://api.open-meteo.com/v1/forecast?${q}`)
-      .then(r => (r.ok ? r.json() : null))
-      .then(j => {
-        if (!j || !j.current) return;
-        const code = j.current.weather_code;
-        const rainy = (code >= 51 && code <= 99);
-        this.setState({ tempC: Math.round(j.current.temperature_2m), weatherCode: code, weatherLive: rainy ? 'rainy' : 'sunny' });
-      })
-      .catch(() => {});
-  }
-
-  // Resolves the app's working context: real Paris time + live weather, unless overridden.
-  getCtx() {
-    const S = this.state;
-    const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', weekday: 'long', hour: '2-digit', minute: '2-digit', hour12: false });
-    const parts = Object.fromEntries(fmt.formatToParts(new Date()).map(x => [x.type, x.value]));
-    const h = Number(parts.hour);
-    const realTod = h >= 5 && h < 11 ? 'morning' : h < 17 ? 'afternoon' : h < 22 ? 'evening' : 'night';
-    const timeOfDay = S.timeOverride || realTod;
-    const clock = S.timeOverride ? CTX[S.timeOverride].t : `${parts.hour}:${parts.minute}`;
-    const weather = S.weatherOverride || S.weatherLive || 'sunny';
-    const sunny = weather === 'sunny';
-    const code = S.weatherCode;
-    const weatherLabel = S.weatherOverride || code == null
-      ? (sunny ? 'Sunny' : 'Rain')
-      : (!sunny ? 'Rain' : code <= 1 ? 'Sunny' : 'Clouds');
-    const tempC = S.weatherOverride ? (sunny ? 21 : 16) : S.tempC;
-    return { timeOfDay, clock, weekday: parts.weekday, weather, sunny, weatherLabel, tempC };
-  }
-
-  distFor(p) {
-    if (p.fixedDist) return { km: 0.12, dist: p.fixedDist };
-    const loc = this.state.userLoc || PARIS;
-    const km = haversineKm(loc, { lat: p.lat, lng: p.lng });
-    const dist = km < 1 ? `${Math.max(50, Math.round(km * 1000 / 50) * 50)}m` : `${km.toFixed(1)}km`;
-    return { km, dist };
-  }
-
-  // Lazily fetch live rating / open-now for a card as it enters the stack.
-  ensureLive(p) {
-    if (p.noLive) return;
-    this._liveReq = this._liveReq || {};
-    if (this._liveReq[p.id]) return;
-    this._liveReq[p.id] = true;
-    fetch(`/api/places?name=${encodeURIComponent(p.fsq || p.name)}&ll=${p.lat},${p.lng}`)
-      .then(r => (r.ok ? r.json() : null))
-      .then(j => { if (j && j.ok) this.setState(s => ({ live: { ...s.live, [p.id]: j } })); })
-      .catch(() => {});
   }
 
   componentDidUpdate() {
@@ -551,36 +418,36 @@ class Component extends DCLogic {
   }
 
   scorePlace(p, T) {
-    const FAMOUS = ['p5', 'p10', 'p15', 'p16', 'p19', 'p21'];
+    const FAMOUS = ['p5', 'p10', 'p15', 'p16', 'p19'];
     let s = 0;
     if (T.coffeeFirst && (p.kind === 'Café' || p.kind === 'Boulangerie')) s += 3;
-    if (T.likesButter && (p.kind === 'Boulangerie' || p.kind === 'Crêperie')) s += 2;
+    if (T.likesButter && p.kind === 'Boulangerie') s += 2;
     if (T.museumLover && p.accent === 'indigo') s += 3;
-    if (T.streetFood && (p.kind === 'Street food' || p.kind === 'Market' || p.kind === 'Crêperie')) s += 3;
-    if (T.fancy && (p.kind === 'Bistro' || p.kind === 'Wine bar' || p.kind === 'Cocktail bar')) s += 2;
+    if (T.streetFood && (p.kind === 'Street food' || p.kind === 'Market')) s += 3;
+    if (T.fancy && (p.kind === 'Bistro' || p.kind === 'Wine bar')) s += 2;
     if (T.jazz && p.kind === 'Jazz club') s += 3;
-    if (T.wine && (p.kind === 'Wine bar' || p.kind === 'Bar' || p.kind === 'Cocktail bar')) s += 3;
+    if (T.wine && (p.kind === 'Wine bar' || p.kind === 'Bar')) s += 3;
     if (T.crowdShy && FAMOUS.includes(p.id)) s -= 3;
     if (T.trapHater && FAMOUS.includes(p.id)) s -= 2;
     if (T.trapLover && FAMOUS.includes(p.id)) s += 1;
     return s;
   }
 
-  getDeck(ctx) {
-    const { swiped, quizAnswers } = this.state;
+  getDeck() {
+    const { timeOfDay, weather, swiped, quizAnswers } = this.state;
     const T = this.getTaste();
     const places = PLACES.filter(p =>
-      p.times.includes(ctx.timeOfDay) &&
-      (p.weather === 'any' || p.weather === ctx.weather) &&
+      p.times.includes(timeOfDay) &&
+      (p.weather === 'any' || p.weather === weather) &&
       !swiped[p.id] &&
-      !(T.noGluten && (p.kind === 'Boulangerie' || p.kind === 'Crêperie' || p.id === 'p20')) &&
+      !(T.noGluten && (p.kind === 'Boulangerie' || p.id === 'p20')) &&
       !(T.noMuseums && p.kind === 'Museum') &&
       !(T.earlyBed && p.kind === 'Jazz club') &&
       (this.state.cat === 'all' || p.accent === this.state.cat)
     );
     const deck = places
-      .map(p => ({ ...p, ...this.distFor(p), score: this.scorePlace(p, T) }))
-      .sort((a, b) => b.score - a.score || a.km - b.km || a.slot - b.slot);
+      .map(p => ({ ...p, score: this.scorePlace(p, T) }))
+      .sort((a, b) => b.score - a.score || a.slot - b.slot);
     const pending = QUIZ.filter(q => !quizAnswers[q.id]);
     if (pending[0] && deck.length > 2) deck.splice(2, 0, pending[0]);
     if (pending[1] && deck.length > 5) deck.splice(5, 0, pending[1]);
@@ -661,40 +528,17 @@ class Component extends DCLogic {
 
   sendChatMsg(text) {
     const t = (text || '').trim();
-    if (!t || this._chatBusy) return;
-    const history = [...this.state.chat.filter(m => !m.typing), { who: 'me', text: t }];
-    this._chatBusy = true;
-    this.setState({ chat: [...history, { who: 'bot', text: 'The concierge is composing\u2026', typing: true }], chatDraft: '' });
-
-    const S = this.state;
-    const ctx = this.getCtx();
-    const liked = PLACES.filter(p => S.swiped[p.id] === 'like').map(p => p.name);
-    const deck = this.getDeck(ctx).filter(p => !p.q).slice(0, 5).map(p => p.name);
-    const taste = [...S.obAnswers, ...Object.values(S.quizAnswers).filter(v => v !== 'skipped')];
-    const done = (reply) => {
-      this._chatBusy = false;
+    if (!t) return;
+    this.setState(s => ({
+      chat: [...s.chat, { who: 'me', text: t }],
+      chatDraft: '',
+    }));
+    setTimeout(() => {
       this.setState(s => ({
-        chat: s.chat.map(m => (m.typing ? { who: 'bot', text: reply } : m)),
+        chat: [...s.chat, { who: 'bot', text: REPLIES[s.replyIx % REPLIES.length] }],
         replyIx: s.replyIx + 1,
       }));
-    };
-
-    fetch('/api/concierge', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: history,
-        context: {
-          clock: ctx.clock, weekday: ctx.weekday, timeOfDay: ctx.timeOfDay,
-          weatherLabel: ctx.weatherLabel, tempC: ctx.tempC, geo: S.geo,
-          taste, liked, deck,
-          places: PLACES.map(p => ({ name: p.name, kind: p.kind, area: p.area })),
-        },
-      }),
-    })
-      .then(r => (r.ok ? r.json() : null))
-      .then(j => done((j && j.reply) || OFFLINE[S.replyIx % OFFLINE.length]))
-      .catch(() => done(OFFLINE[S.replyIx % OFFLINE.length]));
+    }, 650);
   }
 
   getPlanVals(plan, planKm, ctx) {
@@ -705,7 +549,7 @@ class Component extends DCLogic {
       ix === 0 ? a.slot - b.slot : ((a.slot * 7 + ix * 13) % 17) - ((b.slot * 7 + ix * 13) % 17)
     );
     // sequential times from "now", rounded up to the next half hour, 90 min per stop
-    const [h0, m0] = ctx.clock.split(':').map(Number);
+    const [h0, m0] = ctx.t.split(':').map(Number);
     let mins = h0 * 60 + (m0 > 30 ? 60 : 30);
     const timed = ordered.map(p => {
       const at = `${Math.floor(mins / 60) % 24}:${String(mins % 60).padStart(2, '0')}`;
@@ -714,10 +558,10 @@ class Component extends DCLogic {
     });
 
     const msgs = [
-      `Based on your ${plan.length} like${plan.length === 1 ? '' : 's'} and frankly excellent taste, here\u2019s the day. Say the word.`,
+      `Based on your ${plan.length} like${plan.length === 1 ? '' : 's'} and frankly excellent taste, here’s the day. Say the word.`,
       'Re-drafted. New running order, same excellent taste. Better?',
       'Draft three. I moved things around so your feet survive. Final answer?',
-      'At this point I\u2019m just showing off. Pick one.',
+      'At this point I’m just showing off. Pick one.',
     ];
 
     const draft = plan.length > 0 && S.planStatus !== 'approved';
@@ -734,8 +578,8 @@ class Component extends DCLogic {
         const a = ACCENTS[p.accent];
         return {
           at, name: p.name,
-          rowStyle: { display: 'flex', gap: 10, alignItems: 'baseline', background: a.body, padding: '12px 14px' },
-          atStyle: { font: "500 10px 'Saans Mono', monospace", color: a.ink, width: 42, flex: 'none' },
+          rowStyle: { display: 'flex', gap: 12, alignItems: 'baseline', background: a.body, padding: '14px 16px' },
+          atStyle: { font: "500 12px 'Saans Mono', monospace", color: a.ink, width: 46, flex: 'none' },
         };
       }),
       approvePlan: () => { this.setState({ planStatus: 'approved' }); this.showToast('Plan approved. Go forth.'); },
@@ -746,10 +590,10 @@ class Component extends DCLogic {
         return {
           at, name: p.name,
           meta: `${p.kind} · ${p.dist}`,
-          blockStyle: { display: 'flex', gap: 12, alignItems: 'flex-start', background: a.body, padding: '12px 14px' },
-          atStyle: { font: "500 10px 'Saans Mono', monospace", color: a.ink, width: 40, flex: 'none', paddingTop: 3 },
-          metaStyle: { font: "500 9px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, marginTop: 4 },
-          xStyle: { fontSize: 16, color: a.ink, opacity: 0.6 },
+          blockStyle: { display: 'flex', gap: 12, alignItems: 'flex-start', background: a.body, padding: '14px 16px' },
+          atStyle: { font: "500 12px 'Saans Mono', monospace", color: a.ink, width: 46, flex: 'none', paddingTop: 3 },
+          metaStyle: { font: "500 10.5px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, marginTop: 5 },
+          xStyle: { fontSize: 20, color: a.ink, opacity: 0.6 },
           remove: () => this.setState(s => {
             const sw = { ...s.swiped }; delete sw[p.id];
             return { swiped: sw };
@@ -759,7 +603,7 @@ class Component extends DCLogic {
       planHasStops: approved,
       planSub: plan.length === 0
         ? 'Swipe right and the concierge drafts your day.'
-        : (approved ? 'Locked in. I did the time math so you don\u2019t have to.' : 'The concierge has thoughts. Review the draft.'),
+        : (approved ? 'Locked in. I did the time math so you don’t have to.' : 'The concierge has thoughts. Review the draft.'),
       planStats: `${plan.length} stop${plan.length === 1 ? '' : 's'} · ${planKm.toFixed(1)} km of strutting`,
     };
   }
@@ -775,18 +619,14 @@ class Component extends DCLogic {
     const showQuiz = !booted && S.obStep >= 0 && S.obStep < OB.length;
     const ob = OB[Math.min(Math.max(S.obStep, 0), OB.length - 1)];
 
-    const ctx = this.getCtx();
-    const sunny = ctx.sunny;
-    const deck = this.getDeck(ctx);
+    const ctx = CTX[S.timeOfDay];
+    const sunny = S.weather === 'sunny';
+    const deck = this.getDeck();
 
     const stack = deck.slice(0, 3).map((c, i) => {
       const isTop = i === 0;
       const isQuiz = !!c.q;
       const a = isQuiz ? null : ACCENTS[c.accent];
-      if (!isQuiz) this.ensureLive(c);
-      const live = isQuiz ? null : S.live[c.id];
-      const fallback = isQuiz ? null : (RATINGS[c.id] || ['4.5', '1k']);
-      const openBit = live && live.openNow != null ? (live.openNow ? ' · Open now' : ' · Closed now') : '';
       return {
         id: c.id,
         isTop,
@@ -794,9 +634,9 @@ class Component extends DCLogic {
         isQuiz,
         name: c.name, kind: c.kind, dist: c.dist, blurb: c.blurb, icon: c.icon,
         // 2b: time-dash meta line
-        meta: isQuiz ? '' : `${ctx.clock} — ${c.kind} · ${c.dist}${c.score >= 2 ? ' · Very you' : ''}${openBit}`,
-        rating: isQuiz ? '' : ((live && live.rating) || fallback[0]),
-        reviews: isQuiz ? '' : (live && live.ratings != null ? `${fmtCount(live.ratings)} live ratings` : `${fallback[1]} reviews`),
+        meta: isQuiz ? '' : `${ctx.t} — ${c.kind} · ${c.dist}${c.score >= 2 ? ' · Very you' : ''}`,
+        rating: isQuiz ? '' : (RATINGS[c.id] || ['4.5','1k'])[0],
+        reviews: isQuiz ? '' : (RATINGS[c.id] || ['4.5','1k'])[1],
         gmaps: isQuiz ? null : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' Paris')}`,
         q: c.q,
         opts: isQuiz ? c.opts.map(o => ({ label: o, go: () => this.answerQuiz(c.id, o) })) : [],
@@ -836,17 +676,15 @@ class Component extends DCLogic {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         } : null,
         artIcon: a ? { fontSize: 38, color: a.ink } : null,
-        bodyStyle: a ? { flex: 1, display: 'flex', flexDirection: 'column', padding: '16px 18px 14px', background: a.body } : null,
-        kickerStyle: a ? { font: "500 9px 'Saans Mono', monospace", letterSpacing: '.12em', textTransform: 'uppercase', color: a.ink, marginBottom: 8 } : null,
-        footStyle: a ? { marginTop: 'auto', borderTop: `1px solid ${a.ink}`, paddingTop: 10, display: 'flex', alignItems: 'center', gap: 7 } : null,
-        footIconStyle: a ? { fontSize: 12, color: a.ink } : null,
-        linkStyle: a ? { marginLeft: 'auto', font: "500 9px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, textDecoration: 'none', borderBottom: `1px solid ${a.ink}`, paddingBottom: 1 } : null,
+        bodyStyle: a ? { flex: 1, display: 'flex', flexDirection: 'column', padding: '18px 20px 16px', background: a.body } : null,
+        kickerStyle: a ? { font: "500 11px 'Saans Mono', monospace", letterSpacing: '.12em', textTransform: 'uppercase', color: a.ink, marginBottom: 10 } : null,
+        footStyle: a ? { marginTop: 'auto', borderTop: `1px solid ${a.ink}`, paddingTop: 12, display: 'flex', alignItems: 'center', gap: 8 } : null,
+        footIconStyle: a ? { fontSize: 14, color: a.ink } : null,
+        linkStyle: a ? { marginLeft: 'auto', font: "500 11px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, textDecoration: 'none', borderBottom: `1px solid ${a.ink}`, paddingBottom: 2, padding: '8px 0 2px' } : null,
       };
     });
 
-    const plan = PLACES.filter(p => S.swiped[p.id] === 'like')
-      .map(p => ({ ...p, ...this.distFor(p) }))
-      .sort((x, y) => x.slot - y.slot);
+    const plan = PLACES.filter(p => S.swiped[p.id] === 'like').sort((x, y) => x.slot - y.slot);
     const planKm = plan.reduce((n, p) => n + p.km, 0);
     const likedN = Object.values(S.swiped).filter(v => v === 'like').length;
     const nopedN = Object.values(S.swiped).filter(v => v === 'nope').length;
@@ -860,22 +698,20 @@ class Component extends DCLogic {
 
     const btnBase = {
       flex: 1, position: 'relative',
-      font: "500 9.5px 'Saans Mono', monospace", letterSpacing: '.12em', textTransform: 'uppercase',
-      padding: '15px 0 13px', marginTop: -1,
+      font: "500 10px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase',
+      padding: '10px 0 9px', marginTop: -1,
       background: 'none', border: 'none', cursor: 'pointer',
     };
 
     const pills = [...S.obAnswers, ...Object.values(S.quizAnswers).filter(v => v !== 'skipped')];
 
     const ctlBtn = (active) => ({
-      font: "500 9.5px 'Saans Mono', monospace", letterSpacing: '.05em', textTransform: 'uppercase',
-      padding: '10px 4px', cursor: 'pointer',
+      font: "500 11px 'Saans Mono', monospace", letterSpacing: '.05em', textTransform: 'uppercase',
+      padding: '13px 6px', cursor: 'pointer',
       background: active ? '#002910' : '#ffffff',
       color: active ? '#f8fffa' : '#002910',
       border: active ? '1px solid #002910' : '1px solid #d4e8da',
     });
-
-    const geoBit = S.geo === 'ok' ? ' · Near you' : S.geo === 'far' ? ' · From afar' : '';
 
     return {
       appName,
@@ -893,11 +729,11 @@ class Component extends DCLogic {
         },
       })),
 
-      ctxLine: `Paris · ${ctx.weekday} · ${ctx.clock} · ${ctx.weatherLabel}${ctx.tempC != null ? ` ${ctx.tempC}°` : ''}${geoBit}`,
+      ctxLine: `Paris · Friday · ${ctx.t} · ${sunny ? 'Sunny 21°' : 'Rain 16°'}`,
       ctxIcon: sunny ? 'ri-sun-line' : 'ri-rainy-line',
       greeting: sass === 'polite'
-        ? `Good ${ctx.timeOfDay}. Here\u2019s what\u2019s nearby.`
-        : (sunny ? CTX[ctx.timeOfDay].greetSunny : CTX[ctx.timeOfDay].greetRainy),
+        ? `Good ${S.timeOfDay}. Here’s what’s nearby.`
+        : (sunny ? ctx.greetSunny : ctx.greetRainy),
 
       tabDiscover: S.tab === 'discover', tabPlan: S.tab === 'plan',
       tabChat: S.tab === 'chat', tabYou: S.tab === 'you',
@@ -923,7 +759,7 @@ class Component extends DCLogic {
           label: c.label,
           go: () => this.setState({ cat: active ? 'all' : c.key }),
           style: {
-            font: "500 10px 'Saans', sans-serif", padding: '5px 10px', cursor: 'pointer',
+            font: "500 13px 'Saans', sans-serif", padding: '9px 14px', cursor: 'pointer',
             background: active ? '#002910' : c.bg,
             color: active ? '#f8fffa' : c.ink,
             border: active ? '1px solid #002910' : '1px solid rgba(0,41,16,.12)',
@@ -942,14 +778,14 @@ class Component extends DCLogic {
         speaker: m.who === 'me' ? 'You' : 'The concierge',
         rowStyle: { display: 'flex', flexDirection: 'column', gap: 4, alignItems: m.who === 'me' ? 'flex-end' : 'flex-start' },
         labelStyle: {
-          font: "500 8.5px 'Saans Mono', monospace", letterSpacing: '.14em', textTransform: 'uppercase',
+          font: "500 10px 'Saans Mono', monospace", letterSpacing: '.14em', textTransform: 'uppercase',
           color: m.who === 'me' ? '#676c79' : '#057a28',
         },
         textStyle: m.who === 'me'
-          ? { maxWidth: '80%', font: "400 14px/1.5 'Saans', sans-serif", color: '#01200d', textAlign: 'right' }
-          : { maxWidth: '86%', font: "italic 400 15.5px/1.5 'Serrif VF', Georgia, serif", color: '#002910', opacity: m.typing ? 0.55 : 1 },
+          ? { maxWidth: '80%', font: "400 16px/1.5 'Saans', sans-serif", color: '#01200d', textAlign: 'right' }
+          : { maxWidth: '86%', font: "italic 400 17.5px/1.5 'Serrif VF', Georgia, serif", color: '#002910' },
       })),
-      chips: ['Plan my evening', 'I\u2019m hungry', 'Surprise me'].map(label => ({
+      chips: ['Plan my evening', 'I’m hungry', 'Surprise me'].map(label => ({
         label, go: () => this.sendChatMsg(label),
       })),
       chatDraft: S.chatDraft,
@@ -958,13 +794,12 @@ class Component extends DCLogic {
       sendChat: () => this.sendChatMsg(S.chatDraft),
 
       youCalib: `${S.obAnswers.length} questions · ${S.swipeCount} swipes`,
-      tastePills: pills.length ? pills : ['Blank slate', 'Mysterious', 'Jury\u2019s out'],
+      tastePills: pills.length ? pills : ['Blank slate', 'Mysterious', 'Jury’s out'],
       youStats: [
         { label: 'Liked', val: `${likedN}` },
         { label: 'Passed on', val: `${nopedN}` },
         { label: 'Croissant loyalty', val: S.quizAnswers.q1 === 'Croissant' ? '100%' : (S.quizAnswers.q1 ? 'BETRAYED' : 'TBD') },
         { label: 'Tourist-trap tolerance', val: S.quizAnswers.q2 === 'Ironically, yes' ? 'HIGH' : (S.quizAnswers.q2 ? 'ZERO' : 'TBD') },
-        { label: 'Location', val: S.geo === 'ok' ? 'LIVE' : S.geo === 'far' ? 'NOT IN PARIS' : S.geo === 'pending' ? 'LOCATING\u2026' : 'MARAIS (DEFAULT)' },
       ],
       resetTaste: () => {
         this.setState({ swiped: {}, quizAnswers: {}, swipeCount: 0, obAnswers: [], obStep: -1, tab: 'discover' });
@@ -973,15 +808,11 @@ class Component extends DCLogic {
 
       toast: S.toast,
 
-      timeOpts: [null, 'morning', 'afternoon', 'evening', 'night'].map(k => ({
-        label: k || 'Auto (live)',
-        go: () => this.setState({ timeOverride: k }),
-        style: ctlBtn(S.timeOverride === k),
+      timeOpts: ['morning', 'afternoon', 'evening', 'night'].map(k => ({
+        label: k, go: () => this.setState({ timeOfDay: k }), style: ctlBtn(S.timeOfDay === k),
       })),
-      weatherOpts: [null, 'sunny', 'rainy'].map(k => ({
-        label: k || 'Auto (live)',
-        go: () => this.setState({ weatherOverride: k }),
-        style: ctlBtn(S.weatherOverride === k),
+      weatherOpts: ['sunny', 'rainy'].map(k => ({
+        label: k, go: () => this.setState({ weather: k }), style: ctlBtn(S.weather === k),
       })),
     };
   }
