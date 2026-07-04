@@ -750,6 +750,33 @@ const WILD_BLURBS = [
   (k) => `Proof that the best ${k} is never the one on the postcard.`,
 ];
 
+const KIND_ICONS = {
+  'Museum': ['ri-gallery-line', 'ri-ancient-pavilion-line', 'ri-bank-line', 'ri-artboard-line'],
+  'Gallery': ['ri-artboard-line', 'ri-brush-line', 'ri-palette-line'],
+  'Restaurant': ['ri-restaurant-line', 'ri-restaurant-2-line', 'ri-bowl-line'],
+  'Café': ['ri-cup-line', 'ri-cup-fill'],
+  'Boulangerie': ['ri-cake-2-line', 'ri-bread-line'],
+  'Pâtisserie': ['ri-cake-3-line', 'ri-cake-line'],
+  'Bar': ['ri-goblet-line', 'ri-beer-line'],
+  'Wine bar': ['ri-goblet-fill', 'ri-goblet-line'],
+  'Cocktail bar': ['ri-goblet-line', 'ri-door-closed-line'],
+  'Park': ['ri-plant-line', 'ri-leaf-line', 'ri-tree-line'],
+  'Bookshop': ['ri-book-open-line', 'ri-book-2-line', 'ri-booklet-line'],
+  'Vintage shop': ['ri-t-shirt-line', 'ri-handbag-line'],
+  'Brocante': ['ri-store-2-line', 'ri-armchair-line'],
+  'Concept store': ['ri-shopping-bag-line', 'ri-gift-line'],
+  'Oddity': ['ri-ghost-line', 'ri-key-2-line', 'ri-magic-line'],
+  'Club': ['ri-disc-line', 'ri-headphone-line'],
+  'Dive bar': ['ri-mic-line', 'ri-music-2-line'],
+  'Veggie table': ['ri-leaf-line', 'ri-seedling-line'],
+};
+
+function kindIcon(id, kind, fallback) {
+  const pool = KIND_ICONS[kind];
+  if (!pool) return fallback;
+  return pool[strHash('i' + id) % pool.length];
+}
+
 function wildBlurb(id, kind) {
   const f = WILD_BLURBS[strHash('b' + id) % WILD_BLURBS.length];
   return f(String(kind || 'place').toLowerCase());
@@ -1348,7 +1375,7 @@ class Component extends DCLogic {
             if (curated.has(g.name.toLowerCase())) return;
             const id = 'tf_' + strHash(g.name);
             gplaces[id] = {
-              id, name: g.name, kind: 'Restaurant', icon: 'ri-restaurant-line', accent: 'pink',
+              id, name: g.name, kind: 'Restaurant', icon: kindIcon(id, 'Restaurant', 'ri-restaurant-line'), accent: 'pink',
               times: ['afternoon', 'evening'], weather: 'any', kids: false,
               area: (g.cuisine || 'Paris'), lat: g.lat, lng: g.lng,
               blurb: [
@@ -1379,7 +1406,7 @@ class Component extends DCLogic {
             const id = 'ao_' + strHash(g.name);
             const hasLoc = g.lat != null && g.lng != null;
             gplaces[id] = {
-              id, name: g.name, kind: 'Oddity', icon: 'ri-ghost-line', accent: 'indigo',
+              id, name: g.name, kind: 'Oddity', icon: kindIcon(id, 'Oddity', 'ri-ghost-line'), accent: 'indigo',
               times: ['morning', 'afternoon'], weather: 'any', kids: false,
               area: g.category || 'Atlas Obscura', lat: hasLoc ? g.lat : PARIS.lat, lng: hasLoc ? g.lng : PARIS.lng,
               blurb: g.blurb || 'An oddity the guidebooks skip. Whim doesn’t.',
@@ -1413,7 +1440,7 @@ class Component extends DCLogic {
             : WILD_KIND.restaurant);
           const id = 'g_' + g.id;
           gplaces[id] = {
-            id, name: g.name, kind: meta.kind, icon: meta.icon, accent: meta.accent,
+            id, name: g.name, kind: meta.kind, icon: kindIcon(id, meta.kind, meta.icon), accent: meta.accent,
             times: meta.times, weather: meta.kind === 'Park' ? 'sunny' : 'any',
             kids: !!meta.kids, area: 'Nearby', lat: g.lat, lng: g.lng,
             blurb: g.blurb || wildBlurb(id, meta.kind),
@@ -2092,9 +2119,9 @@ class Component extends DCLogic {
             style: { display: 'flex', alignItems: 'center', gap: 10, background: '#ffffff', border: '1px solid #f2d3c6', padding: '9px 12px 9px 9px', cursor: 'pointer', marginTop: 8 },
             thumb: S.photos[x.id]
               ? { width: 44, height: 44, flex: 'none', backgroundImage: `url("${S.photos[x.id]}")`, backgroundSize: 'cover', backgroundPosition: 'center', border: `1px solid ${xa.dot}` }
-              : { width: 44, height: 44, flex: 'none', background: xa.bg, backgroundImage: `radial-gradient(${xa.dot} 1px, transparent 1px)`, backgroundSize: '8px 8px', border: `1px solid ${xa.dot}`, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+              : { width: 44, height: 44, flex: 'none', background: xa.bg, border: `1px solid ${xa.dot}`, display: 'flex', alignItems: 'center', justifyContent: 'center' },
             thumbIcon: x.icon,
-            thumbIconStyle: { fontSize: 19, color: xa.ink, display: S.photos[x.id] ? 'none' : 'block' },
+            thumbIconStyle: { fontSize: 23, color: xa.ink, display: S.photos[x.id] ? 'none' : 'block' },
           };
         }),
       get dSimilarAny() { return this.dSimilar.length > 0; },
@@ -2367,9 +2394,9 @@ class Component extends DCLogic {
             style: { display: 'flex', alignItems: 'center', gap: 10, background: '#ffffff', border: '1px solid #f2d3c6', padding: '9px 12px 9px 9px', cursor: 'pointer', maxWidth: '86%', marginTop: 6 },
             thumb: S.photos[p.id]
               ? { width: 46, height: 46, flex: 'none', backgroundImage: `url("${S.photos[p.id]}")`, backgroundSize: 'cover', backgroundPosition: 'center', border: `1px solid ${a.dot}` }
-              : { width: 46, height: 46, flex: 'none', background: a.bg, backgroundImage: `radial-gradient(${a.dot} 1px, transparent 1px)`, backgroundSize: '8px 8px', border: `1px solid ${a.dot}`, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+              : { width: 46, height: 46, flex: 'none', background: a.bg, border: `1px solid ${a.dot}`, display: 'flex', alignItems: 'center', justifyContent: 'center' },
             thumbIcon: p.icon,
-            thumbIconStyle: { fontSize: 20, color: a.ink, display: S.photos[p.id] ? 'none' : 'block' },
+            thumbIconStyle: { fontSize: 24, color: a.ink, display: S.photos[p.id] ? 'none' : 'block' },
           };
         }).filter(Boolean),
         speaker: m.who === 'me' ? 'You' : 'The concierge',
