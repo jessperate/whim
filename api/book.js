@@ -25,7 +25,8 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           searchLocation: 'Paris',
           sort: 'popularity',
-          maxRestaurants: 150,
+          bestRated: true,
+          maxRestaurants: 400,
           maxReviews: 0,
           maxPhotos: 0,
           language: 'en',
@@ -49,6 +50,26 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: false, reason: 'no_run_yet' });
     }
 
+    if (req.query.peek) {
+      return res.status(200).json({ count: items.length, names: items.slice(0, 20).map(i => `${i.name} [${i.locality}]`) });
+    }
+    if (req.query.feed) {
+      const feed = items
+        .filter((i) => i.name && i.is_bookable !== false && i.latitude != null && (i.thefork_rating ?? 0) >= 9)
+        .sort((a, b) => (b.thefork_rating ?? 0) - (a.thefork_rating ?? 0))
+        .slice(0, 60)
+        .map((i) => ({
+          name: i.name,
+          url: i.url || null,
+          rating: i.thefork_rating != null ? Number(i.thefork_rating).toFixed(1) : null,
+          ratings: i.rating_count ?? i.thefork_review_count ?? null,
+          price: i.avg_price != null ? `${i.avg_price}${i.avg_price_currency === 'EUR' ? '€' : ''}` : null,
+          cuisine: i.cuisine || null,
+          lat: i.latitude, lng: i.longitude,
+        }));
+      res.setHeader('Cache-Control', 's-maxage=43200, stale-while-revalidate=604800');
+      return res.status(200).json({ ok: true, feed });
+    }
     const want = normalize(name);
     const hit = items.find((i) => {
       const got = normalize(i.name);

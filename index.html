@@ -1285,6 +1285,33 @@ class Component extends DCLogic {
 
     calls.forEach(({ url, meta }) => this.fetchWildcards(url, meta));
 
+    // TheFork top-rated bookable inventory joins the wildcard pool
+    if (!this._forkLoaded) {
+      this._forkLoaded = true;
+      fetch(`/api/book?feed=1&d=${day}`)
+        .then(r => (r.ok ? r.json() : null))
+        .then(j => {
+          if (!j || !j.ok || !Array.isArray(j.feed)) return;
+          const curated = new Set(PLACES.map(p => p.name.toLowerCase()));
+          const gplaces = { ...this.state.gplaces };
+          j.feed.forEach(g => {
+            if (curated.has(g.name.toLowerCase())) return;
+            const id = 'tf_' + strHash(g.name);
+            gplaces[id] = {
+              id, name: g.name, kind: 'Restaurant', icon: 'ri-restaurant-line', accent: 'pink',
+              times: ['afternoon', 'evening'], weather: 'any', kids: false,
+              area: (g.cuisine || 'Paris'), lat: g.lat, lng: g.lng,
+              blurb: `${g.cuisine || 'A table'} the bookers rate ${g.rating}/10${g.price ? `, ~${g.price} a head` : ''}. Bookable right from here.`,
+              slot: 50 + (strHash(id) % 40), wild: true,
+              grating: g.rating != null ? (Number(g.rating) / 2).toFixed(1) : null, greviews: g.ratings,
+              forkUrl: g.url, forkRating: g.rating, forkPrice: g.price,
+            };
+          });
+          this.setState({ gplaces });
+        })
+        .catch(() => {});
+    }
+
     // Atlas Obscura layer for the hidden-gem and macabre crowd
     if ((T.offPath || T.macabre) && !this._aoLoaded) {
       this._aoLoaded = true;
@@ -1978,14 +2005,14 @@ class Component extends DCLogic {
       dClose: () => this.closeDetail(),
       dMaps: (dd && dd.gmaps) || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + ' Paris')}`,
       // Paris = TheFork territory; OpenTable as the fallback for visitors who live in that app
-      dBookable: ['Bistro', 'Café', 'Wine bar', 'Cocktail bar', 'Bar', 'Crêperie'].includes(p.kind),
-      dResyIdle: ['Bistro', 'Café', 'Wine bar', 'Cocktail bar', 'Bar', 'Crêperie'].includes(p.kind) && !S.resy[p.id],
+      dBookable: ['Bistro', 'Café', 'Wine bar', 'Cocktail bar', 'Bar', 'Crêperie', 'Restaurant'].includes(p.kind) && !p.forkUrl,
+      dResyIdle: ['Bistro', 'Café', 'Wine bar', 'Cocktail bar', 'Bar', 'Crêperie', 'Restaurant'].includes(p.kind) && !S.resy[p.id] && !p.forkUrl,
       dResyLoading: !!(S.resy[p.id] && S.resy[p.id].loading),
-      dResyUrl: (S.resy[p.id] && S.resy[p.id].found && S.resy[p.id].bookable !== false && S.resy[p.id].url) || null,
+      dResyUrl: (S.resy[p.id] && S.resy[p.id].found && S.resy[p.id].bookable !== false && S.resy[p.id].url) || p.forkUrl || null,
       dResyMatch: (S.resy[p.id] && S.resy[p.id].match) || p.name,
-      dResyInfo: S.resy[p.id] && S.resy[p.id].found
+      dResyInfo: (S.resy[p.id] && S.resy[p.id].found)
         ? [S.resy[p.id].rating ? `${S.resy[p.id].rating}/10 on TheFork` : null, S.resy[p.id].price ? `~${S.resy[p.id].price} a head` : null].filter(Boolean).join(' · ')
-        : '',
+        : (p.forkUrl ? [p.forkRating ? `${p.forkRating}/10 on TheFork` : null, p.forkPrice ? `~${p.forkPrice} a head` : null].filter(Boolean).join(' · ') : ''),
       dResyNone: !!(S.resy[p.id] && !S.resy[p.id].loading && (S.resy[p.id].error || !S.resy[p.id].found || S.resy[p.id].bookable === false || !S.resy[p.id].url)),
       dResyCheck: () => this.checkResy(p),
       dBookFork: `https://www.thefork.fr/search?queryText=${encodeURIComponent(p.name)}`,
