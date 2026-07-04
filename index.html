@@ -729,6 +729,28 @@ const WILD_KIND = {
   park: { kind: 'Park', icon: 'ri-plant-line', accent: 'green', times: ['morning', 'afternoon'], kids: true },
 };
 
+// Fallback blurbs for wildcards without an editorial summary — picked
+// deterministically per venue so cards keep their line between renders.
+const WILD_BLURBS = [
+  (k) => `Locals keep this ${k} to themselves. Consider the secret leaked.`,
+  (k) => `A ${k} with a devoted following and no marketing budget. The best kind.`,
+  () => 'The reviews read like love letters. Make of that what you will.',
+  () => 'You haven’t heard of it. That’s rather the point.',
+  (k) => `The kind of ${k} you’ll claim you discovered first.`,
+  () => 'Beloved by people with strong opinions and comfortable shoes.',
+  (k) => `A neighborhood fixture. The neighborhood would prefer you didn’t know.`,
+  () => 'Zero hype, high ratings. The math checks out.',
+  () => 'Regulars only — until now.',
+  (k) => `Paris has a thousand ${k}s. It does not have another one of these.`,
+  () => 'Quietly excellent. Loudly recommended.',
+  (k) => `Proof that the best ${k} is never the one on the postcard.`,
+];
+
+function wildBlurb(id, kind) {
+  const f = WILD_BLURBS[strHash('b' + id) % WILD_BLURBS.length];
+  return f(String(kind || 'place').toLowerCase());
+}
+
 const PARIS = { lat: 48.8590, lng: 2.3600 }; // Marais-ish anchor, used when location is unavailable
 
 function haversineKm(a, b) {
@@ -1301,7 +1323,12 @@ class Component extends DCLogic {
               id, name: g.name, kind: 'Restaurant', icon: 'ri-restaurant-line', accent: 'pink',
               times: ['afternoon', 'evening'], weather: 'any', kids: false,
               area: (g.cuisine || 'Paris'), lat: g.lat, lng: g.lng,
-              blurb: `${g.cuisine || 'A table'} the bookers rate ${g.rating}/10${g.price ? `, ~${g.price} a head` : ''}. Bookable right from here.`,
+              blurb: [
+                `${g.cuisine || 'Dinner'}, rated ${g.rating}/10 by people who actually booked. So can you — right from here.`,
+                `${g.rating}/10 on TheFork${g.price ? `, ~${g.price} a head` : ''}. The table is a button away.`,
+                `${g.cuisine || 'A kitchen'} the booking crowd scores ${g.rating}/10. One tap and it’s yours.`,
+                `Book it before your group chat does. ${g.rating}/10${g.price ? `, ~${g.price} a head` : ''}.`,
+              ][strHash('f' + g.name) % 4],
               slot: 50 + (strHash(id) % 40), wild: true,
               grating: g.rating != null ? (Number(g.rating) / 2).toFixed(1) : null, greviews: g.ratings,
               forkUrl: g.url, forkRating: g.rating, forkPrice: g.price,
@@ -1361,7 +1388,7 @@ class Component extends DCLogic {
             id, name: g.name, kind: meta.kind, icon: meta.icon, accent: meta.accent,
             times: meta.times, weather: meta.kind === 'Park' ? 'sunny' : 'any',
             kids: !!meta.kids, area: 'Nearby', lat: g.lat, lng: g.lng,
-            blurb: g.blurb || `A ${meta.kind.toLowerCase()} the algorithm swears by. Prove it wrong.`,
+            blurb: g.blurb || wildBlurb(id, meta.kind),
             slot: 50 + (strHash(id) % 40), wild: true,
             grating: g.rating, greviews: g.ratings,
           };
