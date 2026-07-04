@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Whim — swipe right on Paris</title>
 <meta name="description" content="A pocket concierge for Paris. Swipe on curated spots, get a day plan drafted around real time, weather and distance, and argue with the concierge.">
-<meta name="theme-color" content="#f8fffa">
+<meta name="theme-color" content="#fff7f2">
 <meta property="og:title" content="Whim — swipe right on Paris">
 <meta property="og:description" content="Ten questions. Then I know you better than your mother does.">
 <meta property="og:type" content="website">
@@ -18,7 +18,7 @@
 <link rel="dns-prefetch" href="https://en.wikipedia.org">
 <link rel="dns-prefetch" href="https://upload.wikimedia.org">
 <link rel="dns-prefetch" href="https://api.open-meteo.com">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%2300ff64%27/%3E%3Ctext x=%2750%27 y=%2772%27 font-size=%2760%27 text-anchor=%27middle%27%3E%F0%9F%A5%90%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%23e8432c%27/%3E%3Ctext x=%2750%27 y=%2772%27 font-size=%2760%27 text-anchor=%27middle%27%3E%F0%9F%A5%90%3C/text%3E%3C/svg%3E">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -32,39 +32,39 @@
 @font-face { font-family:'Saans'; src:url('fonts/Saans-Bold.ttf') format('truetype'); font-display:swap; font-weight:700; }
 @font-face { font-family:'Saans Mono'; src:url('fonts/SaansMono-Medium.ttf') format('truetype'); font-display:swap; font-weight:500; }
 html, body { height:100%; }
-body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; overscroll-behavior:none; }
+body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; overscroll-behavior:none; }
 #whim-app { height:100dvh; }
 @media (min-width:480px) {
-  #whim-app { height:min(880px, 94dvh); max-width:430px; margin:3dvh auto 0; border:1px solid rgba(0,41,16,.18); box-shadow:0 24px 70px rgba(0,13,5,.14); }
+  #whim-app { height:min(880px, 94dvh); max-width:430px; margin:3dvh auto 0; border:1px solid rgba(69,18,18,.2); box-shadow:0 24px 70px rgba(40,8,6,.15); }
 }
 @keyframes whim-toast { from { opacity:0; transform:translate(-50%,8px); } to { opacity:1; transform:translate(-50%,0); } }
 </style>
 </helmet>
 
-<div id="whim-app" style="display:flex; flex-direction:column; background:#f8fffa; font-family:'Saans',sans-serif; color:#002910; overflow:hidden; box-sizing:border-box; position:relative; padding-top:env(safe-area-inset-top);">
+<div id="whim-app" style="display:flex; flex-direction:column; background:#fff7f2; font-family:'Saans',sans-serif; color:#451212; overflow:hidden; box-sizing:border-box; position:relative; padding-top:env(safe-area-inset-top);">
 
   <!-- ===== ONBOARDING ===== -->
   <sc-if value="{{ showSplash }}" hint-placeholder-val="{{ true }}">
-    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0; padding:32px; text-align:center; background-color:#ffffff; background-image:radial-gradient(#d4e8da 1px, transparent 1px); background-size:24px 24px;">
-      <div style="font:500 11.5px 'Saans Mono',monospace; letter-spacing:.16em; color:#057a28; text-transform:uppercase; margin-bottom:16px;">Est. 2026 · Paris edition</div>
-      <div style="width:230px; border-top:1px solid #002910; margin-bottom:2px;"></div>
-      <div style="width:230px; border-top:1px solid #002910; margin-bottom:24px;"></div>
-      <div style="font:400 88px/0.9 'Serrif VF',Georgia,serif; letter-spacing:-0.03em; color:#002910;">{{ appName }}</div>
-      <div style="font:italic 400 20px/1.4 'Serrif VF',Georgia,serif; color:#01200d; margin:22px 0 24px; max-width:280px;">Swipe right on Paris.<br>Left on regret.</div>
-      <div style="width:230px; border-top:1px solid #002910; margin-bottom:2px;"></div>
-      <div style="width:230px; border-top:1px solid #002910; margin-bottom:32px;"></div>
-      <button onClick="{{ startQuiz }}" style="font:500 17px 'Saans',sans-serif; background:#00ff64; color:#002910; border:none; border-radius:58px; padding:18px 46px; cursor:pointer;">Allons-y</button>
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0; padding:32px; text-align:center; background-color:#ffffff; background-image:radial-gradient(#f2d3c6 1px, transparent 1px); background-size:24px 24px;">
+      <div style="font:500 11.5px 'Saans Mono',monospace; letter-spacing:.16em; color:#c0361c; text-transform:uppercase; margin-bottom:16px;">Est. 2026 · Paris edition</div>
+      <div style="width:230px; border-top:1px solid #451212; margin-bottom:2px;"></div>
+      <div style="width:230px; border-top:1px solid #451212; margin-bottom:24px;"></div>
+      <img src="/whim-logo.png" alt="{{ appName }}" style="width:250px; max-width:72%; height:auto; display:block; margin:8px auto 0;">
+      <div style="font:italic 400 20px/1.4 'Serrif VF',Georgia,serif; color:#38100c; margin:22px 0 24px; max-width:280px;">Swipe right on Paris.<br>Left on regret.</div>
+      <div style="width:230px; border-top:1px solid #451212; margin-bottom:2px;"></div>
+      <div style="width:230px; border-top:1px solid #451212; margin-bottom:32px;"></div>
+      <button onClick="{{ startQuiz }}" style="font:500 17px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:18px 46px; cursor:pointer;">Allons-y</button>
       <div style="font:400 13px/1.5 'Saans',sans-serif; color:#676c79; margin-top:16px; max-width:280px;">Ten questions. Then I know you better than your mother does.</div>
     </div>
   </sc-if>
 
   <sc-if value="{{ showName }}" hint-placeholder-val="{{ false }}">
-    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; padding:32px; background-color:#ffffff; background-image:radial-gradient(#d4e8da 1px, transparent 1px); background-size:24px 24px;">
-      <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; color:#057a28; text-transform:uppercase;">Taste calibration · Introductions</div>
-      <div style="font:400 34px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910; margin:26px 0 6px;">What should I call you?</div>
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; padding:32px; background-color:#ffffff; background-image:radial-gradient(#f2d3c6 1px, transparent 1px); background-size:24px 24px;">
+      <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; color:#c0361c; text-transform:uppercase;">Taste calibration · Introductions</div>
+      <div style="font:400 34px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:26px 0 6px;">What should I call you?</div>
       <div style="font:400 14px/1.5 'Saans',sans-serif; color:#676c79; margin-bottom:26px;">For the greetings. And the gossip.</div>
-      <input value="{{ nameDraft }}" onChange="{{ onNameDraft }}" onKeyDown="{{ onNameKey }}" placeholder="Your name" autocomplete="given-name" style="font:400 18px 'Saans',sans-serif; background:#ffffff; border:1px solid #002910; color:#002910; padding:16px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
-      <button onClick="{{ commitName }}" style="font:500 15px 'Saans',sans-serif; background:#00ff64; color:#002910; border:none; border-radius:58px; padding:16px 36px; cursor:pointer; margin-top:16px;">Enchanté</button>
+      <input value="{{ nameDraft }}" onChange="{{ onNameDraft }}" onKeyDown="{{ onNameKey }}" placeholder="Your name" autocomplete="given-name" style="font:400 18px 'Saans',sans-serif; background:#ffffff; border:1px solid #451212; color:#451212; padding:16px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+      <button onClick="{{ commitName }}" style="font:500 15px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:16px 36px; cursor:pointer; margin-top:16px;">Enchanté</button>
       <div style="font:400 11px 'Saans',sans-serif; color:#676c79; margin-top:12px;">Leave it blank to stay mysterious. I’ll manage.</div>
     </div>
   </sc-if>
@@ -72,18 +72,18 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
   <sc-if value="{{ showQuiz }}" hint-placeholder-val="{{ false }}">
     <div style="flex:1; display:flex; flex-direction:column; padding:28px 24px; background:#ffffff; overflow:auto;">
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
-        <span style="font:500 12px 'Saans Mono',monospace; letter-spacing:.08em; color:#057a28; text-transform:uppercase;">Taste calibration · {{ obSec }}</span>
+        <span style="font:500 12px 'Saans Mono',monospace; letter-spacing:.08em; color:#c0361c; text-transform:uppercase;">Taste calibration · {{ obSec }}</span>
         <span style="font:500 12px 'Saans Mono',monospace; color:#676c79;">{{ obProgress }}</span>
       </div>
-      <div style="height:3px; background:#eef9f3; margin-top:14px;">
+      <div style="height:3px; background:#fdece4; margin-top:14px;">
         <div style="{{ obBarStyle }}"></div>
       </div>
-      <div style="font:400 36px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910; margin:28px 0 8px;">{{ obQuestion }}</div>
+      <div style="font:400 36px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:28px 0 8px;">{{ obQuestion }}</div>
       <div style="font:400 16px/1.5 'Saans',sans-serif; color:#676c79; margin-bottom:28px;">{{ obSub }}</div>
       <div style="display:flex; flex-direction:column; gap:12px;">
         <sc-for list="{{ obOptions }}" as="opt" hint-placeholder-count="3">
-          <button onClick="{{ opt.go }}" style="font:400 17px 'Saans',sans-serif; text-align:left; background:#eef9f3; color:#002910; border:1px solid #d4e8da; padding:18px 20px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:12px;" style-hover="background:#ccffe0;">
-            {{ opt.label }}<i class="ri-arrow-right-line" style="font-size:18px; color:#008c44; flex:none;"></i>
+          <button onClick="{{ opt.go }}" style="font:400 17px 'Saans',sans-serif; text-align:left; background:#fdece4; color:#451212; border:1px solid #f2d3c6; padding:18px 20px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:12px;" style-hover="background:#ffd9c9;">
+            {{ opt.label }}<i class="ri-arrow-right-line" style="font-size:18px; color:#d1401f; flex:none;"></i>
           </button>
         </sc-for>
       </div>
@@ -94,16 +94,16 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
   <sc-if value="{{ showApp }}" hint-placeholder-val="{{ false }}">
     <!-- masthead (2b) -->
     <div style="background:#ffffff; padding:14px 20px 0; text-align:center;">
-      <div style="font:400 34px/1 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910;">{{ appName }}</div>
-      <div style="display:flex; align-items:center; justify-content:center; gap:6px; font:500 10px 'Saans Mono',monospace; letter-spacing:.14em; text-transform:uppercase; color:#057a28; margin:9px 0 11px;"><i class="{{ ctxIcon }}" style="font-size:13px;"></i>{{ ctxLine }}</div>
-      <div style="border-bottom:1px solid #002910; margin-bottom:2px;"></div>
-      <div style="border-bottom:1px solid #002910;"></div>
+      <img src="/whim-logo.png" alt="{{ appName }}" style="height:40px; width:auto; display:block; margin:2px auto 0;">
+      <div style="display:flex; align-items:center; justify-content:center; gap:6px; font:500 10px 'Saans Mono',monospace; letter-spacing:.14em; text-transform:uppercase; color:#c0361c; margin:9px 0 11px;"><i class="{{ ctxIcon }}" style="font-size:13px;"></i>{{ ctxLine }}</div>
+      <div style="border-bottom:1px solid #451212; margin-bottom:2px;"></div>
+      <div style="border-bottom:1px solid #451212;"></div>
     </div>
 
     <!-- DISCOVER -->
     <sc-if value="{{ tabDiscover }}" hint-placeholder-val="{{ true }}">
-      <div style="flex:1; display:flex; flex-direction:column; background-color:#f8fffa; background-image:radial-gradient(#d4e8da 1px, transparent 1px); background-size:24px 24px; overflow:hidden;">
-        <div style="padding:14px 20px 2px; font:italic 400 18px/1.35 'Serrif VF',Georgia,serif; color:#002910; text-align:center;">{{ greeting }}</div>
+      <div style="flex:1; display:flex; flex-direction:column; background-color:#fff7f2; background-image:radial-gradient(#f2d3c6 1px, transparent 1px); background-size:24px 24px; overflow:hidden;">
+        <div style="padding:14px 20px 2px; font:italic 400 18px/1.35 'Serrif VF',Georgia,serif; color:#451212; text-align:center;">{{ greeting }}</div>
         <div style="display:flex; justify-content:center; gap:8px; padding:12px 16px 0; flex-wrap:wrap;">
           <sc-for list="{{ catChips }}" as="cc" hint-placeholder-count="5">
             <button onClick="{{ cc.go }}" style="{{ cc.style }}">{{ cc.label }}</button>
@@ -111,11 +111,11 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
         </div>
         <div style="flex:1; position:relative; margin:12px 16px 10px;">
           <sc-if value="{{ deckEmpty }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:10px; border:1px dashed #d4e8da; background:#ffffff; padding:28px;">
-              <i class="ri-map-pin-time-line" style="font-size:36px; color:#008c44;"></i>
-              <div style="font:400 26px/1.1 'Serrif VF',Georgia,serif; color:#002910;">That's everything nearby</div>
+            <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:10px; border:1px dashed #f2d3c6; background:#ffffff; padding:28px;">
+              <i class="ri-map-pin-time-line" style="font-size:36px; color:#d1401f;"></i>
+              <div style="font:400 26px/1.1 'Serrif VF',Georgia,serif; color:#451212;">That's everything nearby</div>
               <div style="font:400 15px/1.55 'Saans',sans-serif; color:#676c79;">Flip the weather in the You tab, or check your day plan. It's looking good.</div>
-              <button onClick="{{ reshuffleDeck }}" style="font:500 13px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#00ff64; color:#002910; border:none; border-radius:58px; padding:13px 22px; cursor:pointer; margin-top:4px;">Deal me everything again</button>
+              <button onClick="{{ reshuffleDeck }}" style="font:500 13px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:13px 22px; cursor:pointer; margin-top:4px;">Deal me everything again</button>
             </div>
           </sc-if>
           <sc-for list="{{ stack }}" as="card" hint-placeholder-count="1">
@@ -128,17 +128,17 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
                 </div>
                 <div style="{{ card.bodyStyle }}">
                   <div style="{{ card.kickerStyle }}">{{ card.meta }}</div>
-                  <div style="font:400 30px/1.02 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910;">{{ card.name }}</div>
-                  <div style="font:italic 400 17px/1.45 'Serrif VF',Georgia,serif; color:#01200d; margin-top:9px;">{{ card.blurb }}</div>
+                  <div style="font:400 30px/1.02 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212;">{{ card.name }}</div>
+                  <div style="font:italic 400 17px/1.45 'Serrif VF',Georgia,serif; color:#38100c; margin-top:9px;">{{ card.blurb }}</div>
                   <div style="{{ card.footStyle }}">
                     <i class="ri-star-fill" style="{{ card.footIconStyle }}"></i>
-                    <span style="font:500 13px 'Saans Mono',monospace; color:#002910;">{{ card.rating }}</span>
-                    <span style="font:400 13px 'Saans',sans-serif; color:#01200d; opacity:.65;">{{ card.reviews }}</span>
+                    <span style="font:500 13px 'Saans Mono',monospace; color:#451212;">{{ card.rating }}</span>
+                    <span style="font:400 13px 'Saans',sans-serif; color:#38100c; opacity:.65;">{{ card.reviews }}</span>
                     <button onClick="{{ card.openDetail }}" style="{{ card.linkStyle }}">Details</button>
                     <button onClick="{{ card.heart }}" aria-label="Save for later" style="{{ card.heartStyle }}"><i class="{{ card.heartIcon }}"></i></button>
                   </div>
                 </div>
-                <div data-stamp="like" style="position:absolute; top:18px; left:16px; font:500 24px 'Saans Mono',monospace; letter-spacing:.06em; color:#00cc50; border:3px solid #00cc50; padding:4px 12px; transform:rotate(-10deg); opacity:0; background:rgba(248,255,250,.85);">OUI</div>
+                <div data-stamp="like" style="position:absolute; top:18px; left:16px; font:500 24px 'Saans Mono',monospace; letter-spacing:.06em; color:#c22f1a; border:3px solid #c22f1a; padding:4px 12px; transform:rotate(-10deg); opacity:0; background:rgba(248,255,250,.85);">OUI</div>
                 <div data-stamp="nope" style="position:absolute; top:18px; right:16px; font:500 24px 'Saans Mono',monospace; letter-spacing:.06em; color:#852952; border:3px solid #852952; padding:4px 12px; transform:rotate(10deg); opacity:0; background:rgba(255,247,255,.85);">NON</div>
               </sc-if>
               <sc-if value="{{ card.isQuiz }}" hint-placeholder-val="{{ false }}">
@@ -158,7 +158,7 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
         </div>
         <div style="display:flex; justify-content:center; gap:28px; padding:8px 0 16px;">
           <button onClick="{{ swipeNope }}" aria-label="Pass" style="width:64px; height:64px; border-radius:50%; border:1px solid #ffd3fd; background:#fee7fd; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#fff7ff;"><i class="ri-close-line" style="font-size:30px; color:#852952;"></i></button>
-          <button onClick="{{ swipeLike }}" aria-label="Like" style="width:64px; height:64px; border-radius:50%; border:none; background:#00ff64; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#00cc50;"><i class="ri-heart-3-line" style="font-size:30px; color:#002910;"></i></button>
+          <button onClick="{{ swipeLike }}" aria-label="Like" style="width:64px; height:64px; border-radius:50%; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#c22f1a;"><i class="ri-heart-3-line" style="font-size:30px; color:#fff5ee;"></i></button>
         </div>
       </div>
     </sc-if>
@@ -166,37 +166,37 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
     <!-- PLAN (2c: color-blocked) -->
     <sc-if value="{{ tabPlan }}" hint-placeholder-val="{{ false }}">
       <div style="flex:1; overflow:auto; padding:22px 20px; background:#ffffff;">
-        <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28;">Today · Paris</div>
-        <div style="font:400 32px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910; margin:9px 0 5px;">Your day plan</div>
+        <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Today · Paris</div>
+        <div style="font:400 32px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:9px 0 5px;">Your day plan</div>
         <div style="font:italic 400 16px/1.5 'Serrif VF',Georgia,serif; color:#676c79; margin-bottom:20px;">{{ planSub }}</div>
         <sc-if value="{{ planEmpty }}" hint-placeholder-val="{{ false }}">
-          <div style="border:1px dashed #d4e8da; padding:30px 22px; text-align:center; background:#f8fffa;">
-            <div style="font:400 22px/1.2 'Serrif VF',Georgia,serif; color:#002910; margin-bottom:8px;">Nothing yet</div>
+          <div style="border:1px dashed #f2d3c6; padding:30px 22px; text-align:center; background:#fff7f2;">
+            <div style="font:400 22px/1.2 'Serrif VF',Georgia,serif; color:#451212; margin-bottom:8px;">Nothing yet</div>
             <div style="font:400 15px/1.55 'Saans',sans-serif; color:#676c79;">Swipe right on literally anything and I'll draft your day. That's the whole deal.</div>
           </div>
         </sc-if>
         <sc-if value="{{ planDraft }}" hint-placeholder-val="{{ false }}">
-          <div style="background:#ffffff; border:1px solid #002910; padding:18px 16px; display:flex; flex-direction:column; gap:14px; margin-bottom:18px;">
-            <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28;">Concierge proposes · Draft {{ draftNo }}</div>
-            <div style="font:italic 400 17px/1.5 'Serrif VF',Georgia,serif; color:#002910;">{{ proposalMsg }}</div>
+          <div style="background:#ffffff; border:1px solid #451212; padding:18px 16px; display:flex; flex-direction:column; gap:14px; margin-bottom:18px;">
+            <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Concierge proposes · Draft {{ draftNo }}</div>
+            <div style="font:italic 400 17px/1.5 'Serrif VF',Georgia,serif; color:#451212;">{{ proposalMsg }}</div>
             <div style="display:flex; flex-direction:column; gap:8px;">
               <sc-for list="{{ proposalStops }}" as="ps" hint-placeholder-count="3">
                 <div onClick="{{ ps.open }}" style="{{ ps.rowStyle }}">
                   <span style="{{ ps.atStyle }}">{{ ps.at }}</span>
-                  <span style="font:700 16px 'Saans',sans-serif; color:#002910;">{{ ps.name }}</span>
+                  <span style="font:700 16px 'Saans',sans-serif; color:#451212;">{{ ps.name }}</span>
                 </div>
               </sc-for>
             </div>
             <div style="display:flex; gap:10px; margin-top:2px;">
-              <button onClick="{{ approvePlan }}" style="flex:1; font:500 15px 'Saans',sans-serif; background:#00ff64; color:#002910; border:none; border-radius:58px; padding:14px; cursor:pointer;" style-hover="background:#00cc50;">Approve</button>
-              <button onClick="{{ shufflePlan }}" style="flex:1; font:500 15px 'Saans',sans-serif; background:#ffffff; color:#002910; border:1px solid #002910; border-radius:58px; padding:14px; cursor:pointer;" style-hover="background:#eef9f3;">Shuffle it</button>
+              <button onClick="{{ approvePlan }}" style="flex:1; font:500 15px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:14px; cursor:pointer;" style-hover="background:#c22f1a;">Approve</button>
+              <button onClick="{{ shufflePlan }}" style="flex:1; font:500 15px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:14px; cursor:pointer;" style-hover="background:#fdece4;">Shuffle it</button>
             </div>
           </div>
         </sc-if>
         <sc-if value="{{ planApproved }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-            <span style="font:500 11px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#EEFF8C; border:1px solid #d4e87a; border-radius:5px; padding:6px 10px; color:#002910;">Approved by you</span>
-            <button onClick="{{ redraftPlan }}" style="font:500 11px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; border:none; color:#008c44; cursor:pointer; padding:8px 0 8px 12px;" style-hover="color:#00cc50;">Re-draft</button>
+            <span style="font:500 11px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#EEFF8C; border:1px solid #d4e87a; border-radius:5px; padding:6px 10px; color:#451212;">Approved by you</span>
+            <button onClick="{{ redraftPlan }}" style="font:500 11px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; border:none; color:#d1401f; cursor:pointer; padding:8px 0 8px 12px;" style-hover="color:#c22f1a;">Re-draft</button>
           </div>
         </sc-if>
         <div style="display:flex; flex-direction:column; gap:9px;">
@@ -204,7 +204,7 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
             <div style="{{ stop.blockStyle }}">
               <span style="{{ stop.atStyle }}">{{ stop.at }}</span>
               <div onClick="{{ stop.open }}" style="flex:1; cursor:pointer;">
-                <div style="font:700 16px/1.25 'Saans',sans-serif; color:#002910;">{{ stop.name }}</div>
+                <div style="font:700 16px/1.25 'Saans',sans-serif; color:#451212;">{{ stop.name }}</div>
                 <div style="{{ stop.metaStyle }}">{{ stop.meta }}</div>
               </div>
               <button onClick="{{ stop.remove }}" aria-label="Remove stop" style="border:none; background:none; cursor:pointer; padding:6px; margin:-6px;"><i class="ri-close-line" style="{{ stop.xStyle }}"></i></button>
@@ -212,8 +212,8 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
           </sc-for>
         </div>
         <sc-if value="{{ planHasStops }}" hint-placeholder-val="{{ false }}">
-          <div style="border-top:1px solid #002910; margin-top:14px; padding-top:14px; font:500 11.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#057a28;">{{ planStats }}</div>
-          <a href="{{ routeUrl }}" target="_blank" rel="noopener" style="display:block; text-align:center; margin-top:12px; font:500 15px 'Saans',sans-serif; background:#ffffff; color:#002910; border:1px solid #002910; border-radius:58px; padding:14px; text-decoration:none;">Open walking route in Maps</a>
+          <div style="border-top:1px solid #451212; margin-top:14px; padding-top:14px; font:500 11.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#c0361c;">{{ planStats }}</div>
+          <a href="{{ routeUrl }}" target="_blank" rel="noopener" style="display:block; text-align:center; margin-top:12px; font:500 15px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:14px; text-decoration:none;">Open walking route in Maps</a>
         </sc-if>
       </div>
     </sc-if>
@@ -222,8 +222,8 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
     <sc-if value="{{ tabChat }}" hint-placeholder-val="{{ false }}">
       <div style="flex:1; display:flex; flex-direction:column; background:#ffffff; overflow:hidden;">
         <div style="padding:16px 20px 0; text-align:center;">
-          <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.14em; text-transform:uppercase; color:#057a28;">Correspondence with the concierge</div>
-          <div style="border-bottom:1px solid #d4e8da; margin-top:12px;"></div>
+          <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.14em; text-transform:uppercase; color:#c0361c;">Correspondence with the concierge</div>
+          <div style="border-bottom:1px solid #f2d3c6; margin-top:12px;"></div>
         </div>
         <div data-chat-scroll="true" style="flex:1; overflow:auto; padding:18px 20px; display:flex; flex-direction:column; gap:18px;">
           <sc-for list="{{ chat }}" as="m" hint-placeholder-count="2">
@@ -234,15 +234,15 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
                 <div onClick="{{ pc.open }}" style="{{ pc.style }}">
                   <div style="{{ pc.thumb }}"><i class="{{ pc.thumbIcon }}" style="{{ pc.thumbIconStyle }}"></i></div>
                   <div style="flex:1; min-width:0;">
-                    <div style="font:700 14px 'Saans',sans-serif; color:#002910;">{{ pc.name }}</div>
-                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; margin-top:3px;">{{ pc.meta }}</div>
+                    <div style="font:700 14px 'Saans',sans-serif; color:#451212;">{{ pc.name }}</div>
+                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ pc.meta }}</div>
                   </div>
-                  <i class="ri-arrow-right-s-line" style="font-size:18px; color:#008c44;"></i>
+                  <i class="ri-arrow-right-s-line" style="font-size:18px; color:#d1401f;"></i>
                 </div>
               </sc-for>
               <sc-if value="{{ m.showFb }}" hint-placeholder-val="{{ false }}">
                 <div style="display:flex; gap:2px; margin-top:4px;">
-                  <button onClick="{{ m.fbUp }}" aria-label="Good recommendation" style="background:none; border:none; cursor:pointer; padding:5px;"><i class="{{ m.fbUpIcon }}" style="font-size:14px; color:#057a28;"></i></button>
+                  <button onClick="{{ m.fbUp }}" aria-label="Good recommendation" style="background:none; border:none; cursor:pointer; padding:5px;"><i class="{{ m.fbUpIcon }}" style="font-size:14px; color:#c0361c;"></i></button>
                   <button onClick="{{ m.fbDown }}" aria-label="Bad recommendation" style="background:none; border:none; cursor:pointer; padding:5px;"><i class="{{ m.fbDownIcon }}" style="font-size:14px; color:#852952;"></i></button>
                   <button onClick="{{ m.fbRefresh }}" aria-label="Another option" style="background:none; border:none; cursor:pointer; padding:5px;"><i class="ri-refresh-line" style="font-size:14px; color:#676c79;"></i></button>
                 </div>
@@ -252,12 +252,12 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
         </div>
         <div style="display:flex; gap:8px; padding:0 20px 12px; flex-wrap:wrap;">
           <sc-for list="{{ chips }}" as="c" hint-placeholder-count="3">
-            <button onClick="{{ c.go }}" style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; background:#ffffff; color:#057a28; border:1px solid #d4e8da; padding:11px 14px; cursor:pointer;" style-hover="background:#eef9f3;">{{ c.label }}</button>
+            <button onClick="{{ c.go }}" style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; background:#ffffff; color:#c0361c; border:1px solid #f2d3c6; padding:11px 14px; cursor:pointer;" style-hover="background:#fdece4;">{{ c.label }}</button>
           </sc-for>
         </div>
         <div style="display:flex; gap:10px; padding:0 20px 16px;">
-          <input value="{{ chatDraft }}" onChange="{{ onDraft }}" onKeyDown="{{ onChatKey }}" placeholder="Tell me what you're craving…" style="flex:1; min-width:0; font:400 16px 'Saans',sans-serif; background:#ffffff; border:1px solid #002910; color:#002910; padding:14px 16px; outline:none; border-radius:0; -webkit-appearance:none;">
-          <button onClick="{{ sendChat }}" aria-label="Send message" style="width:52px; flex:none; border:none; background:#00ff64; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#00cc50;"><i class="ri-arrow-up-line" style="font-size:24px; color:#002910;"></i></button>
+          <input value="{{ chatDraft }}" onChange="{{ onDraft }}" onKeyDown="{{ onChatKey }}" placeholder="Tell me what you're craving…" style="flex:1; min-width:0; font:400 16px 'Saans',sans-serif; background:#ffffff; border:1px solid #451212; color:#451212; padding:14px 16px; outline:none; border-radius:0; -webkit-appearance:none;">
+          <button onClick="{{ sendChat }}" aria-label="Send message" style="width:52px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#c22f1a;"><i class="ri-arrow-up-line" style="font-size:24px; color:#fff5ee;"></i></button>
         </div>
       </div>
     </sc-if>
@@ -265,30 +265,30 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
     <!-- YOU -->
     <sc-if value="{{ tabYou }}" hint-placeholder-val="{{ false }}">
       <div style="flex:1; overflow:auto; padding:22px 20px; background:#ffffff;">
-        <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28;">Calibrated from {{ youCalib }}</div>
-        <div style="font:400 32px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910; margin:9px 0 18px;">{{ youTitle }}</div>
+        <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Calibrated from {{ youCalib }}</div>
+        <div style="font:400 32px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:9px 0 18px;">{{ youTitle }}</div>
         <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px;">
           <sc-for list="{{ tastePills }}" as="tp" hint-placeholder-count="4">
-            <span style="font:500 11.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#eef9f3; border:1px solid #d4e8da; border-radius:5px; padding:7px 11px; color:#002910;">{{ tp }}</span>
+            <span style="font:500 11.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#fdece4; border:1px solid #f2d3c6; border-radius:5px; padding:7px 11px; color:#451212;">{{ tp }}</span>
           </sc-for>
         </div>
-        <div style="border:1px solid #d4e8da;">
+        <div style="border:1px solid #f2d3c6;">
           <sc-for list="{{ youStats }}" as="st" hint-placeholder-count="3">
-            <div style="display:flex; justify-content:space-between; padding:15px 16px; border-bottom:1px solid #d4e8da; align-items:baseline; gap:12px;">
-              <span style="font:400 16px 'Saans',sans-serif; color:#01200d;">{{ st.label }}</span>
-              <span style="font:500 13px 'Saans Mono',monospace; color:#057a28; flex:none;">{{ st.val }}</span>
+            <div style="display:flex; justify-content:space-between; padding:15px 16px; border-bottom:1px solid #f2d3c6; align-items:baseline; gap:12px;">
+              <span style="font:400 16px 'Saans',sans-serif; color:#38100c;">{{ st.label }}</span>
+              <span style="font:500 13px 'Saans Mono',monospace; color:#c0361c; flex:none;">{{ st.val }}</span>
             </div>
           </sc-for>
         </div>
         <sc-if value="{{ signedOut }}" hint-placeholder-val="{{ false }}">
-          <button onClick="{{ doSignIn }}" style="display:flex; align-items:center; justify-content:center; gap:9px; width:100%; margin-top:22px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#002910; border:1px solid #002910; border-radius:58px; padding:14px; cursor:pointer;"><i class="ri-google-fill" style="font-size:16px;"></i>Continue with Google</button>
+          <button onClick="{{ doSignIn }}" style="display:flex; align-items:center; justify-content:center; gap:9px; width:100%; margin-top:22px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:14px; cursor:pointer;"><i class="ri-google-fill" style="font-size:16px;"></i>Continue with Google</button>
           <div style="font:400 12px/1.5 'Saans',sans-serif; color:#676c79; margin-top:8px;">Sign in to keep your taste file, saves and reviews when the social features land.</div>
         </sc-if>
         <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
-          <div style="display:flex; align-items:center; gap:10px; margin-top:22px; border:1px solid #d4e8da; padding:13px 14px;">
-            <i class="ri-account-circle-fill" style="font-size:26px; color:#057a28;"></i>
+          <div style="display:flex; align-items:center; gap:10px; margin-top:22px; border:1px solid #f2d3c6; padding:13px 14px;">
+            <i class="ri-account-circle-fill" style="font-size:26px; color:#c0361c;"></i>
             <div style="flex:1; min-width:0;">
-              <div style="font:700 14px 'Saans',sans-serif; color:#002910;">{{ userLine }}</div>
+              <div style="font:700 14px 'Saans',sans-serif; color:#451212;">{{ userLine }}</div>
               <div style="font:400 12px 'Saans',sans-serif; color:#676c79;">{{ userSub }}</div>
             </div>
             <button onClick="{{ doSignOut }}" style="font:500 9px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; border:none; color:#852952; cursor:pointer; padding:6px;">Sign out</button>
@@ -296,15 +296,15 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
         </sc-if>
         <sc-if value="{{ savedAny }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:24px;">
-            <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;">
               <i class="ri-folder-heart-line" style="font-size:14px;"></i>{{ savedCity }} · Saved for later ({{ savedCount }})
             </div>
-            <div style="border:1px solid #d4e8da;">
+            <div style="border:1px solid #f2d3c6;">
               <sc-for list="{{ saved }}" as="sv" hint-placeholder-count="2">
-                <div style="display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #d4e8da;">
+                <div style="display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #f2d3c6;">
                   <div onClick="{{ sv.open }}" style="flex:1; min-width:0; cursor:pointer;">
-                    <div style="font:700 15px 'Saans',sans-serif; color:#002910;">{{ sv.name }}</div>
-                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; margin-top:3px;">{{ sv.meta }}</div>
+                    <div style="font:700 15px 'Saans',sans-serif; color:#451212;">{{ sv.name }}</div>
+                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ sv.meta }}</div>
                   </div>
                   <button onClick="{{ sv.remove }}" aria-label="Remove from saved" style="border:none; background:none; cursor:pointer; padding:6px;"><i class="ri-heart-3-fill" style="font-size:16px; color:#c54b9b;"></i></button>
                 </div>
@@ -316,8 +316,8 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
         <div style="font:400 13px/1.5 'Saans',sans-serif; color:#676c79; margin-top:10px;">Fresh start. I'll pretend the croissant thing never happened.</div>
 
         <!-- demo controls (was the desktop sidebar) -->
-        <div style="border-top:1px solid #d4e8da; margin-top:26px; padding-top:18px;">
-          <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; margin-bottom:14px;">Context overrides</div>
+        <div style="border-top:1px solid #f2d3c6; margin-top:26px; padding-top:18px;">
+          <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:14px;">Context overrides</div>
           <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79; margin-bottom:8px;">Time of day</div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
             <sc-for list="{{ timeOpts }}" as="o" hint-placeholder-count="4">
@@ -337,8 +337,8 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
 
     <!-- detail sheet -->
     <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
-      <div style="position:absolute; inset:0; z-index:60; background:#f8fffa; display:flex; flex-direction:column;">
-        <div style="height:42%; flex:none; position:relative; border-bottom:1px solid #002910; background:#eef9f3; overflow:hidden;">
+      <div style="position:absolute; inset:0; z-index:60; background:#fff7f2; display:flex; flex-direction:column;">
+        <div style="height:42%; flex:none; position:relative; border-bottom:1px solid #451212; background:#fdece4; overflow:hidden;">
           <sc-if value="{{ dHasPhotos }}" hint-placeholder-val="{{ true }}">
             <div style="display:flex; height:100%; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
               <sc-for list="{{ dPhotos }}" as="ph" hint-placeholder-count="1">
@@ -350,64 +350,65 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
             <div style="{{ dArtStyle }}"><i class="{{ dArtIcon }}" style="{{ dArtIconStyle }}"></i></div>
           </sc-if>
           <sc-if value="{{ dSwipeHint }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute; bottom:10px; right:12px; font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; background:rgba(0,41,16,.78); color:#f8fffa; padding:5px 9px;">{{ dSwipeHint }}</div>
+            <div style="position:absolute; bottom:10px; right:12px; font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; background:rgba(69,18,18,.8); color:#fff7f2; padding:5px 9px;">{{ dSwipeHint }}</div>
           </sc-if>
-          <button onClick="{{ dClose }}" aria-label="Close details" style="position:absolute; top:12px; right:12px; width:38px; height:38px; border-radius:50%; border:1px solid #002910; background:#f8fffa; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-close-line" style="font-size:20px; color:#002910;"></i></button>
+          <button onClick="{{ dClose }}" aria-label="Close details" style="position:absolute; top:12px; right:12px; width:38px; height:38px; border-radius:50%; border:1px solid #451212; background:#fff7f2; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-close-line" style="font-size:20px; color:#451212;"></i></button>
         </div>
         <div style="flex:1; overflow:auto; padding:18px 20px 24px;">
-          <div style="font:500 9.5px 'Saans Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#057a28;">{{ dKicker }}</div>
-          <div style="font:400 30px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910; margin:8px 0 8px;">{{ dName }}</div>
-          <div style="font:italic 400 16px/1.45 'Serrif VF',Georgia,serif; color:#01200d;">{{ dBlurb }}</div>
-          <div style="display:flex; align-items:center; gap:7px; border-top:1px solid #d4e8da; margin-top:14px; padding-top:12px;">
-            <i class="ri-star-fill" style="font-size:13px; color:#057a28;"></i>
-            <span style="font:500 14px 'Saans Mono',monospace; color:#002910;">{{ dRating }}</span>
+          <div style="font:500 9.5px 'Saans Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#c0361c;">{{ dKicker }}</div>
+          <div style="font:400 30px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:8px 0 8px;">{{ dName }}</div>
+          <div style="font:italic 400 16px/1.45 'Serrif VF',Georgia,serif; color:#38100c;">{{ dBlurb }}</div>
+          <div style="display:flex; align-items:center; gap:7px; border-top:1px solid #f2d3c6; margin-top:14px; padding-top:12px;">
+            <i class="ri-star-fill" style="font-size:13px; color:#c0361c;"></i>
+            <span style="font:500 14px 'Saans Mono',monospace; color:#451212;">{{ dRating }}</span>
             <span style="font:400 13px 'Saans',sans-serif; color:#676c79;">{{ dRatingLabel }}</span>
-            <a href="{{ dMaps }}" target="_blank" rel="noopener" style="margin-left:auto; font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#008c44; text-decoration:none; border-bottom:1px solid #008c44; padding-bottom:1px;">Open in Maps</a>
+            <a href="{{ dMaps }}" target="_blank" rel="noopener" style="margin-left:auto; font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#d1401f; text-decoration:none; border-bottom:1px solid #d1401f; padding-bottom:1px;">Open in Maps</a>
           </div>
           <div style="display:flex; gap:10px; margin:14px 0 6px;">
             <button onClick="{{ dHeart }}" style="{{ dHeartStyle }}"><i class="{{ dHeartIcon }}" style="font-size:16px;"></i>{{ dHeartLabel }}</button>
             <button onClick="{{ dPlan }}" style="{{ dPlanStyle }}">{{ dPlanLabel }}</button>
+            <button onClick="{{ dShare }}" aria-label="Share this spot" style="flex:none; width:46px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-share-forward-line" style="font-size:17px;"></i></button>
           </div>
           <sc-if value="{{ dMyReview }}" hint-placeholder-val="{{ false }}">
-            <div style="border:1px solid #002910; background:#f8fffa; padding:12px 14px; margin-bottom:10px;">
+            <div style="border:1px solid #451212; background:#fff7f2; padding:12px 14px; margin-bottom:10px;">
               <div style="display:flex; align-items:baseline; gap:8px;">
-                <span style="font:500 10px 'Saans Mono',monospace; letter-spacing:.04em; color:#057a28;">{{ dMyHead }}</span>
-                <button onClick="{{ dMyEdit }}" style="margin-left:auto; font:500 9px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; border:none; color:#008c44; cursor:pointer; padding:2px;">Edit</button>
+                <span style="font:500 10px 'Saans Mono',monospace; letter-spacing:.04em; color:#c0361c;">{{ dMyHead }}</span>
+                <button onClick="{{ dMyEdit }}" style="margin-left:auto; font:500 9px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; border:none; color:#d1401f; cursor:pointer; padding:2px;">Edit</button>
                 <button onClick="{{ dMyDelete }}" style="font:500 9px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; border:none; color:#852952; cursor:pointer; padding:2px;">Delete</button>
               </div>
-              <div style="font:italic 400 14.5px/1.5 'Serrif VF',Georgia,serif; color:#01200d; margin-top:5px;">{{ dMyText }}</div>
+              <div style="font:italic 400 14.5px/1.5 'Serrif VF',Georgia,serif; color:#38100c; margin-top:5px;">{{ dMyText }}</div>
             </div>
           </sc-if>
           <sc-if value="{{ dRevEdit }}" hint-placeholder-val="{{ false }}">
-            <div style="border:1px solid #002910; background:#ffffff; padding:12px 14px; margin-bottom:10px;">
+            <div style="border:1px solid #451212; background:#ffffff; padding:12px 14px; margin-bottom:10px;">
               <div style="display:flex; gap:4px; margin-bottom:9px;">
                 <sc-for list="{{ dRevStars }}" as="st" hint-placeholder-count="5">
-                  <button onClick="{{ st.go }}" aria-label="Set rating" style="background:none; border:none; cursor:pointer; padding:2px;"><i class="{{ st.icon }}" style="font-size:19px; color:#057a28;"></i></button>
+                  <button onClick="{{ st.go }}" aria-label="Set rating" style="background:none; border:none; cursor:pointer; padding:2px;"><i class="{{ st.icon }}" style="font-size:19px; color:#c0361c;"></i></button>
                 </sc-for>
               </div>
-              <input value="{{ dRevText }}" onChange="{{ dRevOnText }}" placeholder="Your verdict, in a sentence or three…" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #d4e8da; color:#002910; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+              <input value="{{ dRevText }}" onChange="{{ dRevOnText }}" placeholder="Your verdict, in a sentence or three…" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
               <div style="display:flex; gap:8px; margin-top:9px;">
-                <button onClick="{{ dRevSave }}" style="flex:1; font:500 13px 'Saans',sans-serif; background:#00ff64; color:#002910; border:none; border-radius:58px; padding:11px; cursor:pointer;">Publish</button>
-                <button onClick="{{ dRevCancel }}" style="font:500 13px 'Saans',sans-serif; background:#ffffff; color:#676c79; border:1px solid #d4e8da; border-radius:58px; padding:11px 16px; cursor:pointer;">Cancel</button>
+                <button onClick="{{ dRevSave }}" style="flex:1; font:500 13px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:11px; cursor:pointer;">Publish</button>
+                <button onClick="{{ dRevCancel }}" style="font:500 13px 'Saans',sans-serif; background:#ffffff; color:#676c79; border:1px solid #f2d3c6; border-radius:58px; padding:11px 16px; cursor:pointer;">Cancel</button>
               </div>
             </div>
           </sc-if>
           <sc-if value="{{ dRevButton }}" hint-placeholder-val="{{ false }}">
-            <button onClick="{{ dRevOpen }}" style="display:block; width:100%; text-align:center; font:500 13px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; color:#008c44; border:1px dashed #d4e8da; padding:11px; cursor:pointer; margin-bottom:10px;">Write your review</button>
+            <button onClick="{{ dRevOpen }}" style="display:block; width:100%; text-align:center; font:500 13px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; color:#d1401f; border:1px dashed #f2d3c6; padding:11px; cursor:pointer; margin-bottom:10px;">Write your review</button>
           </sc-if>
           <sc-if value="{{ dResyIdle }}" hint-placeholder-val="{{ false }}">
-            <button onClick="{{ dResyCheck }}" style="display:block; width:100%; text-align:center; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#002910; border:1px solid #002910; border-radius:58px; padding:12px; cursor:pointer; margin-bottom:6px;">Check tonight’s tables <span style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#057a28;">Resy</span></button>
+            <button onClick="{{ dResyCheck }}" style="display:block; width:100%; text-align:center; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:12px; cursor:pointer; margin-bottom:6px;">Check tonight’s tables <span style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#c0361c;">Resy</span></button>
           </sc-if>
           <sc-if value="{{ dResyLoading }}" hint-placeholder-val="{{ false }}">
-            <div style="text-align:center; font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; padding:12px; border:1px dashed #d4e8da; margin-bottom:6px;">Interrogating Resy… takes a moment.</div>
+            <div style="text-align:center; font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; padding:12px; border:1px dashed #f2d3c6; margin-bottom:6px;">Interrogating Resy… takes a moment.</div>
           </sc-if>
           <sc-if value="{{ dResyUrl }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px; align-items:center;">
-              <span style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28;">Tonight on Resy:</span>
+              <span style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Tonight on Resy:</span>
               <sc-for list="{{ dResySlots }}" as="sl" hint-placeholder-count="3">
-                <a href="{{ sl.href }}" target="_blank" rel="noopener" style="font:500 13px 'Saans Mono',monospace; background:#00ff64; color:#002910; padding:8px 12px; text-decoration:none; border-radius:58px;">{{ sl.label }}</a>
+                <a href="{{ sl.href }}" target="_blank" rel="noopener" style="font:500 13px 'Saans Mono',monospace; background:#e8432c; color:#fff5ee; padding:8px 12px; text-decoration:none; border-radius:58px;">{{ sl.label }}</a>
               </sc-for>
-              <a href="{{ dResyUrl }}" target="_blank" rel="noopener" style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#008c44; text-decoration:none; border-bottom:1px solid #008c44; padding-bottom:1px;">Open Resy</a>
+              <a href="{{ dResyUrl }}" target="_blank" rel="noopener" style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#d1401f; text-decoration:none; border-bottom:1px solid #d1401f; padding-bottom:1px;">Open Resy</a>
             </div>
           </sc-if>
           <sc-if value="{{ dResyNone }}" hint-placeholder-val="{{ false }}">
@@ -415,8 +416,8 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
           </sc-if>
           <sc-if value="{{ dBookable }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex; gap:10px; margin-bottom:6px;">
-              <a href="{{ dBookFork }}" target="_blank" rel="noopener" style="flex:1.4; text-align:center; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#002910; border:1px solid #d4e8da; border-radius:58px; padding:12px 6px; text-decoration:none;">Book a table <span style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#057a28;">TheFork</span></a>
-              <a href="{{ dBookOT }}" target="_blank" rel="noopener" style="flex:1; text-align:center; font:500 13px 'Saans',sans-serif; background:#ffffff; color:#676c79; border:1px solid #d4e8da; border-radius:58px; padding:12px 6px; text-decoration:none;">OpenTable</a>
+              <a href="{{ dBookFork }}" target="_blank" rel="noopener" style="flex:1.4; text-align:center; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #f2d3c6; border-radius:58px; padding:12px 6px; text-decoration:none;">Book a table <span style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#c0361c;">TheFork</span></a>
+              <a href="{{ dBookOT }}" target="_blank" rel="noopener" style="flex:1; text-align:center; font:500 13px 'Saans',sans-serif; background:#ffffff; color:#676c79; border:1px solid #f2d3c6; border-radius:58px; padding:12px 6px; text-decoration:none;">OpenTable</a>
             </div>
           </sc-if>
           <sc-if value="{{ dLoadingReviews }}" hint-placeholder-val="{{ false }}">
@@ -426,22 +427,22 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
             <div style="font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; margin-top:12px;">{{ dNoReviews }}</div>
           </sc-if>
           <sc-for list="{{ dReviews }}" as="rv" hint-placeholder-count="2">
-            <div style="border-top:1px solid #d4e8da; padding:12px 0 2px; margin-top:10px;">
-              <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.04em; color:#057a28;">{{ rv.head }}</div>
-              <div style="font:italic 400 14.5px/1.5 'Serrif VF',Georgia,serif; color:#01200d; margin-top:6px;">{{ rv.text }}</div>
+            <div style="border-top:1px solid #f2d3c6; padding:12px 0 2px; margin-top:10px;">
+              <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.04em; color:#c0361c;">{{ rv.head }}</div>
+              <div style="font:italic 400 14.5px/1.5 'Serrif VF',Georgia,serif; color:#38100c; margin-top:6px;">{{ rv.text }}</div>
             </div>
           </sc-for>
           <sc-if value="{{ dSimilarAny }}" hint-placeholder-val="{{ false }}">
-            <div style="border-top:1px solid #002910; margin-top:16px; padding-top:14px;">
-              <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#057a28;">Similar, nearby</div>
+            <div style="border-top:1px solid #451212; margin-top:16px; padding-top:14px;">
+              <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#c0361c;">Similar, nearby</div>
               <sc-for list="{{ dSimilar }}" as="sn" hint-placeholder-count="3">
                 <div onClick="{{ sn.open }}" style="{{ sn.style }}">
                   <div style="{{ sn.thumb }}"><i class="{{ sn.thumbIcon }}" style="{{ sn.thumbIconStyle }}"></i></div>
                   <div style="flex:1; min-width:0;">
-                    <div style="font:700 14px 'Saans',sans-serif; color:#002910;">{{ sn.name }}</div>
-                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; margin-top:3px;">{{ sn.meta }}</div>
+                    <div style="font:700 14px 'Saans',sans-serif; color:#451212;">{{ sn.name }}</div>
+                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ sn.meta }}</div>
                   </div>
-                  <i class="ri-arrow-right-s-line" style="font-size:18px; color:#008c44;"></i>
+                  <i class="ri-arrow-right-s-line" style="font-size:18px; color:#d1401f;"></i>
                 </div>
               </sc-for>
             </div>
@@ -452,13 +453,13 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
 
     <!-- toast -->
     <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
-      <div style="position:absolute; bottom:calc(96px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); background:#002910; color:#f8fffa; font:500 12px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; padding:11px 16px; white-space:nowrap; animation:whim-toast .25s ease-out; z-index:40;">{{ toast }}</div>
+      <div style="position:absolute; bottom:calc(96px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); background:#451212; color:#fff7f2; font:500 12px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; padding:11px 16px; white-space:nowrap; animation:whim-toast .25s ease-out; z-index:40;">{{ toast }}</div>
     </sc-if>
 
     <!-- tab bar -->
-    <div style="display:flex; border-top:1px solid #002910; background:#ffffff; padding-bottom:env(safe-area-inset-bottom);">
+    <div style="display:flex; border-top:1px solid #451212; background:#ffffff; padding-bottom:env(safe-area-inset-bottom);">
       <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
-        <button onClick="{{ t.go }}" style="{{ t.style }}"><i class="{{ t.icon }}" style="font-size:22px; display:block; margin:0 auto 3px;"></i>{{ t.label }}<sc-if value="{{ t.badge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:4px; color:#008c44;">({{ t.badge }})</span></sc-if></button>
+        <button onClick="{{ t.go }}" style="{{ t.style }}"><i class="{{ t.icon }}" style="font-size:22px; display:block; margin:0 auto 3px;"></i>{{ t.label }}<sc-if value="{{ t.badge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:4px; color:#d1401f;">({{ t.badge }})</span></sc-if></button>
       </sc-for>
     </div>
   </sc-if>
@@ -538,7 +539,7 @@ const CTX = {
 const ACCENTS = {
   pink:   { bg:'#ffd3fd', dot:'#c54b9b', ink:'#852952', chip:'#fff7ff', body:'#fee7fd' },
   indigo: { bg:'#e5e5ff', dot:'#1b1b8f', ink:'#1b1b8f', chip:'#f4f4ff', body:'#e5e5ff' },
-  green:  { bg:'#ccffe0', dot:'#057a28', ink:'#057a28', chip:'#f8fffa', body:'#ccffe0' },
+  green:  { bg:'#ffd9c9', dot:'#c0361c', ink:'#c0361c', chip:'#fff7f2', body:'#ffd9c9' },
   yellow: { bg:'#EEFF8C', dot:'#8a9a1e', ink:'#5c6a0a', chip:'#fbffe0', body:'#EEFF8C' },
 };
 
@@ -913,6 +914,23 @@ class Component extends DCLogic {
       return { myReviews, revEdit: false };
     });
     this.showToast('Retracted. Very diplomatic.');
+  }
+
+  shareCard(id) {
+    const p = this.findPlace(id);
+    if (!p) return;
+    const live = this.state.details[id] || this.state.live[id] || {};
+    const rating = live.rating || (RATINGS[id] || [])[0] || (p.grating || '');
+    const text = `${p.name} — ${p.kind}, ${p.area}, Paris. ${p.blurb} ${rating ? rating + '★. ' : ''}https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + ' Paris')} — found on Whim`;
+    const done = () => this.showToast('Copied. Send it to someone with taste.');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => this.showToast('Couldn’t copy. Rude.'));
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { this.showToast('Couldn’t copy. Rude.'); }
+      document.body.removeChild(ta);
+    }
   }
 
   toggleHeart(id) {
@@ -1303,9 +1321,9 @@ class Component extends DCLogic {
       dNoReviews: p.noLive ? 'No reviews. It\u2019s a walk \u2014 take it up with the pavement.' : (dd && !reviews.length ? 'Google is being shy about this one.' : ''),
       dHeartIcon: hearted ? 'ri-heart-3-fill' : 'ri-heart-add-line',
       dHeartLabel: hearted ? 'Saved' : 'Save for later',
-      dHeartStyle: { flex: 1, font: "500 14px 'Saans', sans-serif", background: hearted ? '#fee7fd' : '#ffffff', color: hearted ? '#852952' : '#002910', border: '1px solid ' + (hearted ? '#c54b9b' : '#002910'), borderRadius: 58, padding: '13px 8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 },
+      dHeartStyle: { flex: 1, font: "500 14px 'Saans', sans-serif", background: hearted ? '#fee7fd' : '#ffffff', color: hearted ? '#852952' : '#451212', border: '1px solid ' + (hearted ? '#c54b9b' : '#451212'), borderRadius: 58, padding: '13px 8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 },
       dPlanLabel: inPlan ? 'In your plan ✓' : 'Add to plan',
-      dPlanStyle: { flex: 1, font: "500 14px 'Saans', sans-serif", background: inPlan ? '#002910' : '#00ff64', color: inPlan ? '#f8fffa' : '#002910', border: 'none', borderRadius: 58, padding: '13px 8px', cursor: 'pointer' },
+      dPlanStyle: { flex: 1, font: "500 14px 'Saans', sans-serif", background: inPlan ? '#451212' : '#e8432c', color: inPlan ? '#fff7f2' : '#fff5ee', border: 'none', borderRadius: 58, padding: '13px 8px', cursor: 'pointer' },
       dMyReview: !!(S.myReviews[p.id] && !S.revEdit),
       dMyHead: S.myReviews[p.id] ? `${'★'.repeat(S.myReviews[p.id].stars)}${'☆'.repeat(5 - S.myReviews[p.id].stars)}  You` : '',
       dMyText: S.myReviews[p.id] ? `“${S.myReviews[p.id].text}”` : '',
@@ -1335,7 +1353,7 @@ class Component extends DCLogic {
             name: x.name,
             meta: `${x.kind} · ${dk < 1 ? Math.max(50, Math.round(dk * 1000 / 50) * 50) + 'm' : dk.toFixed(1) + 'km'} away`,
             open: () => this.openDetail(x.id),
-            style: { display: 'flex', alignItems: 'center', gap: 10, background: '#ffffff', border: '1px solid #d4e8da', padding: '9px 12px 9px 9px', cursor: 'pointer', marginTop: 8 },
+            style: { display: 'flex', alignItems: 'center', gap: 10, background: '#ffffff', border: '1px solid #f2d3c6', padding: '9px 12px 9px 9px', cursor: 'pointer', marginTop: 8 },
             thumb: S.photos[x.id]
               ? { width: 44, height: 44, flex: 'none', backgroundImage: `url("${S.photos[x.id]}")`, backgroundSize: 'cover', backgroundPosition: 'center', border: `1px solid ${xa.dot}` }
               : { width: 44, height: 44, flex: 'none', background: xa.bg, backgroundImage: `radial-gradient(${xa.dot} 1px, transparent 1px)`, backgroundSize: '8px 8px', border: `1px solid ${xa.dot}`, display: 'flex', alignItems: 'center', justifyContent: 'center' },
@@ -1344,6 +1362,7 @@ class Component extends DCLogic {
           };
         }),
       get dSimilarAny() { return this.dSimilar.length > 0; },
+      dShare: () => this.shareCard(p.id),
       dHeart: () => this.toggleHeart(p.id),
       dPlan: () => this.togglePlan(p.id),
       dClose: () => this.closeDetail(),
@@ -1411,25 +1430,25 @@ class Component extends DCLogic {
         wrapStyle: {
           position: 'absolute', inset: 0,
           display: 'flex', flexDirection: 'column',
-          background: '#ffffff', border: '1px solid #d4e8da',
+          background: '#ffffff', border: '1px solid #f2d3c6',
           overflow: 'hidden',
           zIndex: 10 - i,
           transform: `translateY(${i * 10}px) scale(${1 - i * 0.035})`,
           transformOrigin: 'top center',
           touchAction: 'none', userSelect: 'none',
           cursor: isTop ? 'grab' : 'default',
-          boxShadow: '0 1px 4px rgba(0,13,5,0.06)',
+          boxShadow: '0 1px 4px rgba(40,8,6,0.08)',
         },
         showIcon: !isQuiz && !S.photos[c.id],
         artStyle: a ? (S.photos[c.id] ? {
           height: '44%', flex: 'none', position: 'relative', overflow: 'hidden',
-          borderBottom: '1px solid #002910',
+          borderBottom: '1px solid #451212',
           backgroundColor: a.bg,
           backgroundImage: `url("${S.photos[c.id]}")`,
           backgroundSize: 'cover', backgroundPosition: 'center',
         } : {
           height: '44%', flex: 'none', position: 'relative', overflow: 'hidden',
-          borderBottom: '1px solid #002910',
+          borderBottom: '1px solid #451212',
           backgroundColor: a.bg,
           backgroundImage: `radial-gradient(${a.dot} 1.5px, transparent 1.5px)`,
           backgroundSize: '13px 13px',
@@ -1475,9 +1494,9 @@ class Component extends DCLogic {
     const ctlBtn = (active) => ({
       font: "500 9.5px 'Saans Mono', monospace", letterSpacing: '.05em', textTransform: 'uppercase',
       padding: '10px 4px', cursor: 'pointer',
-      background: active ? '#002910' : '#ffffff',
-      color: active ? '#f8fffa' : '#002910',
-      border: active ? '1px solid #002910' : '1px solid #d4e8da',
+      background: active ? '#451212' : '#ffffff',
+      color: active ? '#fff7f2' : '#451212',
+      border: active ? '1px solid #451212' : '1px solid #f2d3c6',
     });
 
     const geoBit = S.geo === 'ok' ? ' · Near you' : S.geo === 'far' ? ' · From afar' : '';
@@ -1493,7 +1512,7 @@ class Component extends DCLogic {
       commitName: () => this.commitName(),
       obProgress: `${String(Math.min(S.obStep + 1, OB.length)).padStart(2, '0')} / ${String(OB.length).padStart(2, '0')}`,
       obSec: ob.sec,
-      obBarStyle: { height: '100%', background: '#00ff64', width: `${Math.round((Math.max(S.obStep, 0) / OB.length) * 100)}%`, transition: 'width .3s ease-out' },
+      obBarStyle: { height: '100%', background: '#e8432c', width: `${Math.round((Math.max(S.obStep, 0) / OB.length) * 100)}%`, transition: 'width .3s ease-out' },
       obQuestion: ob.q, obSub: ob.sub,
       obOptions: ob.opts.map(o => ({
         label: o,
@@ -1516,16 +1535,16 @@ class Component extends DCLogic {
         go: () => this.setState({ tab: t.key }),
         style: {
           ...btnBase,
-          color: S.tab === t.key ? '#002910' : '#a5aab6',
-          borderTop: S.tab === t.key ? '2px solid #002910' : '2px solid transparent',
+          color: S.tab === t.key ? '#451212' : '#a5aab6',
+          borderTop: S.tab === t.key ? '2px solid #451212' : '2px solid transparent',
         },
       })),
 
       catChips: [
-        { key: 'all', label: 'All', bg: '#ffffff', ink: '#002910' },
+        { key: 'all', label: 'All', bg: '#ffffff', ink: '#451212' },
         { key: 'pink', label: 'Food', bg: '#fee7fd', ink: '#852952' },
         { key: 'indigo', label: 'Culture', bg: '#e5e5ff', ink: '#1b1b8f' },
-        { key: 'green', label: 'Outdoors', bg: '#ccffe0', ink: '#057a28' },
+        { key: 'green', label: 'Outdoors', bg: '#ffd9c9', ink: '#c0361c' },
         { key: 'yellow', label: 'Nights', bg: '#EEFF8C', ink: '#5c6a0a' },
         { key: 'family', label: 'Family', bg: '#ffe9c7', ink: '#7a4b05' },
       ].map(c => {
@@ -1535,9 +1554,9 @@ class Component extends DCLogic {
           go: () => this.setState({ cat: active ? 'all' : c.key }),
           style: {
             font: "500 10px 'Saans', sans-serif", padding: '5px 10px', cursor: 'pointer',
-            background: active ? '#002910' : c.bg,
-            color: active ? '#f8fffa' : c.ink,
-            border: active ? '1px solid #002910' : '1px solid rgba(0,41,16,.12)',
+            background: active ? '#451212' : c.bg,
+            color: active ? '#fff7f2' : c.ink,
+            border: active ? '1px solid #451212' : '1px solid rgba(69,18,18,.14)',
           },
         };
       }),
@@ -1574,7 +1593,7 @@ class Component extends DCLogic {
             name: p.name,
             meta: `${p.kind} · ${this.distFor(p).dist}`,
             open: () => this.openDetail(p.id),
-            style: { display: 'flex', alignItems: 'center', gap: 10, background: '#ffffff', border: '1px solid #d4e8da', padding: '9px 12px 9px 9px', cursor: 'pointer', maxWidth: '86%', marginTop: 6 },
+            style: { display: 'flex', alignItems: 'center', gap: 10, background: '#ffffff', border: '1px solid #f2d3c6', padding: '9px 12px 9px 9px', cursor: 'pointer', maxWidth: '86%', marginTop: 6 },
             thumb: S.photos[p.id]
               ? { width: 46, height: 46, flex: 'none', backgroundImage: `url("${S.photos[p.id]}")`, backgroundSize: 'cover', backgroundPosition: 'center', border: `1px solid ${a.dot}` }
               : { width: 46, height: 46, flex: 'none', background: a.bg, backgroundImage: `radial-gradient(${a.dot} 1px, transparent 1px)`, backgroundSize: '8px 8px', border: `1px solid ${a.dot}`, display: 'flex', alignItems: 'center', justifyContent: 'center' },
@@ -1586,11 +1605,11 @@ class Component extends DCLogic {
         rowStyle: { display: 'flex', flexDirection: 'column', gap: 4, alignItems: m.who === 'me' ? 'flex-end' : 'flex-start' },
         labelStyle: {
           font: "500 8.5px 'Saans Mono', monospace", letterSpacing: '.14em', textTransform: 'uppercase',
-          color: m.who === 'me' ? '#676c79' : '#057a28',
+          color: m.who === 'me' ? '#676c79' : '#c0361c',
         },
         textStyle: m.who === 'me'
-          ? { maxWidth: '80%', font: "400 14px/1.5 'Saans', sans-serif", color: '#01200d', textAlign: 'right' }
-          : { maxWidth: '86%', font: "italic 400 15.5px/1.5 'Serrif VF', Georgia, serif", color: '#002910', opacity: m.typing ? 0.55 : 1 },
+          ? { maxWidth: '80%', font: "400 14px/1.5 'Saans', sans-serif", color: '#38100c', textAlign: 'right' }
+          : { maxWidth: '86%', font: "italic 400 15.5px/1.5 'Serrif VF', Georgia, serif", color: '#451212', opacity: m.typing ? 0.55 : 1 },
       })),
       chips: ['Plan my evening', 'I\u2019m hungry', 'What\u2019s on tonight?', 'Surprise me'].map(label => ({
         label, go: () => this.sendChatMsg(label),
