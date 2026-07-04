@@ -794,6 +794,7 @@ class Component extends DCLogic {
   state = {
     obStep: -1, obAnswers: [], name: '', nameStep: false, nameDraft: '',
     deepMode: false,
+    sharedBoot: false,
     tab: 'discover',
     // live context; overrides come from the You-tab demo controls
     timeOverride: null, weatherOverride: null,
@@ -836,6 +837,29 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
+    // shared-link landing: /p/<id> redirects here with ?place=
+    try {
+      const qs = new URLSearchParams(location.search);
+      const pid = qs.get('place');
+      if (pid) {
+        const n = (qs.get('n') || '').slice(0, 90);
+        this.setState(s => {
+          const gplaces = { ...s.gplaces };
+          if (!PLACES.find(x => x.id === pid) && !gplaces[pid] && n) {
+            gplaces[pid] = {
+              id: pid, name: n, kind: (qs.get('k') || 'Spot').slice(0, 40), icon: 'ri-map-pin-line',
+              accent: 'pink', area: 'Paris', lat: PARIS.lat, lng: PARIS.lng,
+              blurb: 'Sent to you by someone with taste.', times: ['morning', 'afternoon', 'evening', 'night'],
+              weather: 'any', slot: 60, wild: true,
+            };
+          }
+          return { sharedBoot: true, gplaces };
+        });
+        setTimeout(() => this.openDetail(pid), 60);
+        history.replaceState(null, '', location.pathname);
+      }
+    } catch (e) { /* malformed share params */ }
+
     const WIKI = {
       p4: ['en', 'Canal Saint-Martin'],
       p5: ['en', 'Sainte-Chapelle'],
@@ -1452,19 +1476,19 @@ class Component extends DCLogic {
     if (!p) return;
     const live = this.state.details[id] || this.state.live[id] || {};
     const rating = live.rating || (RATINGS[id] || [])[0] || (p.grating || '');
-    const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + ' Paris')}`;
+    const share = `${location.origin}/p/${encodeURIComponent(p.id)}${PLACES.find(x => x.id === p.id) ? '' : `?n=${encodeURIComponent(p.name)}&k=${encodeURIComponent(p.kind)}`}`;
     const body = `${p.name} — ${p.kind}, ${p.area}, Paris. ${p.blurb}${rating ? ` ${rating}★.` : ''} Found on Whim.`;
     // native share sheet on mobile; clipboard on desktop
     if (navigator.share) {
-      navigator.share({ title: `${p.name} — Whim`, text: body, url: maps })
+      navigator.share({ title: `${p.name} — Whim`, text: body, url: share })
         .then(() => this.showToast('Sent. Excellent taste travels.'))
         .catch((e) => {
           if (e && e.name === 'AbortError') return; // user closed the sheet
-          this.copyShare(`${body} ${maps}`);
+          this.copyShare(`${body} ${share}`);
         });
       return;
     }
-    this.copyShare(`${body} ${maps}`);
+    this.copyShare(`${body} ${share}`);
   }
 
   copyShare(text) {
@@ -2104,7 +2128,7 @@ class Component extends DCLogic {
     const sass = this.props.sassLevel ?? 'full';
     const skipOb = this.props.skipOnboarding ?? false;
 
-    const booted = skipOb || S.obStep >= OB.length;
+    const booted = skipOb || S.obStep >= OB.length || S.sharedBoot;
     const showSplash = !booted && S.obStep === -1 && !S.nameStep;
     const showName = !booted && S.nameStep;
     const pendingDeep = DEEP.filter(q => !S.quizAnswers[q.id]);
