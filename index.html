@@ -45,16 +45,12 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
 
   <!-- ===== ONBOARDING ===== -->
   <sc-if value="{{ showSplash }}" hint-placeholder-val="{{ true }}">
-    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0; padding:32px; text-align:center; background-color:#ffffff; background-image:radial-gradient(#f2d3c6 1px, transparent 1px); background-size:24px 24px;">
-      <div style="font:500 11.5px 'Saans Mono',monospace; letter-spacing:.16em; color:#c0361c; text-transform:uppercase; margin-bottom:16px;">Est. 2026 · Paris edition</div>
-      <div style="width:230px; border-top:1px solid #451212; margin-bottom:2px;"></div>
-      <div style="width:230px; border-top:1px solid #451212; margin-bottom:24px;"></div>
-      <img src="/whim-logo.png" alt="{{ appName }}" style="width:250px; max-width:72%; height:auto; display:block; margin:8px auto 0;">
-      <div style="font:italic 400 20px/1.4 'Serrif VF',Georgia,serif; color:#38100c; margin:22px 0 24px; max-width:280px;">Swipe right on Paris.<br>Left on regret.</div>
-      <div style="width:230px; border-top:1px solid #451212; margin-bottom:2px;"></div>
-      <div style="width:230px; border-top:1px solid #451212; margin-bottom:32px;"></div>
-      <button onClick="{{ startQuiz }}" style="font:500 17px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:18px 46px; cursor:pointer;">Allons-y</button>
-      <div style="font:400 13px/1.5 'Saans',sans-serif; color:#676c79; margin-top:16px; max-width:280px;">Ten questions. Then I know you better than your mother does.</div>
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; padding:28px 32px calc(34px + env(safe-area-inset-bottom)); background-image:url('/whim-splash.jpg'); background-size:cover; background-position:center 30%;">
+      <div style="font:500 11.5px 'Saans Mono',monospace; letter-spacing:.16em; color:#451212; text-transform:uppercase; text-shadow:0 1px 8px rgba(255,247,242,.7);">Est. 2026 · Paris edition</div>
+      <div style="flex:1;"></div>
+      <div style="font:italic 400 21px/1.4 'Serrif VF',Georgia,serif; color:#451212; margin-bottom:22px; max-width:280px; text-shadow:0 1px 10px rgba(255,247,242,.75);">Swipe right on Paris.<br>Left on regret.</div>
+      <button onClick="{{ startQuiz }}" style="font:500 17px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:18px 46px; cursor:pointer; box-shadow:0 8px 26px rgba(69,18,18,.28);">Allons-y</button>
+      <div style="font:400 13px/1.5 'Saans',sans-serif; color:#451212; margin-top:14px; max-width:280px; text-shadow:0 1px 8px rgba(255,247,242,.7);">Ten questions. Then I know you better than your mother does.</div>
     </div>
   </sc-if>
 
@@ -751,6 +747,7 @@ function restoreState() {
       planStatus: s.planStatus === 'approved' ? 'approved' : 'draft',
       chat: Array.isArray(s.chat) && s.chat.length ? s.chat.slice(-30) : undefined,
       hearts: s.hearts || {},
+      seen: s.seen || {},
       name: typeof s.name === 'string' ? s.name.slice(0, 40) : '',
       myReviews: s.myReviews || {},
       gplaces: s.gplaces || {},
@@ -777,7 +774,8 @@ class Component extends DCLogic {
     photos: {}, live: {}, pulse: [], hearts: {}, detail: null, details: {}, resy: {},
     myReviews: {}, revEdit: false, revText: '', revStars: 5,
     gplaces: {},
-    user: null, authReady: false, username: '',
+    user: null, authReady: false,
+    seen: {}, username: '',
     authMode: 'signup', authEmail: '', authPassword: '', authUser: '', authBusy: false,
     acctNudge: true,
     friends: [], frIn: [], frOut: [], frDraft: '', friendView: null, friendReviews: {},
@@ -792,6 +790,7 @@ class Component extends DCLogic {
         swiped: S.swiped, swipeCount: S.swipeCount, planStatus: S.planStatus,
         chat: S.chat.filter(m => !m.typing).slice(-30),
         hearts: S.hearts,
+        seen: Object.fromEntries(Object.entries(S.seen).slice(-200)),
         name: S.name,
         myReviews: S.myReviews,
         // keep only the dynamic places the user has acted on
@@ -1255,21 +1254,21 @@ class Component extends DCLogic {
     const T = this.getTaste();
     const ll = `${loc.lat.toFixed(3)},${loc.lng.toFixed(3)}`;
     this._seed = this._seed || Math.floor(Math.random() * 1e9);
+    // day bucket rotates the edge cache so the pool refreshes daily
+    const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());
 
     const calls = [];
     // base sweep — popularity-capped for hidden-gem people so it's not the same icons
-    calls.push({ url: `/api/discover?ll=${ll}${T.offPath ? '&cap=15000' : ''}`, meta: null });
-    // one extra sweep from a rotating offbeat neighborhood for explorers
-    if (T.offPath) {
-      const a = Component.OFFBEAT[this._seed % Component.OFFBEAT.length];
-      calls.push({ url: `/api/discover?ll=${a.lat},${a.lng}&cap=15000`, meta: null });
-    }
-    // up to 3 taste-targeted keyword hunts, rotated by session seed
+    calls.push({ url: `/api/discover?ll=${ll}&d=${day}${T.offPath ? '&cap=15000' : ''}`, meta: null });
+    // everyone gets one rotating-neighborhood sweep; explorers get a capped one
+    const a = Component.OFFBEAT[(this._seed + (T.offPath ? 1 : 0)) % Component.OFFBEAT.length];
+    calls.push({ url: `/api/discover?ll=${a.lat},${a.lng}&d=${day}${T.offPath ? '&cap=15000' : ''}`, meta: null });
+    // every active taste hunt (bounded), rotated so the day's cache still varies per session
     const active = Component.TASTE_QUERIES.filter(t => T[t.flag]);
     active
-      .sort((a, b) => strHash(a.flag + this._seed) - strHash(b.flag + this._seed))
-      .slice(0, 3)
-      .forEach(t => calls.push({ url: `/api/discover?ll=${ll}&q=${encodeURIComponent(t.q)}`, meta: t }));
+      .sort((x, y) => strHash(x.flag + this._seed) - strHash(y.flag + this._seed))
+      .slice(0, 6)
+      .forEach(t => calls.push({ url: `/api/discover?ll=${ll}&d=${day}&q=${encodeURIComponent(t.q)}`, meta: t }));
 
     calls.forEach(({ url, meta }) => this.fetchWildcards(url, meta));
   }
@@ -1412,6 +1411,25 @@ class Component extends DCLogic {
     this.showToast(liked ? 'Out of the plan.' : 'In the plan. The concierge is drafting.');
   }
 
+  markSeen(id) {
+    this._sessionSeen = this._sessionSeen || {};
+    if (!id || id[0] === 'q' || this._sessionSeen[id]) return;
+    this._sessionSeen[id] = true;
+    // defer so we never set state inside a render pass
+    setTimeout(() => this.setState(s => {
+      const prev = s.seen[id] || { n: 0 };
+      return { seen: { ...s.seen, [id]: { n: prev.n + 1, at: Date.now() } } };
+    }), 0);
+  }
+
+  seenPenalty(id) {
+    const e = this.state.seen[id];
+    if (!e || (this._sessionSeen || {})[id]) return 0; // don't penalize mid-session
+    const days = (Date.now() - e.at) / 86400000;
+    if (days > 5) return 0.5;
+    return Math.min(5, 2.5 * e.n);
+  }
+
   componentDidUpdate() {
     const el = document.querySelector('[data-chat-scroll]');
     if (el) el.scrollTop = el.scrollHeight;
@@ -1527,11 +1545,8 @@ class Component extends DCLogic {
     );
     this._seed = this._seed || Math.floor(Math.random() * 1e9);
     const jit = (id) => ((strHash(id + this._seed) % 1000) / 1000 - 0.5) * 2.4;
-    const deck = places
-      .map(p => ({ ...p, ...this.distFor(p), score: this.scorePlace(p, T) + (catActive && fitsNow(p) ? 3 : 0), notNow: catActive && !fitsNow(p) }))
-      .sort((a, b) => (b.score + jit(b.id)) - (a.score + jit(a.id)) || a.km - b.km || a.slot - b.slot);
 
-    // wildcards: fresh Google Maps finds, rotated per session
+    // wildcards join the same scored pool as curated spots (up to 8, seed-rotated)
     const wilds = Object.values(this.state.gplaces)
       .filter(p =>
         p.wild && !swiped[p.id] &&
@@ -1540,15 +1555,34 @@ class Component extends DCLogic {
         !(T.noMuseums && (p.kind === 'Museum' || p.kind === 'Gallery')) &&
         (this.state.cat === 'all' || (this.state.cat === 'family' ? !!p.kids : p.accent === this.state.cat))
       )
-      .map(p => ({ ...p, ...this.distFor(p), score: this.scorePlace(p, T), notNow: catActive && !fitsNow(p) }))
+      .map(p => ({ ...p, ...this.distFor(p) }))
       .filter(p => p.km < 3.5)
       .sort((a, b) => strHash(a.id + this._seed) - strHash(b.id + this._seed))
-      .slice(0, 4);
-    wilds.forEach((w, i) => {
-      const at = 1 + i * 3;
-      if (deck.length >= at) deck.splice(at, 0, w);
-      else deck.push(w);
-    });
+      .slice(0, 8);
+
+    let deck = places
+      .map(p => ({ ...p, ...this.distFor(p) }))
+      .concat(wilds)
+      .map(p => ({ ...p, score: this.scorePlace(p, T) + (catActive && fitsNow(p) ? 3 : 0) - this.seenPenalty(p.id), notNow: catActive && !fitsNow(p) }))
+      .filter(p => p.score > -3) // taste mismatches don't deserve airtime
+      .sort((a, b) => (b.score + jit(b.id)) - (a.score + jit(a.id)) || a.km - b.km || (a.slot || 99) - (b.slot || 99));
+
+    // diversity quota: no more than 2 of the same kind in any run of 6
+    const quota = [];
+    const rest = [...deck];
+    while (rest.length) {
+      const windowKinds = quota.slice(-5).map(p => p.kind);
+      let ix = rest.findIndex(p => windowKinds.filter(k => k === p.kind).length < 2);
+      if (ix === -1) ix = 0;
+      quota.push(rest.splice(ix, 1)[0]);
+    }
+    deck = quota;
+
+    // keep discovery alive: guarantee a wildcard near the top when one exists
+    if (deck.length > 2 && !deck.slice(0, 3).some(p => p.wild)) {
+      const wix = deck.findIndex(p => p.wild);
+      if (wix > 2) deck.splice(1, 0, deck.splice(wix, 1)[0]);
+    }
 
     const pending = [...QUIZ, ...DEEP].filter(q => !quizAnswers[q.id]);
     if (pending[0] && deck.length > 2) deck.splice(2, 0, pending[0]);
@@ -1903,6 +1937,7 @@ class Component extends DCLogic {
       const isQuiz = !!c.q;
       const a = isQuiz ? null : ACCENTS[c.accent];
       if (!isQuiz) this.ensureLive(c);
+      if (i < 2 && !isQuiz) this.markSeen(c.id);
       const live = isQuiz ? null : S.live[c.id];
       const fallback = isQuiz ? null : (RATINGS[c.id] || ['4.5', '1k']);
       const openBit = live && live.openNow != null ? (live.openNow ? ' · Open now' : ' · Closed now') : '';
