@@ -1419,14 +1419,14 @@ class Component extends DCLogic {
       .then(r => (r.ok ? r.json() : null))
       .then(j => {
         if (j && j.ok) return store(j.threads);
-        // server IPs are blocked by reddit/pullpush; the browser isn't — go direct
-        const u = `https://api.pullpush.io/reddit/search/submission/?q=${encodeURIComponent(p.name)}&subreddit=paris,ParisTravelGuide,AskParis&size=10`;
-        return fetch(u)
+        // server IPs are blocked by reddit/pullpush; the browser isn't — go direct.
+        // pullpush only honors a single subreddit filter, so try the best sub first.
+        const hunt = (sub) => fetch(`https://api.pullpush.io/reddit/search/submission/?q=${encodeURIComponent('"' + p.name + '"')}&subreddit=${sub}&size=10`)
           .then(r2 => (r2.ok ? r2.json() : null))
           .then(j2 => {
-            if (!j2 || !Array.isArray(j2.data)) return;
+            if (!j2 || !Array.isArray(j2.data)) return [];
             const low = p.name.toLowerCase();
-            const threads = j2.data
+            return j2.data
               .filter(d => d && d.title)
               .map(d => ({
                 title: String(d.title).slice(0, 120),
@@ -1437,8 +1437,8 @@ class Component extends DCLogic {
               }))
               .sort((a, b) => (b.hit - a.hit) || (b.ups - a.ups))
               .slice(0, 3);
-            store(threads);
           });
+        return hunt('ParisTravelGuide').then(t => (t.length ? store(t) : hunt('paris').then(t2 => t2.length && store(t2))));
       })
       .catch(() => {});
   }

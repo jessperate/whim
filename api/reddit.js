@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   // reddit.com's JSON API now 403s server traffic; pullpush.io mirrors it openly
   const url = new URL('https://api.pullpush.io/reddit/search/submission/');
   url.searchParams.set('q', q);
-  url.searchParams.set('subreddit', 'paris,ParisTravelGuide,AskParis,francetravel');
+  url.searchParams.set('subreddit', 'ParisTravelGuide'); // pullpush honors one sub only
   url.searchParams.set('size', '10');
 
   try {
