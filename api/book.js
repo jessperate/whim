@@ -39,9 +39,14 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, found: false });
     }
 
-    // best name match, else first result
+    // Resy's Paris inventory is thin and the actor fuzzy-matches across cities;
+    // only accept results actually in Paris, and prefer a real name match.
+    const inParis = items.filter((i) =>
+      /paris/i.test(String(i.locality || '')) || String(i.country || '').toLowerCase() === 'france'
+    );
     const low = name.toLowerCase();
-    const hit = items.find((i) => String(i.name || '').toLowerCase().includes(low)) || items[0];
+    const hit = inParis.find((i) => String(i.name || '').toLowerCase().includes(low)) || inParis[0];
+    if (!hit) return res.status(200).json({ ok: true, found: false });
 
     const slots = (Array.isArray(hit.slots) ? hit.slots : [])
       .map((s) => (typeof s === 'string' ? s : (s.time || s.start || s.label || s.dateTime || null)))
