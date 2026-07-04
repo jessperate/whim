@@ -12,29 +12,6 @@ const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
 ));
 
-async function googlePhoto(name) {
-  const key = process.env.GOOGLE_PLACES_API_KEY;
-  if (!key) return null;
-  try {
-    const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': key, 'X-Goog-FieldMask': 'places.photos' },
-      body: JSON.stringify({ textQuery: `${name} Paris`, pageSize: 1 }),
-    });
-    if (!r.ok) return null;
-    const j = await r.json();
-    const ph = j.places?.[0]?.photos?.[0];
-    if (!ph?.name) return null;
-    const pr = await fetch(`https://places.googleapis.com/v1/${ph.name}/media?maxWidthPx=1200&skipHttpRedirect=true`, {
-      headers: { 'X-Goog-Api-Key': key },
-    });
-    if (!pr.ok) return null;
-    return (await pr.json())?.photoUri || null;
-  } catch (e) {
-    return null;
-  }
-}
-
 export default async function handler(req, res) {
   const id = String(req.query.id || '').slice(0, 60);
   const curated = PLACES.find((p) => p.id === id);
@@ -47,7 +24,7 @@ export default async function handler(req, res) {
   const blurb = deesc(curated ? curated.blurb : '');
   const host = req.headers.host || 'whim-eta.vercel.app';
 
-  const photo = (await googlePhoto(name)) || `https://${host}/whim-splash.jpg`;
+  const photo = `https://${host}/whim-og.jpg`;
   const desc = blurb || `${kind} in Paris, found on Whim — the pocket concierge that knows your taste.`;
   const app = `/?place=${encodeURIComponent(id)}&n=${encodeURIComponent(name)}&k=${encodeURIComponent(kind)}`;
 
@@ -61,6 +38,8 @@ export default async function handler(req, res) {
 <meta property="og:title" content="${escapeHtml(name)} — Whim">
 <meta property="og:description" content="${escapeHtml(desc)}">
 <meta property="og:image" content="${escapeHtml(photo)}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://${escapeHtml(host)}/p/${escapeHtml(id)}">
 <meta name="twitter:card" content="summary_large_image">
