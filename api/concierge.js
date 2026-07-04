@@ -10,12 +10,32 @@ export default async function handler(req, res) {
     return res.status(200).json({ reply: null, reason: 'no_key' });
   }
 
-  const { messages = [], context = {} } = req.body || {};
+  // Same-origin gate: browsers always send Origin on cross-site POSTs, so this
+  // blocks other sites scripting the endpoint. Non-browser abuse is bounded by
+  // the payload caps and max_tokens below.
+  const origin = req.headers.origin;
+  if (origin) {
+    let host = null;
+    try { host = new URL(origin).host; } catch (e) { /* malformed origin */ }
+    if (host !== req.headers.host) {
+      return res.status(403).json({ error: 'forbidden' });
+    }
+  }
 
+  const { messages = [], context = {} } = req.body || {};
+  if (!Array.isArray(messages) || messages.length > 40) {
+    return res.status(400).json({ error: 'bad_messages' });
+  }
+
+  const cap = (v, n) => (Array.isArray(v) ? v.slice(0, n) : []);
   const {
-    clock, weekday, timeOfDay, weatherLabel, tempC,
-    geo, taste = [], liked = [], deck = [], places = [],
+    clock, weekday, timeOfDay, weatherLabel, tempC, geo,
   } = context;
+  const taste = cap(context.taste, 24).map(String);
+  const liked = cap(context.liked, 40).map(String);
+  const deck = cap(context.deck, 8).map(String);
+  const places = cap(context.places, 60);
+  const pulse = cap(context.pulse, 8);
 
   const system = `You are the Whim concierge — a Paris local with impeccable taste and a dry, playful wit. Whim is a "swipe right on Paris" app: the user swipes on curated spots, you draft their day, and they can chat with you about what to do.
 
@@ -31,7 +51,10 @@ Currently on top of their deck: ${deck.length ? deck.join(', ') : 'nothing — d
 When recommending, prefer spots from Whim's curated list below (they can swipe on these). You may go off-list for specifics the list doesn't cover, but keep it real — never invent a place. Match recommendations to the current time of day and weather.
 
 Curated list:
-${places.map((p) => `- ${p.name} (${p.kind}, ${p.area})`).join('\n')}`;
+${places.map((p) => `- ${String(p.name).slice(0, 80)} (${String(p.kind).slice(0, 30)}, ${String(p.area).slice(0, 40)})`).join('\n')}${pulse.length ? `
+
+City pulse — fresh intel scraped from Paris Instagram this week (treat as leads, not gospel; mention when the user asks what's happening, what's on, or wants something timely):
+${pulse.map((p) => `- ${String(p.text).slice(0, 200)}${p.spot ? ` [${String(p.spot).slice(0, 50)}]` : ''}`).join('\n')}` : ''}`;
 
   // API requires the first message to be a user turn; drop the leading bot greeting.
   const turns = messages

@@ -1,9 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
 <title>Whim — swipe right on Paris</title>
+<meta name="description" content="A pocket concierge for Paris. Swipe on curated spots, get a day plan drafted around real time, weather and distance, and argue with the concierge.">
+<meta name="theme-color" content="#f8fffa">
+<meta property="og:title" content="Whim — swipe right on Paris">
+<meta property="og:description" content="Ten questions. Then I know you better than your mother does.">
+<meta property="og:type" content="website">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Whim">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="dns-prefetch" href="https://en.wikipedia.org">
+<link rel="dns-prefetch" href="https://upload.wikimedia.org">
+<link rel="dns-prefetch" href="https://api.open-meteo.com">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%2300ff64%27/%3E%3Ctext x=%2750%27 y=%2772%27 font-size=%2760%27 text-anchor=%27middle%27%3E%F0%9F%A5%90%3C/text%3E%3C/svg%3E">
 <script src="./support.js"></script>
 </head>
@@ -12,11 +26,11 @@
 <helmet>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet">
 <style>
-@font-face { font-family:'Serrif VF'; src:url('fonts/SerrifVF.ttf') format('truetype'); font-weight:100 900; }
-@font-face { font-family:'Saans'; src:url('fonts/Saans-Regular.ttf') format('truetype'); font-weight:400; }
-@font-face { font-family:'Saans'; src:url('fonts/Saans-Medium.ttf') format('truetype'); font-weight:500; }
-@font-face { font-family:'Saans'; src:url('fonts/Saans-Bold.ttf') format('truetype'); font-weight:700; }
-@font-face { font-family:'Saans Mono'; src:url('fonts/SaansMono-Medium.ttf') format('truetype'); font-weight:500; }
+@font-face { font-family:'Serrif VF'; src:url('fonts/SerrifVF.ttf') format('truetype'); font-display:swap; font-weight:100 900; }
+@font-face { font-family:'Saans'; src:url('fonts/Saans-Regular.ttf') format('truetype'); font-display:swap; font-weight:400; }
+@font-face { font-family:'Saans'; src:url('fonts/Saans-Medium.ttf') format('truetype'); font-display:swap; font-weight:500; }
+@font-face { font-family:'Saans'; src:url('fonts/Saans-Bold.ttf') format('truetype'); font-display:swap; font-weight:700; }
+@font-face { font-family:'Saans Mono'; src:url('fonts/SaansMono-Medium.ttf') format('truetype'); font-display:swap; font-weight:500; }
 html, body { height:100%; }
 body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; overscroll-behavior:none; }
 #whim-app { height:100dvh; }
@@ -130,8 +144,8 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
           </sc-for>
         </div>
         <div style="display:flex; justify-content:center; gap:28px; padding:8px 0 16px;">
-          <button onClick="{{ swipeNope }}" style="width:64px; height:64px; border-radius:50%; border:1px solid #ffd3fd; background:#fee7fd; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#fff7ff;"><i class="ri-close-line" style="font-size:30px; color:#852952;"></i></button>
-          <button onClick="{{ swipeLike }}" style="width:64px; height:64px; border-radius:50%; border:none; background:#00ff64; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#00cc50;"><i class="ri-heart-3-line" style="font-size:30px; color:#002910;"></i></button>
+          <button onClick="{{ swipeNope }}" aria-label="Pass" style="width:64px; height:64px; border-radius:50%; border:1px solid #ffd3fd; background:#fee7fd; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#fff7ff;"><i class="ri-close-line" style="font-size:30px; color:#852952;"></i></button>
+          <button onClick="{{ swipeLike }}" aria-label="Like" style="width:64px; height:64px; border-radius:50%; border:none; background:#00ff64; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#00cc50;"><i class="ri-heart-3-line" style="font-size:30px; color:#002910;"></i></button>
         </div>
       </div>
     </sc-if>
@@ -180,7 +194,7 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
                 <div style="font:700 16px/1.25 'Saans',sans-serif; color:#002910;">{{ stop.name }}</div>
                 <div style="{{ stop.metaStyle }}">{{ stop.meta }}</div>
               </div>
-              <button onClick="{{ stop.remove }}" style="border:none; background:none; cursor:pointer; padding:6px; margin:-6px;"><i class="ri-close-line" style="{{ stop.xStyle }}"></i></button>
+              <button onClick="{{ stop.remove }}" aria-label="Remove stop" style="border:none; background:none; cursor:pointer; padding:6px; margin:-6px;"><i class="ri-close-line" style="{{ stop.xStyle }}"></i></button>
             </div>
           </sc-for>
         </div>
@@ -212,7 +226,7 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
         </div>
         <div style="display:flex; gap:10px; padding:0 20px 16px;">
           <input value="{{ chatDraft }}" onChange="{{ onDraft }}" onKeyDown="{{ onChatKey }}" placeholder="Tell me what you're craving…" style="flex:1; min-width:0; font:400 16px 'Saans',sans-serif; background:#ffffff; border:1px solid #002910; color:#002910; padding:14px 16px; outline:none; border-radius:0; -webkit-appearance:none;">
-          <button onClick="{{ sendChat }}" style="width:52px; flex:none; border:none; background:#00ff64; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#00cc50;"><i class="ri-arrow-up-line" style="font-size:24px; color:#002910;"></i></button>
+          <button onClick="{{ sendChat }}" aria-label="Send message" style="width:52px; flex:none; border:none; background:#00ff64; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#00cc50;"><i class="ri-arrow-up-line" style="font-size:24px; color:#002910;"></i></button>
         </div>
       </div>
     </sc-if>
@@ -379,6 +393,25 @@ function fmtCount(n) {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 }
 
+const STORE_KEY = 'whim-v1';
+
+function restoreState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return {};
+    const s = JSON.parse(raw);
+    return {
+      obStep: typeof s.obStep === 'number' ? s.obStep : -1,
+      obAnswers: Array.isArray(s.obAnswers) ? s.obAnswers : [],
+      quizAnswers: s.quizAnswers || {},
+      swiped: s.swiped || {},
+      swipeCount: s.swipeCount || 0,
+      planStatus: s.planStatus === 'approved' ? 'approved' : 'draft',
+      chat: Array.isArray(s.chat) && s.chat.length ? s.chat.slice(-30) : undefined,
+    };
+  } catch (e) { return {}; }
+}
+
 class Component extends DCLogic {
   state = {
     obStep: -1, obAnswers: [],
@@ -393,8 +426,20 @@ class Component extends DCLogic {
     ],
     chatDraft: '', replyIx: 0,
     toast: '',
-    photos: {}, live: {},
+    photos: {}, live: {}, pulse: [],
+    ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
+
+  persist() {
+    try {
+      const S = this.state;
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        obStep: S.obStep, obAnswers: S.obAnswers, quizAnswers: S.quizAnswers,
+        swiped: S.swiped, swipeCount: S.swipeCount, planStatus: S.planStatus,
+        chat: S.chat.filter(m => !m.typing).slice(-30),
+      }));
+    } catch (e) {}
+  }
 
   componentDidMount() {
     const WIKI = {
@@ -434,6 +479,10 @@ class Component extends DCLogic {
     });
 
     this.initLocation();
+    fetch('/api/pulse')
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => { if (j && j.ok && Array.isArray(j.pulse)) this.setState({ pulse: j.pulse }); })
+      .catch(() => {});
     // re-render every minute so the clock and time-of-day stay honest
     this._tick = setInterval(() => this.setState({}), 60000);
     // weather goes stale politely
@@ -521,6 +570,8 @@ class Component extends DCLogic {
   componentDidUpdate() {
     const el = document.querySelector('[data-chat-scroll]');
     if (el) el.scrollTop = el.scrollHeight;
+    clearTimeout(this._persistT);
+    this._persistT = setTimeout(() => this.persist(), 250);
   }
 
   showToast(msg) {
@@ -687,6 +738,7 @@ class Component extends DCLogic {
           clock: ctx.clock, weekday: ctx.weekday, timeOfDay: ctx.timeOfDay,
           weatherLabel: ctx.weatherLabel, tempC: ctx.tempC, geo: S.geo,
           taste, liked, deck,
+          pulse: S.pulse.slice(0, 6).map(p => ({ text: p.text, spot: p.spot })),
           places: PLACES.map(p => ({ name: p.name, kind: p.kind, area: p.area })),
         },
       }),
@@ -948,7 +1000,7 @@ class Component extends DCLogic {
           ? { maxWidth: '80%', font: "400 14px/1.5 'Saans', sans-serif", color: '#01200d', textAlign: 'right' }
           : { maxWidth: '86%', font: "italic 400 15.5px/1.5 'Serrif VF', Georgia, serif", color: '#002910', opacity: m.typing ? 0.55 : 1 },
       })),
-      chips: ['Plan my evening', 'I\u2019m hungry', 'Surprise me'].map(label => ({
+      chips: ['Plan my evening', 'I\u2019m hungry', 'What\u2019s on tonight?', 'Surprise me'].map(label => ({
         label, go: () => this.sendChatMsg(label),
       })),
       chatDraft: S.chatDraft,
@@ -966,7 +1018,8 @@ class Component extends DCLogic {
         { label: 'Location', val: S.geo === 'ok' ? 'LIVE' : S.geo === 'far' ? 'NOT IN PARIS' : S.geo === 'pending' ? 'LOCATING\u2026' : 'MARAIS (DEFAULT)' },
       ],
       resetTaste: () => {
-        this.setState({ swiped: {}, quizAnswers: {}, swipeCount: 0, obAnswers: [], obStep: -1, tab: 'discover' });
+        try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+        this.setState({ swiped: {}, quizAnswers: {}, swipeCount: 0, obAnswers: [], obStep: -1, planStatus: 'draft', tab: 'discover' });
         this.showToast('Taste file shredded.');
       },
 

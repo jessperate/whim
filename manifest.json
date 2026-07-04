@@ -1,0 +1,13 @@
+{
+  "name": "Whim — swipe right on Paris",
+  "short_name": "Whim",
+  "description": "A pocket concierge for Paris. Swipe on curated spots, get a day plan, argue with the concierge.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fffa",
+  "theme_color": "#f8fffa",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
