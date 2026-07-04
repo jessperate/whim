@@ -87,6 +87,9 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
           </button>
         </sc-for>
       </div>
+      <sc-if value="{{ deepActive }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ deepExit }}" style="margin-top:18px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; background:none; border:none; color:#676c79; cursor:pointer; padding:8px 0;">Save &amp; exit — finish later</button>
+      </sc-if>
     </div>
   </sc-if>
 
@@ -279,6 +282,9 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             <span style="font:500 11.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#fdece4; border:1px solid #f2d3c6; border-radius:5px; padding:7px 11px; color:#451212;">{{ tp }}</span>
           </sc-for>
         </div>
+        <sc-if value="{{ deepLeft }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ deepStart }}" style="display:block; width:100%; text-align:center; font:500 13px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:14px; cursor:pointer; margin:-8px 0 24px;">Answer the deep cuts ({{ deepLeft }} left)</button>
+        </sc-if>
         <div style="border:1px solid #f2d3c6;">
           <sc-for list="{{ youStats }}" as="st" hint-placeholder-count="3">
             <div style="display:flex; justify-content:space-between; padding:15px 16px; border-bottom:1px solid #f2d3c6; align-items:baseline; gap:12px;">
@@ -632,6 +638,8 @@ const QUIZ = [
 const OB = [
   { sec:'Basics', q:'First thing you do abroad?', sub:'Be honest. I’ll know if you lie.', opts:['Find coffee immediately', 'Walk until lost', 'Museum, obviously'] },
   { sec:'Company', q:'Who’s the entourage?', sub:'This calibrates everything after dark.', opts:['Flying solo', 'With my partner', 'Kids in tow', 'The friend group'] },
+  { sec:'History', q:'Paris and you?', sub:'This changes everything I show you.', opts:['First rendezvous', 'We’ve met before', 'Old flames'] },
+  { sec:'Compass', q:'Tourist magnet or hidden gem?', sub:'Be honest. Both is an answer.', opts:['Icons first, no shame', 'Take me where locals whisper', 'Both, strategically'] },
   { sec:'Food', q:'Your food philosophy?', sub:'This determines 60% of your day.', opts:['Michelin or bust', 'Street food goblin', 'If locals queue, I queue'] },
   { sec:'Food', q:'Croissant stance?', sub:'There is a correct answer.', opts:['Butter is a personality', 'Team pain au chocolat', 'Gluten and I broke up'] },
   { sec:'Caffeine', q:'How do you take it?', sub:'This schedules your entire morning.', opts:['Espresso, standing', 'Oat-milk something, seated', 'Tea, chaotically'] },
@@ -641,6 +649,23 @@ const OB = [
   { sec:'Crowds', q:'Crowd tolerance?', sub:'Paris has opinions about personal space.', opts:['Love the buzz', 'Six people max', 'I am the crowd'] },
   { sec:'Nights', q:'Your ideal night out?', sub:'This decides your 10pm.', opts:['Jazz cellar until late', 'Wine until midnight', 'In bed by ten, proudly'] },
   { sec:'Weather', q:'It starts raining. You…', sub:'It will. This is Europe.', opts:['Museum sprint', 'Café and judge people', 'Rain is cardio'] },
+];
+
+// Deep cuts — the nitty-gritty taste file, answered via deck check-ins or the You tab.
+const DEEP = [
+  { id:'d1', sec:'Rhythm', q:'How far will you walk for something great?', sub:'Paris is a walking city. Allegedly.', opts:['I’ll cross the city', 'Twenty minutes, max', 'If it’s not next door, non'] },
+  { id:'d2', sec:'Shopping', q:'Shopping in Paris means…', sub:'There’s a correct answer per arrondissement.', opts:['Vintage and friperies', 'Designer flagships', 'Bookshops and paper goods', 'I don’t shop on holiday'] },
+  { id:'d3', sec:'Shopping', q:'Flea-market Sundays?', sub:'The bed is warm. Les Puces is not.', opts:['Les Puces, obviously', 'One good brocante', 'Markets are for food only'] },
+  { id:'d4', sec:'Food', q:'Any hard nos on the plate?', sub:'I won’t judge. Much.', opts:['Vegetarian-ish', 'No shellfish', 'I eat everything', 'It’s complicated'] },
+  { id:'d5', sec:'Food', q:'Wine philosophy?', sub:'This determines your bar list.', opts:['Natural or nothing', 'Old World classics', 'It’s all grape juice to me'] },
+  { id:'d6', sec:'Food', q:'Menu’s in French, no pictures.', sub:'A test of character.', opts:['Point and pray', 'Translate every word', 'Make the waiter choose'] },
+  { id:'d7', sec:'Food', q:'Dessert stance?', sub:'Non-negotiable data.', opts:['Pâtisserie pilgrimage', 'One perfect scoop', 'Cheese is dessert'] },
+  { id:'d8', sec:'Culture', q:'Your art era?', sub:'Museums will be filtered accordingly.', opts:['Old Masters', 'Impressionists', 'Weird contemporary', 'Street art'] },
+  { id:'d9', sec:'Culture', q:'Live music tonight would be…', sub:'This decides more than you think.', opts:['Jazz cellar', 'Electro until sunrise', 'Chanson in a dive bar', 'Silence, blessed silence'] },
+  { id:'d10', sec:'Culture', q:'Cemeteries, catacombs, crypts?', sub:'Paris is 30% underground drama.', opts:['Morbidly delighted', 'One skull is plenty', 'Hard pass'] },
+  { id:'d11', sec:'Rhythm', q:'Your day starts…', sub:'Croissants wait for no one.', opts:['Before the boulangeries', 'A civilised ten', 'When the shutters open themselves'] },
+  { id:'d12', sec:'Self', q:'Golden-hour photo ops?', sub:'No judgment. Some judgment.', opts:['I am the content', 'One tasteful shot', 'Cameras stay home'] },
+  { id:'d13', sec:'Self', q:'Your French vocabulary?', sub:'Calibrates how deep into local territory I send you.', opts:['Bonjour and vibes', 'Menu-fluent', 'Basically Parisian'] },
 ];
 
 const CTX = {
@@ -655,6 +680,7 @@ const ACCENTS = {
   indigo: { bg:'#e5e5ff', dot:'#1b1b8f', ink:'#1b1b8f', chip:'#f4f4ff', body:'#e5e5ff' },
   green:  { bg:'#ffd9c9', dot:'#c0361c', ink:'#c0361c', chip:'#fff7f2', body:'#ffd9c9' },
   yellow: { bg:'#EEFF8C', dot:'#8a9a1e', ink:'#5c6a0a', chip:'#fbffe0', body:'#EEFF8C' },
+  lilac:  { bg:'#eadcff', dot:'#7c3aed', ink:'#5b21b6', chip:'#f6f0ff', body:'#eadcff' },
 };
 
 // Baked-in fallbacks, shown until live Foursquare data arrives (or when no API key is set).
@@ -736,6 +762,7 @@ function restoreState() {
 class Component extends DCLogic {
   state = {
     obStep: -1, obAnswers: [], name: '', nameStep: false, nameDraft: '',
+    deepMode: false,
     tab: 'discover',
     // live context; overrides come from the You-tab demo controls
     timeOverride: null, weatherOverride: null,
@@ -1199,9 +1226,56 @@ class Component extends DCLogic {
     return PLACES.find(x => x.id === id) || this.state.gplaces[id] || null;
   }
 
+  // taste flag -> targeted Google query; kind/accent/times override the type map
+  static TASTE_QUERIES = [
+    { flag: 'vintage', q: 'friperie vintage', kind: 'Vintage shop', icon: 'ri-t-shirt-line', accent: 'lilac', times: ['morning', 'afternoon'] },
+    { flag: 'flea', q: 'brocante antiquités', kind: 'Brocante', icon: 'ri-store-2-line', accent: 'lilac', times: ['morning', 'afternoon'] },
+    { flag: 'designer', q: 'concept store créateurs', kind: 'Concept store', icon: 'ri-shopping-bag-line', accent: 'lilac', times: ['morning', 'afternoon'] },
+    { flag: 'bookish', q: 'librairie indépendante', kind: 'Bookshop', icon: 'ri-book-open-line', accent: 'lilac', times: ['afternoon'] },
+    { flag: 'naturalWine', q: 'bar à vin naturel', kind: 'Wine bar', icon: 'ri-goblet-line', accent: 'yellow', times: ['evening', 'night'] },
+    { flag: 'electro', q: 'club électro', kind: 'Club', icon: 'ri-disc-line', accent: 'yellow', times: ['night'] },
+    { flag: 'chanson', q: 'bar chanson cave', kind: 'Dive bar', icon: 'ri-mic-line', accent: 'yellow', times: ['evening', 'night'] },
+    { flag: 'artContemporary', q: 'galerie art contemporain', kind: 'Gallery', icon: 'ri-shapes-line', accent: 'indigo', times: ['morning', 'afternoon'] },
+    { flag: 'artStreet', q: 'street art', kind: 'Street art', icon: 'ri-brush-line', accent: 'indigo', times: ['afternoon'] },
+    { flag: 'sweetTooth', q: 'pâtisserie artisanale', kind: 'Pâtisserie', icon: 'ri-cake-3-line', accent: 'pink', times: ['morning', 'afternoon'] },
+    { flag: 'veg', q: 'restaurant végétarien', kind: 'Veggie table', icon: 'ri-leaf-line', accent: 'pink', times: ['afternoon', 'evening'] },
+    { flag: 'macabre', q: 'crypte catacombes lieu insolite', kind: 'Oddity', icon: 'ri-ghost-line', accent: 'indigo', times: ['morning', 'afternoon'] },
+  ];
+
+  // off-path anchors so hidden-gem people aren't stuck with their own block
+  static OFFBEAT = [
+    { lat: 48.8725, lng: 2.3800 }, // Belleville
+    { lat: 48.8867, lng: 2.3199 }, // Batignolles
+    { lat: 48.8262, lng: 2.3561 }, // Butte-aux-Cailles
+    { lat: 48.8890, lng: 2.3830 }, // Canal de l'Ourcq
+    { lat: 48.8547, lng: 2.3900 }, // Charonne
+  ];
+
   loadWildcards(loc) {
+    const T = this.getTaste();
     const ll = `${loc.lat.toFixed(3)},${loc.lng.toFixed(3)}`;
-    fetch(`/api/discover?ll=${ll}`)
+    this._seed = this._seed || Math.floor(Math.random() * 1e9);
+
+    const calls = [];
+    // base sweep — popularity-capped for hidden-gem people so it's not the same icons
+    calls.push({ url: `/api/discover?ll=${ll}${T.offPath ? '&cap=15000' : ''}`, meta: null });
+    // one extra sweep from a rotating offbeat neighborhood for explorers
+    if (T.offPath) {
+      const a = Component.OFFBEAT[this._seed % Component.OFFBEAT.length];
+      calls.push({ url: `/api/discover?ll=${a.lat},${a.lng}&cap=15000`, meta: null });
+    }
+    // up to 3 taste-targeted keyword hunts, rotated by session seed
+    const active = Component.TASTE_QUERIES.filter(t => T[t.flag]);
+    active
+      .sort((a, b) => strHash(a.flag + this._seed) - strHash(b.flag + this._seed))
+      .slice(0, 3)
+      .forEach(t => calls.push({ url: `/api/discover?ll=${ll}&q=${encodeURIComponent(t.q)}`, meta: t }));
+
+    calls.forEach(({ url, meta }) => this.fetchWildcards(url, meta));
+  }
+
+  fetchWildcards(url, override) {
+    fetch(url)
       .then(r => (r.ok ? r.json() : null))
       .then(j => {
         if (!j || !j.ok) return;
@@ -1210,7 +1284,7 @@ class Component extends DCLogic {
         j.places.forEach(g => {
           if (curated.has(g.name.toLowerCase())) return;
           const t = String(g.type || '');
-          const meta = WILD_KIND[t]
+          const meta = override || WILD_KIND[t]
             || (/museum|gallery|cultural|art/.test(t) ? WILD_KIND.museum
             : /park|garden/.test(t) ? WILD_KIND.park
             : /wine/.test(t) ? WILD_KIND.wine_bar
@@ -1366,6 +1440,29 @@ class Component extends DCLogic {
       fancy: has('Michelin or bust'),
       crowdShy: has('Six people max'),
       likesButter: has('Butter is a personality') || has('Croissant') || has('Team pain au chocolat') || has('Pain au chocolat'),
+      firstTimer: has('First rendezvous'),
+      offPath: has('Take me where locals whisper'),
+      iconsFirst: has('Icons first, no shame'),
+      walker: has('I’ll cross the city'),
+      homebody: has('If it’s not next door, non'),
+      vintage: has('Vintage and friperies'),
+      designer: has('Designer flagships'),
+      bookish: has('Bookshops and paper goods'),
+      flea: has('Les Puces, obviously') || has('One good brocante'),
+      veg: has('Vegetarian-ish'),
+      naturalWine: has('Natural or nothing'),
+      adventurous: has('Point and pray') || has('Make the waiter choose'),
+      sweetTooth: has('Pâtisserie pilgrimage') || has('One perfect scoop'),
+      artOld: has('Old Masters'),
+      artImpressionist: has('Impressionists'),
+      artContemporary: has('Weird contemporary'),
+      artStreet: has('Street art'),
+      electro: has('Electro until sunrise'),
+      chanson: has('Chanson in a dive bar'),
+      macabre: has('Morbidly delighted'),
+      noMacabre: has('Hard pass'),
+      earlyBird: has('Before the boulangeries'),
+      photoLover: has('I am the content'),
       withKids: has('Kids in tow'),
       solo: has('Flying solo'),
       couple: has('With my partner'),
@@ -1387,6 +1484,23 @@ class Component extends DCLogic {
     if (T.wine && (p.kind === 'Wine bar' || p.kind === 'Bar' || p.kind === 'Cocktail bar')) s += 3;
     if (T.crowdShy && FAMOUS.includes(p.id)) s -= 3;
     if (T.trapHater && FAMOUS.includes(p.id)) s -= 2;
+    if (T.offPath && FAMOUS.includes(p.id)) s -= 3;
+    if (T.offPath && !FAMOUS.includes(p.id)) s += 1;
+    if (T.iconsFirst && FAMOUS.includes(p.id)) s += 2;
+    if (T.firstTimer && FAMOUS.includes(p.id)) s += 1;
+    if (T.homebody && p.km != null && p.km > 1.5) s -= 2;
+    if (T.vintage && (p.accent === 'lilac' || p.kind === 'Market')) s += 3;
+    if (T.flea && (p.kind === 'Market' || p.kind === 'Brocante')) s += 2;
+    if (T.bookish && p.kind === 'Bookshop') s += 3;
+    if (T.naturalWine && p.kind === 'Wine bar') s += 2;
+    if (T.sweetTooth && (p.kind === 'Ice cream' || p.kind === 'Boulangerie' || p.kind === 'Pâtisserie' || p.kind === 'Crêperie')) s += 2;
+    if (T.artContemporary && (p.id === 'p35' || p.kind === 'Gallery')) s += 3;
+    if (T.artImpressionist && p.id === 'p6') s += 3;
+    if (T.macabre && (p.id === 'p31' || p.kind === 'Oddity')) s += 3;
+    if (T.noMacabre && (p.id === 'p31' || p.kind === 'Oddity')) s -= 4;
+    if (T.electro && p.kind === 'Club') s += 3;
+    if (T.chanson && (p.kind === 'Dive bar' || p.kind === 'Jazz club')) s += 2;
+    if (T.photoLover && (p.kind === 'Viewpoint' || p.kind === 'Landmark' || p.kind === 'Passage')) s += 2;
     if (T.withKids && p.kids) s += 3;
     if (T.withKids && ['Bar', 'Wine bar', 'Cocktail bar', 'Jazz club'].includes(p.kind)) s -= 2;
     if (T.couple && (p.kind === 'Viewpoint' || p.kind === 'Wine bar' || p.id === 'p36')) s += 2;
@@ -1429,14 +1543,14 @@ class Component extends DCLogic {
       .map(p => ({ ...p, ...this.distFor(p), score: this.scorePlace(p, T), notNow: catActive && !fitsNow(p) }))
       .filter(p => p.km < 3.5)
       .sort((a, b) => strHash(a.id + this._seed) - strHash(b.id + this._seed))
-      .slice(0, 3);
+      .slice(0, 4);
     wilds.forEach((w, i) => {
       const at = 1 + i * 3;
       if (deck.length >= at) deck.splice(at, 0, w);
       else deck.push(w);
     });
 
-    const pending = QUIZ.filter(q => !quizAnswers[q.id]);
+    const pending = [...QUIZ, ...DEEP].filter(q => !quizAnswers[q.id]);
     if (pending[0] && deck.length > 2) deck.splice(2, 0, pending[0]);
     if (pending[1] && deck.length > 5) deck.splice(5, 0, pending[1]);
     return deck;
@@ -1775,8 +1889,10 @@ class Component extends DCLogic {
     const booted = skipOb || S.obStep >= OB.length;
     const showSplash = !booted && S.obStep === -1 && !S.nameStep;
     const showName = !booted && S.nameStep;
-    const showQuiz = !booted && !S.nameStep && S.obStep >= 0 && S.obStep < OB.length;
-    const ob = OB[Math.min(Math.max(S.obStep, 0), OB.length - 1)];
+    const pendingDeep = DEEP.filter(q => !S.quizAnswers[q.id]);
+    const deepActive = booted && S.deepMode && pendingDeep.length > 0;
+    const showQuiz = (!booted && !S.nameStep && S.obStep >= 0 && S.obStep < OB.length) || deepActive;
+    const ob = deepActive ? pendingDeep[0] : OB[Math.min(Math.max(S.obStep, 0), OB.length - 1)];
 
     const ctx = this.getCtx();
     const sunny = ctx.sunny;
@@ -1889,22 +2005,38 @@ class Component extends DCLogic {
 
     return {
       appName,
-      showSplash, showQuiz, showApp: booted,
+      showSplash, showQuiz, showApp: booted && !deepActive,
       startQuiz: () => this.setState({ nameStep: true }),
       showName,
       nameDraft: S.nameDraft,
       onNameDraft: (e) => this.setState({ nameDraft: e.target.value }),
       onNameKey: (e) => { if (e.key === 'Enter') this.commitName(); },
       commitName: () => this.commitName(),
-      obProgress: `${String(Math.min(S.obStep + 1, OB.length)).padStart(2, '0')} / ${String(OB.length).padStart(2, '0')}`,
+      obProgress: deepActive
+        ? `${String(DEEP.length - pendingDeep.length + 1).padStart(2, '0')} / ${String(DEEP.length).padStart(2, '0')}`
+        : `${String(Math.min(S.obStep + 1, OB.length)).padStart(2, '0')} / ${String(OB.length).padStart(2, '0')}`,
       obSec: ob.sec,
-      obBarStyle: { height: '100%', background: '#e8432c', width: `${Math.round((Math.max(S.obStep, 0) / OB.length) * 100)}%`, transition: 'width .3s ease-out' },
+      obBarStyle: { height: '100%', background: '#e8432c', width: `${deepActive ? Math.round(((DEEP.length - pendingDeep.length) / DEEP.length) * 100) : Math.round((Math.max(S.obStep, 0) / OB.length) * 100)}%`, transition: 'width .3s ease-out' },
       obQuestion: ob.q, obSub: ob.sub,
+      deepActive,
+      deepExit: () => this.setState({ deepMode: false }),
       obOptions: ob.opts.map(o => ({
         label: o,
         go: () => {
+          if (S.deepMode) {
+            this.setState(s => {
+              const quizAnswers = { ...s.quizAnswers, [ob.id]: o };
+              const left = DEEP.filter(q => !quizAnswers[q.id]).length;
+              if (!left) this.showToast('Fully calibrated. Terrifying.');
+              return { quizAnswers, deepMode: left > 0 };
+            });
+            return;
+          }
           this.setState(s => ({ obStep: s.obStep + 1, obAnswers: [...s.obAnswers, o] }));
-          if (S.obStep + 1 === OB.length) this.showToast('Calibrated. The deck now discriminates.');
+          if (S.obStep + 1 === OB.length) {
+            this.showToast('Calibrated. The deck now discriminates.');
+            this.loadWildcards(S.userLoc || PARIS);
+          }
         },
       })),
 
@@ -1932,6 +2064,7 @@ class Component extends DCLogic {
         { key: 'indigo', label: 'Culture', bg: '#e5e5ff', ink: '#1b1b8f' },
         { key: 'green', label: 'Outdoors', bg: '#ffd9c9', ink: '#c0361c' },
         { key: 'yellow', label: 'Nights', bg: '#EEFF8C', ink: '#5c6a0a' },
+        { key: 'lilac', label: 'Shopping', bg: '#eadcff', ink: '#5b21b6' },
         { key: 'family', label: 'Family', bg: '#ffe9c7', ink: '#7a4b05' },
       ].map(c => {
         const active = S.cat === c.key;
@@ -1950,6 +2083,7 @@ class Component extends DCLogic {
       stack, deckEmpty: deck.length === 0,
       reshuffleDeck: () => {
         this._seed = Math.floor(Math.random() * 1e9);
+        this.loadWildcards(S.userLoc || PARIS);
         this.setState(s => {
           // forget nopes everywhere and likes too, but keep the approved plan intact
           const keep = {};
@@ -2049,7 +2183,9 @@ class Component extends DCLogic {
       fvHasHearts: fvHearts.length > 0,
       fvHasLikes: fvLikes.length > 0,
       fvEmpty: !!(S.friendView && !S.friendView.loading && !fvHearts.length && !fvLikes.length),
-      youCalib: `${S.obAnswers.length} questions · ${S.swipeCount} swipes`,
+      youCalib: `${S.obAnswers.length + Object.keys(S.quizAnswers).length} questions · ${S.swipeCount} swipes`,
+      deepLeft: pendingDeep.length ? `${pendingDeep.length}` : false,
+      deepStart: () => this.setState({ deepMode: true, tab: 'you' }),
       tastePills: pills.length ? pills : ['Blank slate', 'Mysterious', 'Jury\u2019s out'],
       youStats: [
         { label: 'Liked', val: `${likedN}` },
