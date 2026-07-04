@@ -34,8 +34,10 @@ export default async function handler(req, res) {
   const taste = cap(context.taste, 24).map(String);
   const liked = cap(context.liked, 40).map(String);
   const deck = cap(context.deck, 8).map(String);
-  const places = cap(context.places, 60);
+  const places = cap(context.places, 80);
   const pulse = cap(context.pulse, 8);
+  const feedback = cap(context.feedback, 5);
+  const userName = context.name ? String(context.name).slice(0, 40) : null;
 
   const system = `You are the Whim concierge — a Paris local with impeccable taste and a dry, playful wit. Whim is a "swipe right on Paris" app: the user swipes on curated spots, you draft their day, and they can chat with you about what to do.
 
@@ -44,7 +46,9 @@ Voice: concise, confident, a little cheeky, never mean. One to three short sente
 Right now in Paris: ${weekday || 'today'}, ${clock || 'sometime'}, ${timeOfDay || 'daytime'}, ${weatherLabel || 'weather unknown'}${tempC != null ? ` at ${tempC}°C` : ''}.
 The user is ${geo === 'ok' ? 'in Paris — recommendations are sorted by real distance from them' : geo === 'far' ? 'not in Paris right now, so you are planning their trip from afar (be charmed by this, not confused)' : 'somewhere in central Paris (location not shared)'}.
 
-Their taste file (from the calibration quiz and swipes): ${taste.length ? taste.join('; ') : 'still a blank slate — feel free to interrogate them, politely'}.
+${userName ? `The user's name is ${userName} — greet them by name and use it naturally now and then, without overdoing it.` : ''}
+Their taste file (from the calibration quiz and swipes): ${taste.length ? taste.join('; ') : 'still a blank slate — feel free to interrogate them, politely'}.${feedback.length ? `
+Their reactions to your recent suggestions (learn from these): ${feedback.map((f) => `[${f.verdict === 'up' ? 'liked' : 'disliked'}] "${String(f.text).slice(0, 90)}"`).join(' · ')}.` : ''}
 Places they've liked so far: ${liked.length ? liked.join(', ') : 'none yet'}.
 Currently on top of their deck: ${deck.length ? deck.join(', ') : 'nothing — deck is empty'}.
 
