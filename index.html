@@ -111,8 +111,8 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             <button onClick="{{ nudgeDismiss }}" aria-label="Dismiss" style="background:none; border:none; cursor:pointer; padding:2px; flex:none;"><i class="ri-close-line" style="font-size:16px; color:#676c79;"></i></button>
           </div>
         </sc-if>
-        <div style="display:flex; justify-content:center; gap:8px; padding:12px 16px 0; flex-wrap:wrap;">
-          <sc-for list="{{ catChips }}" as="cc" hint-placeholder-count="5">
+        <div style="display:flex; gap:8px; padding:12px 16px 2px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
+          <sc-for list="{{ catChips }}" as="cc" hint-placeholder-count="6">
             <button onClick="{{ cc.go }}" style="{{ cc.style }}">{{ cc.label }}</button>
           </sc-for>
         </div>
@@ -1658,16 +1658,20 @@ class Component extends DCLogic {
     const { swiped, quizAnswers } = this.state;
     const T = this.getTaste();
     // an explicit category pick relaxes the time/weather gate — show the whole
-    // category, float the right-now spots, and label the rest
-    const catActive = this.state.cat !== 'all';
+    // category, float the right-now spots, and label the rest.
+    // 'Right now' is the opposite: strict to this hour and open-now.
+    const nowMode = this.state.cat === 'now';
+    const catActive = this.state.cat !== 'all' && !nowMode;
     const fitsNow = p => p.times.includes(ctx.timeOfDay) && (p.weather === 'any' || p.weather === ctx.weather);
+    const openish = p => !nowMode || !this.state.live[p.id] || this.state.live[p.id].openNow !== false;
     const places = PLACES.filter(p =>
       (catActive || fitsNow(p)) &&
       !swiped[p.id] &&
       !(T.noGluten && (p.kind === 'Boulangerie' || p.kind === 'Crêperie' || p.id === 'p20')) &&
       !(T.noMuseums && p.kind === 'Museum') &&
       !(T.earlyBed && p.kind === 'Jazz club') &&
-      (this.state.cat === 'all' || (this.state.cat === 'family' ? !!p.kids : p.accent === this.state.cat))
+      openish(p) &&
+      (this.state.cat === 'all' || nowMode || (this.state.cat === 'family' ? !!p.kids : p.accent === this.state.cat))
     );
     this._seed = this._seed || Math.floor(Math.random() * 1e9);
     const jit = (id) => ((strHash(id + this._seed) % 1000) / 1000 - 0.5) * 2.4;
@@ -1679,7 +1683,8 @@ class Component extends DCLogic {
         (catActive || fitsNow(p)) &&
         !(T.noGluten && p.kind === 'Boulangerie') &&
         !(T.noMuseums && (p.kind === 'Museum' || p.kind === 'Gallery')) &&
-        (this.state.cat === 'all' || (this.state.cat === 'family' ? !!p.kids : p.accent === this.state.cat))
+        openish(p) &&
+        (this.state.cat === 'all' || nowMode || (this.state.cat === 'family' ? !!p.kids : p.accent === this.state.cat))
       )
       .map(p => ({ ...p, ...this.distFor(p) }))
       .filter(p => p.km < 3.5)
@@ -1708,6 +1713,23 @@ class Component extends DCLogic {
     if (deck.length > 2 && !deck.slice(0, 3).some(p => p.wild)) {
       const wix = deck.findIndex(p => p.wild);
       if (wix > 2) deck.splice(1, 0, deck.splice(wix, 1)[0]);
+    }
+
+    // 'Right now' opens with this week's happenings scraped from Instagram
+    if (nowMode && this.state.pulse.length) {
+      const happenings = this.state.pulse.slice(0, 4)
+        .map((h, i) => {
+          const id = 'hp_' + strHash(h.text);
+          const headline = h.text.split(/[.!\n•]|—/)[0].trim().slice(0, 52) || 'Happening in Paris';
+          return {
+            id, happening: true, name: headline, kind: 'Happening', icon: 'ri-calendar-event-line',
+            accent: 'yellow', blurb: h.text.slice(0, 170), km: 0, dist: '', slot: 45 + i,
+            igUrl: h.url, spot: h.spot, score: 0, noLive: true, times: [ctx.timeOfDay], weather: 'any',
+          };
+        })
+        .filter(h => !swiped[h.id])
+        .slice(0, 2);
+      deck.unshift(...happenings);
     }
 
     const pending = [...QUIZ, ...DEEP].filter(q => !quizAnswers[q.id]);
@@ -1742,7 +1764,12 @@ class Component extends DCLogic {
     if (Math.abs(d.dx) < 8 && Math.abs(d.dy) < 8) {
       d.el.style.transition = 'none';
       d.el.style.transform = '';
-      if (id && id[0] !== 'q') this.openDetail(id);
+      if (id && id.indexOf('hp_') === 0) {
+        const h = this.getDeck(this.getCtx()).find(x => x.id === id);
+        if (h && h.igUrl) window.open(h.igUrl, '_blank', 'noopener');
+      } else if (id && id[0] !== 'q') {
+        this.openDetail(id);
+      }
       return;
     }
     if (Math.abs(d.dx) > 90) {
@@ -2081,14 +2108,14 @@ class Component extends DCLogic {
         isQuiz,
         name: c.name, kind: c.kind, dist: c.dist, blurb: c.blurb, icon: c.icon,
         // 2b: time-dash meta line
-        meta: isQuiz ? '' : `${ctx.clock} — ${c.wild ? 'Wildcard · ' : ''}${c.kind} · ${c.dist}${c.notNow ? ` · A ${c.times[0]} thing` : (c.score >= 2 ? ' · Very you' : '')}${openBit}`,
-        rating: isQuiz ? '' : ((live && live.rating) || c.grating || fallback[0]),
-        reviews: isQuiz ? '' : (live && live.ratings != null ? `${fmtCount(live.ratings)} Google reviews` : (c.wild ? `${fmtCount(c.greviews)} Google reviews` : `${fallback[1]} reviews`)),
+        meta: isQuiz ? '' : (c.happening ? `${ctx.clock} — This week · via Instagram${c.spot ? ` · ${c.spot}` : ''}` : `${ctx.clock} — ${c.wild ? 'Wildcard · ' : ''}${c.kind} · ${c.dist}${c.notNow ? ` · A ${c.times[0]} thing` : (c.score >= 2 ? ' · Very you' : '')}${openBit}`),
+        rating: isQuiz ? '' : (c.happening ? '✶' : ((live && live.rating) || c.grating || fallback[0])),
+        reviews: isQuiz ? '' : (c.happening ? 'spotted this week' : (live && live.ratings != null ? `${fmtCount(live.ratings)} Google reviews` : (c.wild ? `${fmtCount(c.greviews)} Google reviews` : `${fallback[1]} reviews`))),
         gmaps: isQuiz ? null : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' Paris')}`,
-        openDetail: isQuiz ? null : (() => this.openDetail(c.id)),
+        openDetail: isQuiz ? null : (c.happening ? (() => c.igUrl && window.open(c.igUrl, '_blank', 'noopener')) : (() => this.openDetail(c.id))),
         heart: isQuiz ? null : (() => this.toggleHeart(c.id)),
         heartIcon: isQuiz ? '' : (S.hearts[c.id] ? 'ri-heart-3-fill' : 'ri-heart-add-line'),
-        heartStyle: a ? { border: 'none', background: 'none', cursor: 'pointer', padding: '4px 0 4px 10px', fontSize: 17, color: S.hearts[c.id] ? '#c54b9b' : a.ink } : null,
+        heartStyle: a ? { border: 'none', background: 'none', cursor: 'pointer', padding: '4px 0 4px 10px', fontSize: 17, color: S.hearts[c.id] ? '#c54b9b' : a.ink, display: c.happening ? 'none' : 'block' } : null,
         q: c.q,
         opts: isQuiz ? c.opts.map(o => ({ label: o, go: () => this.answerQuiz(c.id, o) })) : [],
         onDown: isTop ? this.onDown : null,
@@ -2228,6 +2255,7 @@ class Component extends DCLogic {
 
       catChips: [
         { key: 'all', label: 'All', bg: '#ffffff', ink: '#451212' },
+        { key: 'now', label: 'Right now', bg: '#ffe0d9', ink: '#c0361c' },
         { key: 'pink', label: 'Food', bg: '#fee7fd', ink: '#852952' },
         { key: 'indigo', label: 'Culture', bg: '#e5e5ff', ink: '#1b1b8f' },
         { key: 'green', label: 'Outdoors', bg: '#ffd9c9', ink: '#c0361c' },
@@ -2240,7 +2268,8 @@ class Component extends DCLogic {
           label: c.label,
           go: () => this.setState({ cat: active ? 'all' : c.key }),
           style: {
-            font: "500 10px 'Saans', sans-serif", padding: '5px 10px', cursor: 'pointer',
+            font: "500 13.5px 'Saans', sans-serif", padding: '11px 18px', cursor: 'pointer',
+            flex: 'none', borderRadius: 58, whiteSpace: 'nowrap',
             background: active ? '#451212' : c.bg,
             color: active ? '#fff7f2' : c.ink,
             border: active ? '1px solid #451212' : '1px solid rgba(69,18,18,.14)',
