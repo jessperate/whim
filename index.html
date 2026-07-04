@@ -643,6 +643,14 @@ const PLACES = [
   { id:'p37', name:'Jardin d’Acclimatation', kind:'Park', icon:'ri-emotion-happy-line', area:'Bois de Boulogne', lat:48.8785, lng:2.2635, blurb:'Vintage carousels, rollercoasters, wandering peacocks. The 1860s’ idea of fun, still correct.', times:['morning','afternoon'], weather:'sunny', accent:'green', slot:15, kids:true },
   { id:'p38', name:'Ménagerie du Jardin des Plantes', kind:'Zoo', icon:'ri-bear-smile-line', area:'5e', lat:48.8443, lng:2.3614, blurb:'One of the world’s oldest zoos. Small, walkable, dangerously heavy on red pandas.', times:['morning','afternoon'], weather:'any', accent:'green', slot:9, kids:true },
   { id:'p39', name:'Cité des Sciences', kind:'Museum', icon:'ri-rocket-line', area:'La Villette', lat:48.8956, lng:2.3877, blurb:'A giant science playground. Kids lose their minds; adults pretend it’s for the kids.', times:['morning','afternoon'], weather:'rainy', accent:'indigo', slot:10, kids:true },
+  { id:'p40', name:'Merci', kind:'Concept store', icon:'ri-shopping-bag-line', area:'3e', lat:48.8601, lng:2.3668, blurb:'The concept store that invented concept stores. Enter for a notebook, exit re-dressed.', times:['morning','afternoon','evening'], weather:'any', accent:'lilac', slot:11 },
+  { id:'p41', name:'Le Bon Marché', kind:'Grand magasin', icon:'ri-building-2-line', area:'7e', lat:48.8510, lng:2.3238, blurb:'The world’s oldest department store, and its most disciplined. The food hall deserves a passport stamp.', times:['morning','afternoon','evening'], weather:'any', accent:'lilac', slot:12 },
+  { id:'p42', name:'Galeries Lafayette Haussmann', kind:'Grand magasin', icon:'ri-building-4-line', area:'9e', lat:48.8733, lng:2.3322, blurb:'Come for the shopping, stay gawking at the dome. Yes, it’s touristy. It earned it.', times:['morning','afternoon','evening'], weather:'rainy', accent:'lilac', slot:13 },
+  { id:'p43', name:'La Samaritaine', kind:'Grand magasin', icon:'ri-store-3-line', area:'1er', lat:48.8594, lng:2.3423, blurb:'Art nouveau meets seven floors of fashion. The staircase is the real purchase.', times:['morning','afternoon','evening'], weather:'rainy', accent:'lilac', slot:14 },
+  { id:'p44', name:'Kilo Shop', kind:'Vintage shop', icon:'ri-t-shirt-line', area:'Le Marais', lat:48.8576, lng:2.3549, blurb:'Vintage by the kilo. Bring a tote and questionable restraint.', times:['morning','afternoon'], weather:'any', accent:'lilac', slot:15 },
+  { id:'p45', name:'Free’P’Star', kind:'Vintage shop', icon:'ri-handbag-line', area:'Le Marais', lat:48.8575, lng:2.3545, blurb:'Dig-for-it vintage where the €1 bins have cult status. Wear elbows.', times:['morning','afternoon'], weather:'any', accent:'lilac', slot:16 },
+  { id:'p46', name:'L’Appartement Sézane', kind:'Boutique', icon:'ri-shirt-line', area:'2e', lat:48.8706, lng:2.3446, blurb:'The Parisienne starter pack, in apartment form. The line is part of the ritual.', times:['morning','afternoon'], weather:'any', accent:'lilac', slot:17 },
+  { id:'p47', name:'Les Puces de Saint-Ouen', kind:'Brocante', icon:'ri-store-2-line', area:'Saint-Ouen', lat:48.9015, lng:2.3418, blurb:'The world’s largest flea market. Weekends, early, haggle in centimeters.', times:['morning','afternoon'], weather:'any', accent:'lilac', slot:10 },
   { id:'p20', name:'Crêpe au Nutella, standing', kind:'Street food', icon:'ri-donut-chart-line', area:'120m away, always', lat:48.8590, lng:2.3600, blurb:'The official dessert of poor decisions after midnight.', times:['night'], weather:'any', accent:'pink', slot:36, noLive:true, fixedDist:'120m' },
 ];
 
@@ -709,6 +717,7 @@ const RATINGS = {
   p26:['4.3','1.2k'], p27:['4.3','2.9k'], p28:['4.6','1.4k'], p29:['4.5','4.4k'], p30:['4.4','6.1k'],
   p31:['4.7','22k'], p32:['4.6','3.2k'], p33:['4.6','4.3k'], p34:['4.5','1.6k'], p35:['4.2','12k'],
   p36:['4.8','9.4k'], p37:['4.3','17k'], p38:['4.2','12k'], p39:['4.4','31k'],
+  p40:['4.5','21k'], p41:['4.5','19k'], p42:['4.5','185k'], p43:['4.4','15k'], p44:['4.2','4.1k'], p45:['4.1','2.6k'], p46:['4.6','2.8k'], p47:['4.3','38k'],
 };
 
 // Shown only when /api/concierge is unreachable or no key is configured.
@@ -767,6 +776,8 @@ const KIND_ICONS = {
   'Park': ['ri-plant-line', 'ri-leaf-line', 'ri-tree-line'],
   'Bookshop': ['ri-book-open-line', 'ri-book-2-line', 'ri-booklet-line'],
   'Vintage shop': ['ri-t-shirt-line', 'ri-handbag-line'],
+  'Grand magasin': ['ri-building-2-line', 'ri-store-3-line'],
+  'Boutique': ['ri-shirt-line', 'ri-handbag-line', 'ri-shopping-bag-line'],
   'Brocante': ['ri-store-2-line', 'ri-armchair-line'],
   'Concept store': ['ri-shopping-bag-line', 'ri-gift-line'],
   'Oddity': ['ri-ghost-line', 'ri-key-2-line', 'ri-magic-line'],
@@ -920,6 +931,10 @@ class Component extends DCLogic {
       p33: ['en', 'Berthillon'],
       p35: ['en', 'Palais de Tokyo'],
       p36: ['en', 'Pont Alexandre III'],
+      p41: ['en', 'Le Bon Marché'],
+      p42: ['en', 'Galeries Lafayette'],
+      p43: ['en', 'La Samaritaine'],
+      p47: ['fr', 'Marché aux puces de Saint-Ouen'],
       p37: ['fr', "Jardin d'Acclimatation"],
       p38: ['fr', 'Ménagerie du Jardin des plantes'],
       p39: ['en', 'Cité des Sciences et de l\'Industrie'],
@@ -1325,6 +1340,8 @@ class Component extends DCLogic {
     { flag: 'flea', q: 'brocante antiquités', kind: 'Brocante', icon: 'ri-store-2-line', accent: 'lilac', times: ['morning', 'afternoon'] },
     { flag: 'designer', q: 'concept store créateurs', kind: 'Concept store', icon: 'ri-shopping-bag-line', accent: 'lilac', times: ['morning', 'afternoon'] },
     { flag: 'bookish', q: 'librairie indépendante', kind: 'Bookshop', icon: 'ri-book-open-line', accent: 'lilac', times: ['afternoon'] },
+    { flag: 'designer', q: 'boutique mode créateurs', kind: 'Boutique', icon: 'ri-shirt-line', accent: 'lilac', times: ['morning', 'afternoon'] },
+    { flag: 'vintage', q: 'dépôt-vente vêtements luxe', kind: 'Vintage shop', icon: 'ri-handbag-line', accent: 'lilac', times: ['morning', 'afternoon'] },
     { flag: 'naturalWine', q: 'bar à vin naturel', kind: 'Wine bar', icon: 'ri-goblet-line', accent: 'yellow', times: ['evening', 'night'] },
     { flag: 'electro', q: 'club électro', kind: 'Club', icon: 'ri-disc-line', accent: 'yellow', times: ['night'] },
     { flag: 'chanson', q: 'bar chanson cave', kind: 'Dive bar', icon: 'ri-mic-line', accent: 'yellow', times: ['evening', 'night'] },
@@ -1343,6 +1360,18 @@ class Component extends DCLogic {
     { lat: 48.8890, lng: 2.3830 }, // Canal de l'Ourcq
     { lat: 48.8547, lng: 2.3900 }, // Charonne
   ];
+
+  // fired when the Shopping chip is picked and the dynamic shelf is thin
+  loadShoppingHunts() {
+    if (this._shopHunted) return;
+    this._shopHunted = true;
+    const loc = this.state.userLoc || PARIS;
+    const ll = `${loc.lat.toFixed(3)},${loc.lng.toFixed(3)}`;
+    const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());
+    Component.TASTE_QUERIES
+      .filter(t => t.accent === 'lilac')
+      .forEach(t => this.fetchWildcards(`/api/discover?ll=${ll}&d=${day}&q=${encodeURIComponent(t.q)}`, t));
+  }
 
   loadWildcards(loc) {
     const T = this.getTaste();
@@ -1699,7 +1728,7 @@ class Component extends DCLogic {
   }
 
   scorePlace(p, T) {
-    const FAMOUS = ['p5', 'p10', 'p15', 'p16', 'p19', 'p21'];
+    const FAMOUS = ['p5', 'p10', 'p15', 'p16', 'p19', 'p21', 'p42'];
     let s = 0;
     if (T.coffeeFirst && (p.kind === 'Café' || p.kind === 'Boulangerie')) s += 3;
     if (T.likesButter && (p.kind === 'Boulangerie' || p.kind === 'Crêperie')) s += 2;
@@ -1715,7 +1744,10 @@ class Component extends DCLogic {
     if (T.iconsFirst && FAMOUS.includes(p.id)) s += 2;
     if (T.firstTimer && FAMOUS.includes(p.id)) s += 1;
     if (T.homebody && p.km != null && p.km > 1.5) s -= 2;
-    if (T.vintage && (p.accent === 'lilac' || p.kind === 'Market')) s += 3;
+    if (T.vintage && (p.kind === 'Vintage shop' || p.kind === 'Brocante' || p.kind === 'Market')) s += 3;
+    if (T.designer && (p.kind === 'Concept store' || p.kind === 'Grand magasin' || p.kind === 'Boutique')) s += 3;
+    if (T.fancy && p.kind === 'Grand magasin') s += 1;
+    if (T.friends && (p.kind === 'Vintage shop' || p.kind === 'Concept store')) s += 1;
     if (T.flea && (p.kind === 'Market' || p.kind === 'Brocante')) s += 2;
     if (T.bookish && p.kind === 'Bookshop') s += 3;
     if (T.naturalWine && p.kind === 'Wine bar') s += 2;
@@ -1792,10 +1824,11 @@ class Component extends DCLogic {
     }
     deck = quota;
 
-    // keep discovery alive: guarantee a wildcard near the top when one exists
-    if (deck.length > 2 && !deck.slice(0, 3).some(p => p.wild)) {
+    // keep discovery alive: guarantee a wildcard in the two always-visible
+    // slots (the quiz check-in takes slot 3 when pending)
+    if (deck.length > 1 && !deck.slice(0, 2).some(p => p.wild)) {
       const wix = deck.findIndex(p => p.wild);
-      if (wix > 2) deck.splice(1, 0, deck.splice(wix, 1)[0]);
+      if (wix > 1) deck.splice(1, 0, deck.splice(wix, 1)[0]);
     }
 
     // 'Right now' opens with this week's happenings scraped from Instagram
@@ -2349,7 +2382,12 @@ class Component extends DCLogic {
         const active = S.cat === c.key;
         return {
           label: c.label,
-          go: () => this.setState({ cat: active ? 'all' : c.key }),
+          go: () => {
+            if (!active && c.key === 'lilac' && Object.values(S.gplaces).filter(g => g.accent === 'lilac').length < 4) {
+              this.loadShoppingHunts();
+            }
+            this.setState({ cat: active ? 'all' : c.key });
+          },
           style: {
             font: "500 13.5px 'Saans', sans-serif", padding: '11px 18px', cursor: 'pointer',
             flex: 'none', borderRadius: 58, whiteSpace: 'nowrap',
