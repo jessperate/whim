@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
 <title>Whim — swipe right on Paris</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%2300ff64%27/%3E%3Ctext x=%2750%27 y=%2772%27 font-size=%2760%27 text-anchor=%27middle%27%3E%F0%9F%A5%90%3C/text%3E%3C/svg%3E">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -397,19 +398,17 @@ class Component extends DCLogic {
 
   componentDidMount() {
     const WIKI = {
-      p1: ['fr', 'Du Pain et des Idées'],
       p4: ['en', 'Canal Saint-Martin'],
       p5: ['en', 'Sainte-Chapelle'],
-      p6: ['en', 'Musée de l\u2019Orangerie'],
-      p7: ['en', 'Marché d\u2019Aligre'],
-      p8: ['en', 'L\u2019As du Fallafel'],
+      p6: ['en', "Musée de l'Orangerie"],
+      p7: ['fr', "Marché d'Aligre"],
+      p8: ['en', "L'As du Fallafel"],
       p9: ['en', 'Coulée verte René-Dumont'],
       p10: ['en', 'Jardin du Luxembourg'],
       p11: ['en', 'Shakespeare and Company (bookstore)'],
       p12: ['en', 'Montmartre'],
-      p15: ['fr', 'Bouillon Pigalle'],
       p16: ['en', 'Sacré-Cœur, Paris'],
-      p17: ['en', 'Caveau de la Huchette'],
+      p17: ['fr', 'Caveau de la Huchette'],
       p19: ['en', 'Eiffel Tower'],
       p20: ['en', 'Crêpe'],
       p21: ['en', 'Café de Flore'],
@@ -796,7 +795,7 @@ class Component extends DCLogic {
         // 2b: time-dash meta line
         meta: isQuiz ? '' : `${ctx.clock} — ${c.kind} · ${c.dist}${c.score >= 2 ? ' · Very you' : ''}${openBit}`,
         rating: isQuiz ? '' : ((live && live.rating) || fallback[0]),
-        reviews: isQuiz ? '' : (live && live.ratings != null ? `${fmtCount(live.ratings)} live ratings` : `${fallback[1]} reviews`),
+        reviews: isQuiz ? '' : (live && live.ratings != null ? `${fmtCount(live.ratings)} Google reviews` : `${fallback[1]} reviews`),
         gmaps: isQuiz ? null : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' Paris')}`,
         q: c.q,
         opts: isQuiz ? c.opts.map(o => ({ label: o, go: () => this.answerQuiz(c.id, o) })) : [],
