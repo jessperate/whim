@@ -104,6 +104,7 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
               <i class="ri-map-pin-time-line" style="font-size:36px; color:#008c44;"></i>
               <div style="font:400 26px/1.1 'Serrif VF',Georgia,serif; color:#002910;">That's everything nearby</div>
               <div style="font:400 15px/1.55 'Saans',sans-serif; color:#676c79;">Flip the weather in the You tab, or check your day plan. It's looking good.</div>
+              <button onClick="{{ reshuffleDeck }}" style="font:500 13px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#00ff64; color:#002910; border:none; border-radius:58px; padding:13px 22px; cursor:pointer; margin-top:4px;">Deal me everything again</button>
             </div>
           </sc-if>
           <sc-for list="{{ stack }}" as="card" hint-placeholder-count="1">
@@ -200,6 +201,7 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
         </div>
         <sc-if value="{{ planHasStops }}" hint-placeholder-val="{{ false }}">
           <div style="border-top:1px solid #002910; margin-top:14px; padding-top:14px; font:500 11.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#057a28;">{{ planStats }}</div>
+          <a href="{{ routeUrl }}" target="_blank" rel="noopener" style="display:block; text-align:center; margin-top:12px; font:500 15px 'Saans',sans-serif; background:#ffffff; color:#002910; border:1px solid #002910; border-radius:58px; padding:14px; text-decoration:none;">Open walking route in Maps</a>
         </sc-if>
       </div>
     </sc-if>
@@ -808,6 +810,9 @@ class Component extends DCLogic {
         };
       }) : [],
       planHasStops: approved,
+      routeUrl: approved && timed.length
+        ? `https://www.google.com/maps/dir/?api=1&travelmode=walking&destination=${encodeURIComponent(timed[timed.length - 1].p.name + ' Paris')}${timed.length > 1 ? `&waypoints=${encodeURIComponent(timed.slice(0, -1).map(({ p }) => p.name + ' Paris').join('|'))}` : ''}`
+        : null,
       planSub: plan.length === 0
         ? 'Swipe right and the concierge drafts your day.'
         : (approved ? 'Locked in. I did the time math so you don\u2019t have to.' : 'The concierge has thoughts. Review the draft.'),
@@ -983,6 +988,15 @@ class Component extends DCLogic {
       }),
 
       stack, deckEmpty: deck.length === 0,
+      reshuffleDeck: () => {
+        this.setState(s => {
+          // forget nopes everywhere and likes too, but keep the approved plan intact
+          const keep = {};
+          Object.entries(s.swiped).forEach(([id, v]) => { if (v === 'like') keep[id] = v; });
+          return { swiped: keep };
+        });
+        this.showToast('Fresh deck. Your likes are safe.');
+      },
       swipeLike: () => this.swipeTop('like'),
       swipeNope: () => this.swipeTop('nope'),
 
