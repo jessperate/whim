@@ -139,8 +139,8 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
                 </div>
                 <div style="{{ card.bodyStyle }}">
                   <div style="{{ card.kickerStyle }}">{{ card.meta }}</div>
-                  <div style="font:400 clamp(23px, 6.5vw, 30px)/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ card.name }}</div>
-                  <div style="font:italic 400 16px/1.42 'Serrif VF',Georgia,serif; color:#38100c; margin-top:8px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; min-height:0;">{{ card.blurb }}</div>
+                  <div style="font:400 clamp(22px, 6.2vw, 30px)/1.08 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; flex:none;">{{ card.name }}</div>
+                  <div style="font:italic 400 16px/1.42 'Serrif VF',Georgia,serif; color:#38100c; margin-top:8px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; flex:none;">{{ card.blurb }}</div>
                   <div style="{{ card.footStyle }}">
                     <i class="ri-star-fill" style="{{ card.footIconStyle }}"></i>
                     <span style="font:500 13px 'Saans Mono',monospace; color:#451212;">{{ card.rating }}</span>
@@ -242,13 +242,16 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
               <div style="{{ m.labelStyle }}">{{ m.speaker }}</div>
               <div style="{{ m.textStyle }}">{{ m.text }}</div>
               <sc-for list="{{ m.cards }}" as="pc" hint-placeholder-count="1">
-                <div onClick="{{ pc.open }}" style="{{ pc.style }}">
-                  <div style="{{ pc.thumb }}"><i class="{{ pc.thumbIcon }}" style="{{ pc.thumbIconStyle }}"></i></div>
-                  <div style="flex:1; min-width:0;">
-                    <div style="font:700 14px 'Saans',sans-serif; color:#451212;">{{ pc.name }}</div>
-                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ pc.meta }}</div>
+                <div style="{{ pc.style }}">
+                  <div onClick="{{ pc.open }}" style="display:flex; align-items:center; gap:10px; flex:1; min-width:0; cursor:pointer;">
+                    <div style="{{ pc.thumb }}"><i class="{{ pc.thumbIcon }}" style="{{ pc.thumbIconStyle }}"></i></div>
+                    <div style="flex:1; min-width:0;">
+                      <div style="font:700 14px 'Saans',sans-serif; color:#451212;">{{ pc.name }}</div>
+                      <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ pc.meta }}</div>
+                    </div>
                   </div>
-                  <i class="ri-arrow-right-s-line" style="font-size:18px; color:#d1401f;"></i>
+                  <button onClick="{{ pc.heart }}" aria-label="Save for later" style="{{ pc.heartStyle }}"><i class="{{ pc.heartIcon }}"></i></button>
+                  <button onClick="{{ pc.plan }}" aria-label="Add to plan" style="{{ pc.planStyle }}"><i class="{{ pc.planIcon }}"></i></button>
                 </div>
               </sc-for>
               <sc-if value="{{ m.showFb }}" hint-placeholder-val="{{ false }}">
@@ -1262,7 +1265,7 @@ class Component extends DCLogic {
     const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', weekday: 'long', hour: '2-digit', minute: '2-digit', hour12: false });
     const parts = Object.fromEntries(fmt.formatToParts(new Date()).map(x => [x.type, x.value]));
     const h = Number(parts.hour);
-    const realTod = h >= 5 && h < 11 ? 'morning' : h < 17 ? 'afternoon' : h < 22 ? 'evening' : 'night';
+    const realTod = h >= 5 && h < 11 ? 'morning' : h >= 11 && h < 17 ? 'afternoon' : h >= 17 && h < 22 ? 'evening' : 'night';
     const timeOfDay = S.timeOverride || realTod;
     const clock = S.timeOverride ? CTX[S.timeOverride].t : `${parts.hour}:${parts.minute}`;
     const weather = S.weatherOverride || S.weatherLive || 'sunny';
@@ -2387,11 +2390,18 @@ class Component extends DCLogic {
           const p = this.findPlace(id);
           if (!p) return null;
           const a = ACCENTS[p.accent];
+          const inPlan = S.swiped[p.id] === 'like';
           return {
             name: p.name,
             meta: `${p.kind} · ${this.distFor(p).dist}`,
             open: () => this.openDetail(p.id),
-            style: { display: 'flex', alignItems: 'center', gap: 10, background: '#ffffff', border: '1px solid #f2d3c6', padding: '9px 12px 9px 9px', cursor: 'pointer', maxWidth: '86%', marginTop: 6 },
+            plan: () => this.togglePlan(p.id),
+            planIcon: inPlan ? 'ri-check-line' : 'ri-add-line',
+            planStyle: { width: 34, height: 34, flex: 'none', borderRadius: '50%', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: inPlan ? '#451212' : '#e8432c', color: '#fff5ee', fontSize: 17 },
+            heart: () => this.toggleHeart(p.id),
+            heartIcon: S.hearts[p.id] ? 'ri-heart-3-fill' : 'ri-heart-add-line',
+            heartStyle: { width: 34, height: 34, flex: 'none', borderRadius: '50%', border: '1px solid #f2d3c6', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff', color: S.hearts[p.id] ? '#c54b9b' : '#451212', fontSize: 15 },
+            style: { display: 'flex', alignItems: 'center', gap: 8, background: '#ffffff', border: '1px solid #f2d3c6', padding: '9px 10px 9px 9px', maxWidth: '92%', marginTop: 6 },
             thumb: S.photos[p.id]
               ? { width: 46, height: 46, flex: 'none', backgroundImage: `url("${S.photos[p.id]}")`, backgroundSize: 'cover', backgroundPosition: 'center', border: `1px solid ${a.dot}` }
               : { width: 46, height: 46, flex: 'none', background: a.bg, border: `1px solid ${a.dot}`, display: 'flex', alignItems: 'center', justifyContent: 'center' },
