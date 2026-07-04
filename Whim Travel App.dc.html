@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet">
+<style>
+@font-face { font-family:'Serrif VF'; src:url('fonts/SerrifVF.ttf') format('truetype'); font-weight:100 900; }
+@font-face { font-family:'Saans'; src:url('fonts/Saans-Regular.ttf') format('truetype'); font-weight:400; }
+@font-face { font-family:'Saans'; src:url('fonts/Saans-Medium.ttf') format('truetype'); font-weight:500; }
+@font-face { font-family:'Saans'; src:url('fonts/Saans-Bold.ttf') format('truetype'); font-weight:700; }
+@font-face { font-family:'Saans Mono'; src:url('fonts/SaansMono-Medium.ttf') format('truetype'); font-weight:500; }
+body { margin:0; background:#f0eee9; font-family:'Saans',system-ui,sans-serif; }
+@keyframes whim-toast { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</helmet>
+
+<section id="t2" style="padding:40px 44px 32px; border-bottom:1px solid rgba(0,0,0,.08);">
+  <div style="display:flex; align-items:baseline; gap:10px; margin:0 0 8px;">
+    <a href="#t2" style="font:600 10px 'Saans Mono',monospace; padding:3px 7px; background:#002910; color:#f8fffa; border-radius:4px; text-decoration:none;">2</a>
+    <span style="font:600 13px/1.2 'Saans',sans-serif; color:#002910;">Color-block riffs – pastel tiles + chunky type, on the editorial bones of <a href="#1a" style="color:#008c44;">1a</a></span>
+  </div>
+  <p style="font:400 12px/1.6 'Saans',sans-serif; color:rgba(0,41,16,.6); max-width:720px; margin:0 0 24px;">Your reference translated into AirOps tints (mint, pink, indigo, yellow). Cards become flat color tiles keyed to category, with chip filters and date-dash meta lines. <a href="#2a" style="color:#008c44;">2a</a> goes full chunky sans; <a href="#2b" style="color:#008c44;">2b</a> keeps the serif masthead voice on the tiles; <a href="#2c" style="color:#008c44;">2c</a> shows the Plan tab color-blocked.</p>
+
+  <div style="display:flex; flex-wrap:wrap; gap:32px; align-items:flex-start;">
+
+    <div id="2a" data-screen-label="2a Chunky color-block card" style="display:flex; flex-direction:column; gap:9px;">
+      <div style="display:flex; align-items:baseline; gap:8px; font:400 11px/1.3 'Saans',sans-serif; color:rgba(0,0,0,.55);"><a href="#2a" style="font:600 10.5px 'Saans Mono',monospace; padding:3px 7px; background:rgba(0,0,0,.08); color:#1a1a1a; border-radius:5px; text-decoration:none;">2a</a>Chunky sans + flat tiles</div>
+      <div style="width:300px; background:#ffffff; border:1px solid rgba(0,0,0,.08); padding:16px; display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <span style="font:500 10px 'Saans',sans-serif; background:#002910; color:#f8fffa; padding:5px 9px;">All</span>
+          <span style="font:500 10px 'Saans',sans-serif; background:#ccffe0; color:#002910; padding:5px 9px;">Food</span>
+          <span style="font:500 10px 'Saans',sans-serif; background:#fee7fd; color:#002910; padding:5px 9px;">Culture</span>
+          <span style="font:500 10px 'Saans',sans-serif; background:#EEFF8C; color:#002910; padding:5px 9px;">Nights</span>
+        </div>
+        <div style="background:#ccffe0; padding:18px; display:flex; flex-direction:column; gap:10px;">
+          <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28;">8:14 — Boulangerie · 400m</div>
+          <div style="width:74px; height:74px; border-radius:50%; background:#057a28; display:flex; align-items:center; justify-content:center; align-self:center; margin:6px 0;"><i class="ri-cake-2-line" style="font-size:34px; color:#ccffe0;"></i></div>
+          <div style="font:700 23px/1.05 'Saans',sans-serif; letter-spacing:-0.01em; color:#002910;">Du Pain et des Idées</div>
+          <div style="font:400 13px/1.45 'Saans',sans-serif; color:#01200d;">Reddit's eternal answer to "best bakery?" The pistachio escargot has ended relationships.</div>
+          <div style="display:flex; align-items:center; gap:6px; border-top:1px solid #002910; padding-top:9px;">
+            <i class="ri-star-fill" style="font-size:12px; color:#057a28;"></i>
+            <span style="font:500 11px 'Saans Mono',monospace; color:#002910;">4.8</span>
+            <span style="font:400 11px 'Saans',sans-serif; color:#01200d; opacity:.7;">8.9k reviews</span>
+            <span style="margin-left:auto; font:700 11px 'Saans',sans-serif; color:#002910; border-bottom:2px solid #002910;">Read them</span>
+          </div>
+        </div>
+      </div>
+      <div style="font:400 11px/1.4 'Saans',sans-serif; color:rgba(0,0,0,.5); max-width:300px;">Closest to your reference: bold sans, flat tint tile per category, thick underline links.</div>
+    </div>
+
+    <div id="2b" data-screen-label="2b Editorial color-block" style="display:flex; flex-direction:column; gap:9px;">
+      <div style="display:flex; align-items:baseline; gap:8px; font:400 11px/1.3 'Saans',sans-serif; color:rgba(0,0,0,.55);"><a href="#2b" style="font:600 10.5px 'Saans Mono',monospace; padding:3px 7px; background:rgba(0,0,0,.08); color:#1a1a1a; border-radius:5px; text-decoration:none;">2b</a>Serif masthead voice on tiles</div>
+      <div style="width:300px; background:#ffffff; border:1px solid rgba(0,0,0,.08); padding:16px; display:flex; flex-direction:column; gap:12px;">
+        <div style="text-align:center;">
+          <div style="font:400 22px/1 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910;">Whim</div>
+          <div style="border-bottom:1px solid #002910; margin:8px 0 2px;"></div>
+          <div style="border-bottom:1px solid #002910;"></div>
+        </div>
+        <div style="background:#fee7fd; padding:18px; display:flex; flex-direction:column; gap:9px;">
+          <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#852952;">8:14 — Boulangerie · 400m</div>
+          <div style="font:400 25px/1 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910;">Du Pain et des Idées</div>
+          <div style="font:italic 400 14px/1.45 'Serrif VF',Georgia,serif; color:#01200d;">The pistachio escargot has ended relationships. Worth it.</div>
+          <div style="display:flex; align-items:center; gap:6px; border-top:1px solid #852952; padding-top:9px;">
+            <i class="ri-star-fill" style="font-size:12px; color:#852952;"></i>
+            <span style="font:500 11px 'Saans Mono',monospace; color:#002910;">4.8</span>
+            <span style="font:400 11px 'Saans',sans-serif; color:#01200d; opacity:.7;">8.9k reviews</span>
+            <span style="margin-left:auto; font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#852952; border-bottom:1px solid #852952;">Read them</span>
+          </div>
+        </div>
+        <div style="background:#e5e5ff; padding:18px; display:flex; flex-direction:column; gap:9px;">
+          <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#1b1b8f;">10:00 — Landmark · 1.6km</div>
+          <div style="font:400 25px/1 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#0f0f57;">Sainte-Chapelle</div>
+        </div>
+      </div>
+      <div style="font:400 11px/1.4 'Saans',sans-serif; color:rgba(0,0,0,.5); max-width:300px;">Hybrid: keeps the masthead + serif you liked, swaps white card bodies for category tints.</div>
+    </div>
+
+    <div id="2c" data-screen-label="2c Color-block plan" style="display:flex; flex-direction:column; gap:9px;">
+      <div style="display:flex; align-items:baseline; gap:8px; font:400 11px/1.3 'Saans',sans-serif; color:rgba(0,0,0,.55);"><a href="#2c" style="font:600 10.5px 'Saans Mono',monospace; padding:3px 7px; background:rgba(0,0,0,.08); color:#1a1a1a; border-radius:5px; text-decoration:none;">2c</a>Plan tab, color-blocked</div>
+      <div style="width:300px; background:#ffffff; border:1px solid rgba(0,0,0,.08); padding:16px; display:flex; flex-direction:column; gap:8px;">
+        <div style="font:400 24px/1 'Serrif VF',Georgia,serif; color:#002910; margin-bottom:4px;">Your day plan</div>
+        <div style="background:#ccffe0; padding:12px 14px; display:flex; gap:10px; align-items:baseline;"><span style="font:500 10px 'Saans Mono',monospace; color:#057a28;">8:30</span><span style="font:700 15px 'Saans',sans-serif; color:#002910;">Du Pain et des Idées</span></div>
+        <div style="background:#c9ebf2; padding:12px 14px; display:flex; gap:10px; align-items:baseline;"><span style="font:500 10px 'Saans Mono',monospace; color:#002910;">10:00</span><span style="font:700 15px 'Saans',sans-serif; color:#002910;">Canal Saint-Martin stroll</span></div>
+        <div style="background:#fee7fd; padding:12px 14px; display:flex; gap:10px; align-items:baseline;"><span style="font:500 10px 'Saans Mono',monospace; color:#852952;">12:30</span><span style="font:700 15px 'Saans',sans-serif; color:#002910;">Marché d'Aligre</span></div>
+        <div style="background:#EEFF8C; padding:12px 14px; display:flex; gap:10px; align-items:baseline;"><span style="font:500 10px 'Saans Mono',monospace; color:#002910;">19:00</span><span style="font:700 15px 'Saans',sans-serif; color:#002910;">Le Baron Rouge</span></div>
+        <div style="font:500 9.5px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; border-top:1px solid #002910; padding-top:10px; margin-top:4px;">4 stops · 5.2 km of strutting</div>
+      </div>
+      <div style="font:400 11px/1.4 'Saans',sans-serif; color:rgba(0,0,0,.5); max-width:300px;">Each stop tinted by category – the day reads as a color story at a glance.</div>
+    </div>
+  </div>
+  <p style="margin:26px 0 0; font:12px/1.5 'Saans',sans-serif; color:rgba(0,0,0,.5);">Try next: "wire <a href="#2b" style="color:#008c44;">2b</a> into the app" · "use <a href="#2c" style="color:#008c44;">2c</a> for the Plan tab" · "go all-in on <a href="#2a" style="color:#008c44;">2a</a>"</p>
+</section>
+<section id="t1" style="padding:40px 44px 32px; border-bottom:1px solid rgba(0,0,0,.08);">
+  <div style="display:flex; align-items:baseline; gap:10px; margin:0 0 8px;">
+    <a href="#t1" style="font:600 10px 'Saans Mono',monospace; padding:3px 7px; background:#002910; color:#f8fffa; border-radius:4px; text-decoration:none;">1</a>
+    <span style="font:600 13px/1.2 'Saans',sans-serif; color:#002910;">Whim – swipe-right travel concierge, Paris demo</span>
+  </div>
+  <p style="font:400 12px/1.6 'Saans',sans-serif; color:rgba(0,41,16,.6); max-width:720px; margin:0 0 24px;">Assumptions: AirOps system adapted to mobile (serif+sans pairs, mono labels, sharp corners, green-first with one accent per card category). No real photos yet – halftone art placeholders per category. <a href="#1a" style="color:#008c44;">1a</a> is the live prototype: swipe the cards, tap the buttons, use the demo controls to change time and weather. <a href="#1b" style="color:#008c44;">1b</a>–<a href="#1c" style="color:#008c44;">1c</a> are alternate swipe-card styles; <a href="#1d" style="color:#008c44;">1d</a>–<a href="#1f" style="color:#008c44;">1f</a> are three ways likes become an itinerary.</p>
+
+  <div style="display:flex; flex-wrap:wrap; gap:32px; align-items:flex-start;">
+
+    <!-- ============ 1a: LIVE PROTOTYPE ============ -->
+    <div id="1a" data-screen-label="1a Live prototype" style="display:flex; flex-direction:column; gap:9px;">
+      <div style="display:flex; align-items:baseline; gap:8px; font:400 11px/1.3 'Saans',sans-serif; color:rgba(0,0,0,.55);"><a href="#1a" style="font:600 10.5px 'Saans Mono',monospace; padding:3px 7px; background:rgba(0,0,0,.08); color:#1a1a1a; border-radius:5px; text-decoration:none;">1a</a>Interactive prototype – swipe me</div>
+      <div style="display:flex; gap:24px; align-items:flex-start;">
+
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="430px,880px">
+          <div style="height:100%; display:flex; flex-direction:column; background:#f8fffa; font-family:'Saans',sans-serif; color:#002910; overflow:hidden; padding-top:58px; box-sizing:border-box;">
+
+            <!-- ===== ONBOARDING ===== -->
+            <sc-if value="{{ showSplash }}" hint-placeholder-val="{{ true }}">
+              <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0; padding:32px; text-align:center; background-color:#ffffff; background-image:radial-gradient(#d4e8da 1px, transparent 1px); background-size:24px 24px;">
+                <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.16em; color:#057a28; text-transform:uppercase; margin-bottom:14px;">Est. 2026 · Paris edition</div>
+                <div style="width:210px; border-top:1px solid #002910; margin-bottom:2px;"></div>
+                <div style="width:210px; border-top:1px solid #002910; margin-bottom:22px;"></div>
+                <div style="font:400 84px/0.9 'Serrif VF',Georgia,serif; letter-spacing:-0.03em; color:#002910;">{{ appName }}</div>
+                <div style="font:italic 400 18px/1.4 'Serrif VF',Georgia,serif; color:#01200d; margin:20px 0 22px; max-width:250px;">Swipe right on Paris.<br>Left on regret.</div>
+                <div style="width:210px; border-top:1px solid #002910; margin-bottom:2px;"></div>
+                <div style="width:210px; border-top:1px solid #002910; margin-bottom:30px;"></div>
+                <button onClick="{{ startQuiz }}" style="font:500 15px 'Saans',sans-serif; background:#00ff64; color:#002910; border:none; border-radius:58px; padding:16px 36px; cursor:pointer;">Allons-y</button>
+                <div style="font:400 11px 'Saans',sans-serif; color:#676c79; margin-top:14px;">Ten questions. Then I know you better than your mother does.</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ showQuiz }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1; display:flex; flex-direction:column; padding:28px 24px; background:#ffffff;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <span style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; color:#057a28; text-transform:uppercase;">Taste calibration · {{ obSec }}</span>
+                  <span style="font:500 11px 'Saans Mono',monospace; color:#676c79;">{{ obProgress }}</span>
+                </div>
+                <div style="height:3px; background:#eef9f3; margin-top:12px;">
+                  <div style="{{ obBarStyle }}"></div>
+                </div>
+                <div style="font:400 34px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910; margin:26px 0 6px;">{{ obQuestion }}</div>
+                <div style="font:400 14px/1.5 'Saans',sans-serif; color:#676c79; margin-bottom:26px;">{{ obSub }}</div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                  <sc-for list="{{ obOptions }}" as="opt" hint-placeholder-count="3">
+                    <button onClick="{{ opt.go }}" style="font:400 16px 'Saans',sans-serif; text-align:left; background:#eef9f3; color:#002910; border:1px solid #d4e8da; padding:16px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" style-hover="background:#ccffe0;">
+                      {{ opt.label }}<i class="ri-arrow-right-line" style="font-size:16px; color:#008c44;"></i>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- ===== MAIN APP ===== -->
+            <sc-if value="{{ showApp }}" hint-placeholder-val="{{ false }}">
+              <!-- header -->
+              <div style="background:#ffffff; padding:12px 20px 0; text-align:center;">
+                <div style="font:400 32px/1 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910;">{{ appName }}</div>
+                <div style="display:flex; align-items:center; justify-content:center; gap:6px; font:500 8.5px 'Saans Mono',monospace; letter-spacing:.16em; text-transform:uppercase; color:#057a28; margin:8px 0 10px;"><i class="{{ ctxIcon }}" style="font-size:11px;"></i>{{ ctxLine }}</div>
+                <div style="border-bottom:1px solid #002910; margin-bottom:2px;"></div>
+                <div style="border-bottom:1px solid #002910;"></div>
+              </div>
+
+              <!-- DISCOVER -->
+              <sc-if value="{{ tabDiscover }}" hint-placeholder-val="{{ true }}">
+                <div style="flex:1; display:flex; flex-direction:column; background-color:#f8fffa; background-image:radial-gradient(#d4e8da 1px, transparent 1px); background-size:24px 24px; overflow:hidden;">
+                  <div style="padding:12px 20px 2px; font:italic 400 16px/1.35 'Serrif VF',Georgia,serif; color:#002910; text-align:center;">{{ greeting }}</div>
+                  <div style="display:flex; justify-content:center; gap:6px; padding:10px 20px 0; flex-wrap:wrap;">
+                    <sc-for list="{{ catChips }}" as="cc" hint-placeholder-count="5">
+                      <button onClick="{{ cc.go }}" style="{{ cc.style }}">{{ cc.label }}</button>
+                    </sc-for>
+                  </div>
+                  <div style="flex:1; position:relative; margin:10px 20px 8px;">
+                    <sc-if value="{{ deckEmpty }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:10px; border:1px dashed #d4e8da; background:#ffffff; padding:28px;">
+                        <i class="ri-map-pin-time-line" style="font-size:32px; color:#008c44;"></i>
+                        <div style="font:400 24px/1.1 'Serrif VF',Georgia,serif; color:#002910;">That's everything nearby</div>
+                        <div style="font:400 13px/1.5 'Saans',sans-serif; color:#676c79;">Change the weather – the button is right there – or check your day plan. It's looking good.</div>
+                      </div>
+                    </sc-if>
+                    <sc-for list="{{ stack }}" as="card" hint-placeholder-count="1">
+                      <div data-id="{{ card.id }}" data-top-card="{{ card.isTop }}" onPointerDown="{{ card.onDown }}" onPointerMove="{{ card.onMove }}" onPointerUp="{{ card.onUp }}" style="{{ card.wrapStyle }}">
+                        <sc-if value="{{ card.isPlace }}" hint-placeholder-val="{{ true }}">
+                          <div style="{{ card.artStyle }}">
+                            <sc-if value="{{ card.showIcon }}" hint-placeholder-val="{{ true }}">
+                              <div style="{{ card.artIconWrap }}"><i class="{{ card.icon }}" style="{{ card.artIcon }}"></i></div>
+                            </sc-if>
+                          </div>
+                          <div style="{{ card.bodyStyle }}">
+                            <div style="{{ card.kickerStyle }}">{{ card.meta }}</div>
+                            <div style="font:400 27px/1 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910;">{{ card.name }}</div>
+                            <div style="font:italic 400 15px/1.45 'Serrif VF',Georgia,serif; color:#01200d; margin-top:8px;">{{ card.blurb }}</div>
+                            <div style="{{ card.footStyle }}">
+                              <i class="ri-star-fill" style="{{ card.footIconStyle }}"></i>
+                              <span style="font:500 11px 'Saans Mono',monospace; color:#002910;">{{ card.rating }}</span>
+                              <span style="font:400 11px 'Saans',sans-serif; color:#01200d; opacity:.65;">{{ card.reviews }} Google reviews</span>
+                              <a href="{{ card.gmaps }}" target="_blank" style="{{ card.linkStyle }}">Read them</a>
+                            </div>
+                          </div>
+                          <div data-stamp="like" style="position:absolute; top:18px; left:16px; font:500 24px 'Saans Mono',monospace; letter-spacing:.06em; color:#00cc50; border:3px solid #00cc50; padding:4px 12px; transform:rotate(-10deg); opacity:0; background:rgba(248,255,250,.85);">OUI</div>
+                          <div data-stamp="nope" style="position:absolute; top:18px; right:16px; font:500 24px 'Saans Mono',monospace; letter-spacing:.06em; color:#852952; border:3px solid #852952; padding:4px 12px; transform:rotate(10deg); opacity:0; background:rgba(255,247,255,.85);">NON</div>
+                        </sc-if>
+                        <sc-if value="{{ card.isQuiz }}" hint-placeholder-val="{{ false }}">
+                          <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:14px; padding:24px; background:#e5e5ff;">
+                            <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#1b1b8f;">Taste check-in</div>
+                            <div style="font:400 30px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#0f0f57;">{{ card.q }}</div>
+                            <div style="display:flex; flex-direction:column; gap:9px; margin-top:6px;">
+                              <sc-for list="{{ card.opts }}" as="qo" hint-placeholder-count="2">
+                                <button onClick="{{ qo.go }}" style="font:400 15px 'Saans',sans-serif; text-align:left; background:#ffffff; color:#0f0f57; border:1px solid #1b1b8f; padding:13px 16px; cursor:pointer;">{{ qo.label }}</button>
+                              </sc-for>
+                            </div>
+                            <div style="font:400 11px 'Saans',sans-serif; color:#1b1b8f; opacity:.7;">Or swipe left to dodge the question. Coward.</div>
+                          </div>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex; justify-content:center; gap:22px; padding:6px 0 14px;">
+                    <button onClick="{{ swipeNope }}" style="width:56px; height:56px; border-radius:50%; border:1px solid #ffd3fd; background:#fee7fd; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#fff7ff;"><i class="ri-close-line" style="font-size:26px; color:#852952;"></i></button>
+                    <button onClick="{{ swipeLike }}" style="width:56px; height:56px; border-radius:50%; border:none; background:#00ff64; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#00cc50;"><i class="ri-heart-3-line" style="font-size:26px; color:#002910;"></i></button>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- PLAN -->
+              <sc-if value="{{ tabPlan }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:1; overflow:auto; padding:20px; background:#ffffff;">
+                  <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28;">Today · Paris</div>
+                  <div style="font:400 30px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910; margin:8px 0 4px;">Your day plan</div>
+                  <div style="font:italic 400 14px/1.5 'Serrif VF',Georgia,serif; color:#676c79; margin-bottom:18px;">{{ planSub }}</div>
+                  <sc-if value="{{ planEmpty }}" hint-placeholder-val="{{ false }}">
+                    <div style="border:1px dashed #d4e8da; padding:26px 20px; text-align:center; background:#f8fffa;">
+                      <div style="font:400 20px/1.2 'Serrif VF',Georgia,serif; color:#002910; margin-bottom:6px;">Nothing yet</div>
+                      <div style="font:400 13px/1.5 'Saans',sans-serif; color:#676c79;">Swipe right on literally anything and I'll draft your day. That's the whole deal.</div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ planDraft }}" hint-placeholder-val="{{ false }}">
+                    <div style="background:#002910; padding:18px; display:flex; flex-direction:column; gap:13px; margin-bottom:16px;">
+                      <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#EEFF8C;">Concierge proposes · Draft {{ draftNo }}</div>
+                      <div style="font:400 14px/1.55 'Saans',sans-serif; color:#f8fffa;">{{ proposalMsg }}</div>
+                      <div style="display:flex; flex-direction:column; gap:7px;">
+                        <sc-for list="{{ proposalStops }}" as="ps" hint-placeholder-count="3">
+                          <div style="display:flex; gap:12px; align-items:baseline; background:#00250e; border:1px solid #057a28; padding:9px 12px;">
+                            <span style="font:500 11px 'Saans Mono',monospace; color:#00ff64; width:42px; flex:none;">{{ ps.at }}</span>
+                            <span style="font:400 16px 'Serrif VF',Georgia,serif; color:#f8fffa;">{{ ps.name }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                      <div style="display:flex; gap:8px; margin-top:2px;">
+                        <button onClick="{{ approvePlan }}" style="flex:1; font:500 13px 'Saans',sans-serif; background:#00ff64; color:#002910; border:none; border-radius:58px; padding:11px; cursor:pointer;" style-hover="background:#00cc50;">Approve</button>
+                        <button onClick="{{ shufflePlan }}" style="flex:1; font:500 13px 'Saans',sans-serif; background:rgba(0,0,0,.3); color:#f8fffa; border:1px solid #057a28; border-radius:58px; padding:11px; cursor:pointer;">Shuffle it</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ planApproved }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                      <span style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#EEFF8C; border:1px solid #d4e87a; border-radius:5px; padding:4px 8px; color:#002910;">Approved by you</span>
+                      <button onClick="{{ redraftPlan }}" style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; border:none; color:#008c44; cursor:pointer; padding:0;" style-hover="color:#00cc50;">Re-draft</button>
+                    </div>
+                  </sc-if>
+                  <div style="display:flex; flex-direction:column; gap:8px;">
+                    <sc-for list="{{ plan }}" as="stop" hint-placeholder-count="3">
+                      <div style="{{ stop.blockStyle }}">
+                        <span style="{{ stop.atStyle }}">{{ stop.at }}</span>
+                        <div style="flex:1;">
+                          <div style="font:700 15px/1.2 'Saans',sans-serif; color:#002910;">{{ stop.name }}</div>
+                          <div style="{{ stop.metaStyle }}">{{ stop.meta }}</div>
+                        </div>
+                        <button onClick="{{ stop.remove }}" style="border:none; background:none; cursor:pointer; padding:2px;"><i class="ri-close-line" style="{{ stop.xStyle }}"></i></button>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <sc-if value="{{ planHasStops }}" hint-placeholder-val="{{ false }}">
+                    <div style="border-top:1px solid #002910; margin-top:12px; padding-top:12px; font:500 10.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#057a28;">{{ planStats }}</div>
+                  </sc-if>
+                </div>
+              </sc-if>
+
+              <!-- CHAT -->
+              <sc-if value="{{ tabChat }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:1; display:flex; flex-direction:column; background:#ffffff; overflow:hidden;">
+                  <div style="padding:14px 20px 0; text-align:center;">
+                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.16em; text-transform:uppercase; color:#057a28;">Correspondence with the concierge</div>
+                    <div style="border-bottom:1px solid #d4e8da; margin-top:10px;"></div>
+                  </div>
+                  <div data-chat-scroll="true" style="flex:1; overflow:auto; padding:16px 20px; display:flex; flex-direction:column; gap:16px;">
+                    <sc-for list="{{ chat }}" as="m" hint-placeholder-count="2">
+                      <div style="{{ m.rowStyle }}">
+                        <div style="{{ m.labelStyle }}">{{ m.speaker }}</div>
+                        <div style="{{ m.textStyle }}">{{ m.text }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex; gap:8px; padding:0 20px 10px; flex-wrap:wrap;">
+                    <sc-for list="{{ chips }}" as="c" hint-placeholder-count="3">
+                      <button onClick="{{ c.go }}" style="font:500 9px 'Saans Mono',monospace; letter-spacing:.1em; text-transform:uppercase; background:#ffffff; color:#057a28; border:1px solid #d4e8da; padding:7px 10px; cursor:pointer;" style-hover="background:#eef9f3;">{{ c.label }}</button>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex; gap:8px; padding:0 20px 14px;">
+                    <input value="{{ chatDraft }}" onChange="{{ onDraft }}" onKeyDown="{{ onChatKey }}" placeholder="Tell me what you're craving…" style="flex:1; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #002910; color:#002910; padding:12px 14px; outline:none;">
+                    <button onClick="{{ sendChat }}" style="width:44px; border:none; background:#00ff64; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#00cc50;"><i class="ri-arrow-up-line" style="font-size:20px; color:#002910;"></i></button>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- YOU -->
+              <sc-if value="{{ tabYou }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:1; overflow:auto; padding:20px; background:#ffffff;">
+                  <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28;">Calibrated from {{ youCalib }}</div>
+                  <div style="font:400 30px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910; margin:8px 0 16px;">Your taste file</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:22px;">
+                    <sc-for list="{{ tastePills }}" as="tp" hint-placeholder-count="4">
+                      <span style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#eef9f3; border:1px solid #d4e8da; border-radius:5px; padding:5px 9px; color:#002910;">{{ tp }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="border:1px solid #d4e8da;">
+                    <sc-for list="{{ youStats }}" as="st" hint-placeholder-count="3">
+                      <div style="display:flex; justify-content:space-between; padding:13px 16px; border-bottom:1px solid #d4e8da; align-items:baseline;">
+                        <span style="font:400 14px 'Saans',sans-serif; color:#01200d;">{{ st.label }}</span>
+                        <span style="font:500 12px 'Saans Mono',monospace; color:#057a28;">{{ st.val }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <button onClick="{{ resetTaste }}" style="margin-top:20px; font:500 12px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#fee7fd; color:#852952; border:none; border-radius:8px; padding:12px 18px; cursor:pointer;" style-hover="background:#fff7ff;">Wipe my taste file</button>
+                  <div style="font:400 11px 'Saans',sans-serif; color:#676c79; margin-top:8px;">Fresh start. I'll pretend the croissant thing never happened.</div>
+                </div>
+              </sc-if>
+
+              <!-- toast -->
+              <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute; bottom:96px; left:50%; transform:translateX(-50%); background:#002910; color:#f8fffa; font:500 10.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; padding:9px 14px; white-space:nowrap; animation:whim-toast .25s ease-out; z-index:40;">{{ toast }}</div>
+              </sc-if>
+
+              <!-- tab bar -->
+              <div style="display:flex; border-top:1px solid #002910; background:#ffffff;">
+                <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+                  <button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}<sc-if value="{{ t.badge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:4px; color:#008c44;">({{ t.badge }})</span></sc-if></button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </x-import>
+
+        <!-- demo controls -->
+        <div style="width:210px; border:1px solid #d4e8da; background:#ffffff; padding:18px; display:flex; flex-direction:column; gap:16px; position:sticky; top:20px;">
+          <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28;">Demo controls</div>
+          <div>
+            <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79; margin-bottom:7px;">Time of day</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <sc-for list="{{ timeOpts }}" as="o" hint-placeholder-count="4">
+                <button onClick="{{ o.go }}" style="{{ o.style }}">{{ o.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79; margin-bottom:7px;">Weather</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <sc-for list="{{ weatherOpts }}" as="o" hint-placeholder-count="2">
+                <button onClick="{{ o.go }}" style="{{ o.style }}">{{ o.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="font:400 11px/1.5 'Saans',sans-serif; color:#676c79; border-top:1px solid #d4e8da; padding-top:12px;">The deck re-filters live. Morning + sunny = pastries. Rain = museums. Night = decisions you'll defend later.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 1b: POSTER CARD VARIANT ============ -->
+    <div id="1b" data-screen-label="1b Poster card" style="display:flex; flex-direction:column; gap:9px;">
+      <div style="display:flex; align-items:baseline; gap:8px; font:400 11px/1.3 'Saans',sans-serif; color:rgba(0,0,0,.55);"><a href="#1b" style="font:600 10.5px 'Saans Mono',monospace; padding:3px 7px; background:rgba(0,0,0,.08); color:#1a1a1a; border-radius:5px; text-decoration:none;">1b</a>Card style B – full-bleed poster</div>
+      <div style="width:290px; height:420px; position:relative; background-color:#ffd3fd; background-image:radial-gradient(#c54b9b 1.5px, transparent 1.5px); background-size:13px 13px; border:1px solid #d4e8da; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end;">
+        <div style="position:absolute; top:16px; left:16px; display:flex; gap:6px;">
+          <span style="font:500 9.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#EEFF8C; border:1px solid #d4e87a; border-radius:5px; padding:3px 7px; color:#002910;">Boulangerie</span>
+        </div>
+        <div style="position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); width:88px; height:88px; border-radius:50%; background:#fff7ff; display:flex; align-items:center; justify-content:center; border:1px solid #c54b9b;"><i class="ri-cake-2-line" style="font-size:40px; color:#852952;"></i></div>
+        <div style="background:linear-gradient(transparent, rgba(0,41,16,.92) 38%); padding:56px 18px 18px;">
+          <div style="font:500 9.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#EEFF8C; margin-bottom:6px;">400m · Canal Saint-Martin · Open now</div>
+          <div style="font:400 30px/0.95 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#f8fffa;">Du Pain et des Idées</div>
+          <div style="font:400 13px/1.4 'Saans',sans-serif; color:#eef9f3; margin-top:8px; opacity:.85;">The pistachio escargot here has ended relationships. Worth it.</div>
+          <div style="display:flex; align-items:center; gap:7px; margin-top:10px;">
+            <i class="ri-star-fill" style="font-size:13px; color:#EEFF8C;"></i>
+            <span style="font:500 11px 'Saans Mono',monospace; color:#f8fffa;">4.8</span>
+            <span style="font:400 11px 'Saans',sans-serif; color:#eef9f3; opacity:.7;">8.9k Google reviews</span>
+            <a href="https://www.google.com/maps/search/?api=1&query=Du%20Pain%20et%20des%20Id%C3%A9es%20Paris" target="_blank" style="margin-left:auto; font:500 9.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#EEFF8C; text-decoration:none; border-bottom:1px solid #EEFF8C; padding-bottom:1px;">Read them</a>
+          </div>
+        </div>
+      </div>
+      <div style="font:400 11px/1.4 'Saans',sans-serif; color:rgba(0,0,0,.5); max-width:290px;">Maximum drama, photo-first once real imagery lands. Meta in label yellow on forest.</div>
+    </div>
+
+    <!-- ============ 1c: BOARDING PASS VARIANT ============ -->
+    <div id="1c" data-screen-label="1c Boarding pass card" style="display:flex; flex-direction:column; gap:9px;">
+      <div style="display:flex; align-items:baseline; gap:8px; font:400 11px/1.3 'Saans',sans-serif; color:rgba(0,0,0,.55);"><a href="#1c" style="font:600 10.5px 'Saans Mono',monospace; padding:3px 7px; background:rgba(0,0,0,.08); color:#1a1a1a; border-radius:5px; text-decoration:none;">1c</a>Card style C – boarding pass</div>
+      <div style="width:290px; background:#ffffff; border:1px solid #002910;">
+        <div style="background:#002910; padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font:500 10px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#EEFF8C;">Whim pass · 08:14</span>
+          <i class="ri-sun-line" style="font-size:14px; color:#00ff64;"></i>
+        </div>
+        <div style="padding:16px;">
+          <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#676c79;">Destination</div>
+          <div style="font:400 26px/1 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910; margin:4px 0 12px;">Du Pain et des Idées</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; border-top:1px solid #d4e8da; padding-top:12px;">
+            <div><div style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79;">Gate</div><div style="font:500 13px 'Saans Mono',monospace; color:#002910;">400M</div></div>
+            <div><div style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79;">Class</div><div style="font:500 13px 'Saans Mono',monospace; color:#002910;">PASTRY</div></div>
+            <div><div style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79;">Seat</div><div style="font:500 13px 'Saans Mono',monospace; color:#002910;">ANY</div></div>
+          </div>
+          <div style="font:400 13px/1.45 'Saans',sans-serif; color:#01200d; margin-top:12px;">The pistachio escargot here has ended relationships. Worth it.</div>
+        </div>
+        <div style="border-top:1px dashed #d4e8da; padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="height:26px; flex:1; background:repeating-linear-gradient(90deg, #002910 0 2px, transparent 2px 5px, #002910 5px 6px, transparent 6px 10px);"></div>
+          <span style="font:500 9px 'Saans Mono',monospace; letter-spacing:.06em; color:#057a28; margin-left:12px;">SWIPE → TO BOARD</span>
+        </div>
+      </div>
+      <div style="font:400 11px/1.4 'Saans',sans-serif; color:rgba(0,0,0,.5); max-width:290px;">Every like feels like a ticket. Mono-heavy, most "engineered" of the three.</div>
+    </div>
+
+    <!-- ============ 1d: ITINERARY A ============ -->
+    <div id="1d" data-screen-label="1d Auto timeline" style="display:flex; flex-direction:column; gap:9px;">
+      <div style="display:flex; align-items:baseline; gap:8px; font:400 11px/1.3 'Saans',sans-serif; color:rgba(0,0,0,.55);"><a href="#1d" style="font:600 10.5px 'Saans Mono',monospace; padding:3px 7px; background:rgba(0,0,0,.08); color:#1a1a1a; border-radius:5px; text-decoration:none;">1d</a>Itinerary A – auto timeline</div>
+      <div style="width:290px; background:#ffffff; border:1px solid #d4e8da; padding:18px;">
+        <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; margin-bottom:10px;">Builds itself as you swipe</div>
+        <div style="display:flex; gap:12px;"><span style="font:500 11px 'Saans Mono',monospace; color:#057a28; width:38px;">8:30</span><div style="flex:1; border:1px solid #d4e8da; padding:9px 12px; font:400 15px 'Serrif VF',Georgia,serif; color:#002910; margin-bottom:8px;">Du Pain et des Idées</div></div>
+        <div style="display:flex; gap:12px;"><span style="font:500 11px 'Saans Mono',monospace; color:#057a28; width:38px;">11:00</span><div style="flex:1; border:1px solid #d4e8da; padding:9px 12px; font:400 15px 'Serrif VF',Georgia,serif; color:#002910; margin-bottom:8px;">Canal Saint-Martin stroll</div></div>
+        <div style="display:flex; gap:12px;"><span style="font:500 11px 'Saans Mono',monospace; color:#057a28; width:38px;">12:30</span><div style="flex:1; border:1px solid #d4e8da; padding:9px 12px; font:400 15px 'Serrif VF',Georgia,serif; color:#002910;">Marché des Enfants Rouges</div></div>
+        <div style="border-top:1px solid #d4e8da; margin-top:12px; padding-top:10px; font:500 9.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#057a28;">3 stops · 1.6 km of strutting</div>
+      </div>
+      <div style="font:400 11px/1.4 'Saans',sans-serif; color:rgba(0,0,0,.5); max-width:290px;">Zero effort: likes slot into sensible time order automatically.</div>
+    </div>
+
+    <!-- ============ 1e: ITINERARY B ============ -->
+    <div id="1e" data-screen-label="1e Concierge proposal" style="display:flex; flex-direction:column; gap:9px;">
+      <div style="display:flex; align-items:baseline; gap:8px; font:400 11px/1.3 'Saans',sans-serif; color:rgba(0,0,0,.55);"><a href="#1e" style="font:600 10.5px 'Saans Mono',monospace; padding:3px 7px; background:rgba(0,0,0,.08); color:#1a1a1a; border-radius:5px; text-decoration:none;">1e</a>Itinerary B – concierge proposes (now in <a href="#1a" style="color:#008c44;">1a</a>)</div>
+      <div style="width:290px; background:#002910; padding:18px; display:flex; flex-direction:column; gap:12px;">
+        <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#EEFF8C;">Concierge · 8:14</div>
+        <div style="background:#00250e; border:1px solid #057a28; padding:14px; font:400 14px/1.5 'Saans',sans-serif; color:#f8fffa;">Based on your five likes and frankly excellent taste: pastry at 8:30, canal strut at 11, market lunch at 12:30. Say the word.</div>
+        <div style="display:flex; gap:8px;">
+          <button style="flex:1; font:500 13px 'Saans',sans-serif; background:#00ff64; color:#002910; border:none; border-radius:58px; padding:11px; cursor:pointer;">Approve</button>
+          <button style="flex:1; font:500 13px 'Saans',sans-serif; background:rgba(0,0,0,.3); color:#f8fffa; border:1px solid #057a28; border-radius:58px; padding:11px; cursor:pointer;">Shuffle it</button>
+        </div>
+      </div>
+      <div style="font:400 11px/1.4 'Saans',sans-serif; color:rgba(0,0,0,.5); max-width:290px;">The AI drafts the day from your likes; you approve or make it try again.</div>
+    </div>
+
+    <!-- ============ 1f: ITINERARY C ============ -->
+    <div id="1f" data-screen-label="1f Curate board" style="display:flex; flex-direction:column; gap:9px;">
+      <div style="display:flex; align-items:baseline; gap:8px; font:400 11px/1.3 'Saans',sans-serif; color:rgba(0,0,0,.55);"><a href="#1f" style="font:600 10.5px 'Saans Mono',monospace; padding:3px 7px; background:rgba(0,0,0,.08); color:#1a1a1a; border-radius:5px; text-decoration:none;">1f</a>Itinerary C – drag-to-curate board</div>
+      <div style="width:290px; background:#ffffff; border:1px solid #d4e8da; padding:18px; display:flex; flex-direction:column; gap:10px;">
+        <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#676c79;">Morning</div>
+        <div style="display:flex; align-items:center; gap:10px; border:1px solid #d4e8da; padding:10px 12px;"><i class="ri-draggable" style="color:#a5aab6; font-size:15px;"></i><span style="font:400 15px 'Serrif VF',Georgia,serif; color:#002910;">Du Pain et des Idées</span></div>
+        <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#676c79; margin-top:4px;">Afternoon</div>
+        <div style="display:flex; align-items:center; gap:10px; border:1px solid #d4e8da; padding:10px 12px;"><i class="ri-draggable" style="color:#a5aab6; font-size:15px;"></i><span style="font:400 15px 'Serrif VF',Georgia,serif; color:#002910;">Jardin du Luxembourg</span></div>
+        <div style="border:1px dashed #d4e8da; padding:10px 12px; font:400 12px 'Saans',sans-serif; color:#a5aab6; text-align:center;">Drop your likes here</div>
+      </div>
+      <div style="font:400 11px/1.4 'Saans',sans-serif; color:rgba(0,0,0,.5); max-width:290px;">Full control: likes land in a tray, you drag them into morning / afternoon / evening buckets.</div>
+    </div>
+  </div>
+
+  <p style="margin:26px 0 0; font:12px/1.5 'Saans',sans-serif; color:rgba(0,0,0,.5);">Try next: "make <a href="#1b" style="color:#008c44;">1b</a> the card style in the app" · "use the <a href="#1e" style="color:#008c44;">1e</a> proposal flow for the Plan tab" · "different name ideas"</p>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;appName&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Whim&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Branding&quot;}, &quot;skipOnboarding&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;}, &quot;sassLevel&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;full&quot;, &quot;polite&quot;], &quot;default&quot;: &quot;full&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Copy&quot;}}">
+const PLACES = [
+  { id:'p1', name:'Du Pain et des Idées', kind:'Boulangerie', icon:'ri-cake-2-line', area:'Canal Saint-Martin', dist:'400m', km:0.4, blurb:'Reddit\u2019s eternal answer to \u201cbest bakery?\u201d The pistachio escargot has ended relationships.', times:['morning'], weather:'any', accent:'pink', at:'8:30', slot:1 },
+  { id:'p2', name:'Boulangerie Utopie', kind:'Boulangerie', icon:'ri-cake-3-line', area:'11e', dist:'1.4km', km:1.4, blurb:'The internet\u2019s favorite underdog bakery. The charcoal-sesame baguette has a fan club.', times:['morning'], weather:'any', accent:'pink', at:'9:15', slot:2 },
+  { id:'p3', name:'La Fontaine de Belleville', kind:'Café', icon:'ri-cup-line', area:'10e', dist:'900m', km:0.9, blurb:'Actually good coffee, zinc counter, locals debating nothing. Peak Paris.', times:['morning'], weather:'any', accent:'pink', at:'10:00', slot:3 },
+  { id:'p4', name:'Canal Saint-Martin stroll', kind:'Walk', icon:'ri-walk-line', area:'10e', dist:'500m', km:0.5, blurb:'Lock bridges, quiche picnics, effortlessly cool locals. Bring sunglasses.', times:['morning','afternoon'], weather:'sunny', accent:'green', at:'11:00', slot:4 },
+  { id:'p5', name:'Sainte-Chapelle', kind:'Landmark', icon:'ri-building-4-line', area:'Île de la Cité', dist:'1.6km', km:1.6, blurb:'1,113 stained-glass panels. The one line every forum agrees is worth it.', times:['morning','afternoon'], weather:'rainy', accent:'indigo', at:'10:00', slot:2 },
+  { id:'p6', name:'Musée de l\u2019Orangerie', kind:'Museum', icon:'ri-gallery-line', area:'1er', dist:'2.0km', km:2.0, blurb:'Monet\u2019s water lilies, wall to wall, minus the Louvre crowds. The connoisseur\u2019s pick.', times:['morning','afternoon'], weather:'rainy', accent:'indigo', at:'11:30', slot:3 },
+  { id:'p7', name:'Marché d\u2019Aligre', kind:'Market', icon:'ri-store-2-line', area:'12e', dist:'1.3km', km:1.3, blurb:'Chaotic flea stalls, cheap produce, zero tourists. A local-thread legend.', times:['morning','afternoon'], weather:'any', accent:'pink', at:'12:30', slot:5 },
+  { id:'p8', name:'L\u2019As du Fallafel', kind:'Street food', icon:'ri-restaurant-2-line', area:'Le Marais', dist:'350m', km:0.35, blurb:'The falafel with a permanent line. Lenny Kravitz is a regular, allegedly.', times:['afternoon'], weather:'any', accent:'pink', at:'13:30', slot:6 },
+  { id:'p9', name:'Coulée Verte', kind:'Walk', icon:'ri-leaf-line', area:'12e', dist:'1.5km', km:1.5, blurb:'An elevated park on old rail tracks. The High Line copied Paris, not the other way around.', times:['afternoon'], weather:'sunny', accent:'green', at:'15:00', slot:7 },
+  { id:'p10', name:'Jardin du Luxembourg', kind:'Garden', icon:'ri-plant-line', area:'6e', dist:'1.5km', km:1.5, blurb:'Steal a green chair by the fountain. It\u2019s tradition.', times:['afternoon'], weather:'sunny', accent:'green', at:'15:30', slot:8 },
+  { id:'p11', name:'Shakespeare and Company', kind:'Bookshop', icon:'ri-book-open-line', area:'5e', dist:'1.8km', km:1.8, blurb:'Buy a book you\u2019ll never finish. The stamp alone is worth it.', times:['afternoon'], weather:'rainy', accent:'indigo', at:'16:00', slot:9 },
+  { id:'p12', name:'Montmartre wander', kind:'Walk', icon:'ri-landscape-line', area:'18e', dist:'3.4km', km:3.4, blurb:'Hills, artists, and one very smug basilica view.', times:['afternoon'], weather:'sunny', accent:'green', at:'16:30', slot:10 },
+  { id:'p13', name:'Le Baron Rouge', kind:'Wine bar', icon:'ri-goblet-line', area:'Bastille', dist:'1.1km', km:1.1, blurb:'Wine from barrels, oysters on car hoods. Every \u201cwhere do locals drink\u201d thread, answered.', times:['evening'], weather:'any', accent:'yellow', at:'19:00', slot:11 },
+  { id:'p14', name:'Le Comptoir Général', kind:'Bar', icon:'ri-door-open-line', area:'Canal Saint-Martin', dist:'600m', km:0.6, blurb:'A hidden canal-side bar full of oddities. Weird, wonderful, word-of-mouth famous.', times:['evening'], weather:'any', accent:'yellow', at:'19:30', slot:12 },
+  { id:'p15', name:'Bouillon Pigalle', kind:'Bistro', icon:'ri-restaurant-line', area:'9e', dist:'2.4km', km:2.4, blurb:'Steak frites at 1998 prices. The line moves, trust.', times:['evening'], weather:'any', accent:'pink', at:'20:30', slot:13 },
+  { id:'p16', name:'Sunset at Sacré-Cœur', kind:'Viewpoint', icon:'ri-sun-foggy-line', area:'18e', dist:'3.4km', km:3.4, blurb:'The city turns gold and everyone forgets their phone. Almost.', times:['evening'], weather:'sunny', accent:'green', at:'21:00', slot:14 },
+  { id:'p17', name:'Caveau de la Huchette', kind:'Jazz club', icon:'ri-music-2-line', area:'5e', dist:'1.9km', km:1.9, blurb:'Swing dancing in a medieval cellar. Yes, really.', times:['night'], weather:'any', accent:'indigo', at:'22:00', slot:15 },
+  { id:'p18', name:'38Riv Jazz Club', kind:'Jazz club', icon:'ri-music-line', area:'4e', dist:'800m', km:0.8, blurb:'A tiny vaulted jazz cave. Regulars go three times in eleven days. It\u2019s that kind of place.', times:['night'], weather:'any', accent:'indigo', at:'22:30', slot:16 },
+  { id:'p19', name:'Eiffel sparkle run', kind:'Landmark', icon:'ri-flashlight-line', area:'7e', dist:'2.8km', km:2.8, blurb:'It glitters on the hour. Cynics have cried.', times:['night'], weather:'any', accent:'yellow', at:'23:00', slot:17 },
+  { id:'p20', name:'Crêpe au Nutella, standing', kind:'Street food', icon:'ri-donut-chart-line', area:'120m away, always', dist:'120m', km:0.12, blurb:'The official dessert of poor decisions after midnight.', times:['night'], weather:'any', accent:'pink', at:'23:30', slot:18 },
+];
+
+const QUIZ = [
+  { id:'q1', q:'Croissant or pain au chocolat?', opts:['Croissant', 'Pain au chocolat'] },
+  { id:'q2', q:'Tourist traps: yes or no?', opts:['Ironically, yes', 'Absolutely not'] },
+];
+
+const OB = [
+  { sec:'Basics', q:'First thing you do abroad?', sub:'Be honest. I\u2019ll know if you lie.', opts:['Find coffee immediately', 'Walk until lost', 'Museum, obviously'] },
+  { sec:'Food', q:'Your food philosophy?', sub:'This determines 60% of your day.', opts:['Michelin or bust', 'Street food goblin', 'If locals queue, I queue'] },
+  { sec:'Food', q:'Croissant stance?', sub:'There is a correct answer.', opts:['Butter is a personality', 'Team pain au chocolat', 'Gluten and I broke up'] },
+  { sec:'Caffeine', q:'How do you take it?', sub:'This schedules your entire morning.', opts:['Espresso, standing', 'Oat-milk something, seated', 'Tea, chaotically'] },
+  { sec:'Culture', q:'Museums: how long?', sub:'Your honest attention span.', opts:['Hours in every wing', 'One masterpiece, then gift shop', 'Museums are nap factories'] },
+  { sec:'Pace', q:'Pace of a perfect day?', sub:'No wrong answers. Some worse than others.', opts:['Packed schedule', 'One plan, then vibes', 'No plans. Ever.'] },
+  { sec:'Money', q:'Budget honesty check?', sub:'I won\u2019t tell your bank.', opts:['Splash out, it\u2019s Paris', 'Mid, with strategic treats', 'Backpacker at heart'] },
+  { sec:'Crowds', q:'Crowd tolerance?', sub:'Paris has opinions about personal space.', opts:['Love the buzz', 'Six people max', 'I am the crowd'] },
+  { sec:'Nights', q:'Your ideal night out?', sub:'This decides your 10pm.', opts:['Jazz cellar until late', 'Wine until midnight', 'In bed by ten, proudly'] },
+  { sec:'Weather', q:'It starts raining. You…', sub:'It will. This is Europe.', opts:['Museum sprint', 'Café and judge people', 'Rain is cardio'] },
+];
+
+const CTX = {
+  morning: { t:'8:14', greetSunny:'Sunny 8am in the Marais. Pastry o\u2019clock.', greetRainy:'Rainy morning. Museums and carbs it is.' },
+  afternoon: { t:'14:37', greetSunny:'Golden afternoon. Go be seen in a park.', greetRainy:'Rain check – literally. Indoor picks only.' },
+  evening: { t:'18:52', greetSunny:'Golden hour. Wine is basically mandatory.', greetRainy:'Drizzly evening. Cozy bistro weather.' },
+  night: { t:'23:05', greetSunny:'Paris after dark. Make questionable plans.', greetRainy:'Wet midnight. Jazz cellars are dry, just saying.' },
+};
+
+const ACCENTS = {
+  pink:   { bg:'#ffd3fd', dot:'#c54b9b', ink:'#852952', chip:'#fff7ff', body:'#fee7fd' },
+  indigo: { bg:'#e5e5ff', dot:'#1b1b8f', ink:'#1b1b8f', chip:'#f4f4ff', body:'#e5e5ff' },
+  green:  { bg:'#ccffe0', dot:'#057a28', ink:'#057a28', chip:'#f8fffa', body:'#ccffe0' },
+  yellow: { bg:'#EEFF8C', dot:'#8a9a1e', ink:'#5c6a0a', chip:'#fbffe0', body:'#EEFF8C' },
+};
+
+const RATINGS = {
+  p1:['4.8','8.9k'], p2:['4.8','2.4k'], p3:['4.6','2.3k'], p4:['4.7','3.1k'], p5:['4.8','61k'],
+  p6:['4.7','34k'], p7:['4.5','6.7k'], p8:['4.4','11k'], p9:['4.7','12k'], p10:['4.7','108k'],
+  p11:['4.7','9.2k'], p12:['4.7','5.4k'], p13:['4.7','4.6k'], p14:['4.3','7.8k'], p15:['4.5','33k'],
+  p16:['4.8','19k'], p17:['4.5','3.9k'], p18:['4.8','1.1k'], p19:['4.7','380k'], p20:['4.6','2.0k'],
+};
+
+const REPLIES = [
+  'Noted. Filed under \u201cexcellent taste\u201d.',
+  'Bold. Adjusting your plan accordingly.',
+  'Say less. Adding a detour.',
+  'That\u2019s the spirit. Paris rewards the shameless.',
+];
+
+class Component extends DCLogic {
+  state = {
+    obStep: -1, obAnswers: [],
+    tab: 'discover',
+    timeOfDay: 'morning', weather: 'sunny',
+    swiped: {}, quizAnswers: {}, swipeCount: 0, cat: 'all',
+    planStatus: 'draft', shuffleIx: 0,
+    chat: [
+      { who:'bot', text:'Bonjour. I\u2019m your concierge. Tell me what you\u2019re craving and I\u2019ll pretend I didn\u2019t already know.' },
+    ],
+    chatDraft: '', replyIx: 0,
+    toast: '',
+    photos: {},
+  };
+
+  componentDidMount() {
+    const WIKI = {
+      p1: ['fr', 'Du Pain et des Idées'],
+      p4: ['en', 'Canal Saint-Martin'],
+      p5: ['en', 'Sainte-Chapelle'],
+      p6: ['en', 'Musée de l\u2019Orangerie'],
+      p7: ['en', 'Marché d\u2019Aligre'],
+      p8: ['en', 'L\u2019As du Fallafel'],
+      p9: ['en', 'Coulée verte René-Dumont'],
+      p10: ['en', 'Jardin du Luxembourg'],
+      p11: ['en', 'Shakespeare and Company (bookstore)'],
+      p12: ['en', 'Montmartre'],
+      p15: ['fr', 'Bouillon Pigalle'],
+      p16: ['en', 'Sacré-Cœur, Paris'],
+      p17: ['en', 'Caveau de la Huchette'],
+      p19: ['en', 'Eiffel Tower'],
+      p20: ['en', 'Crêpe'],
+    };
+    Object.entries(WIKI).forEach(([id, [lang, title]]) => {
+      fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, '_'))}`)
+        .then(r => (r.ok ? r.json() : null))
+        .then(j => {
+          const url = j && (j.originalimage && j.originalimage.width <= 3000 ? j.originalimage.source : (j.thumbnail && j.thumbnail.source));
+          if (url) this.setState(s => ({ photos: { ...s.photos, [id]: url } }));
+        })
+        .catch(() => {});
+    });
+  }
+
+  componentDidUpdate() {
+    const el = document.querySelector('[data-chat-scroll]');
+    if (el) el.scrollTop = el.scrollHeight;
+  }
+
+  showToast(msg) {
+    clearTimeout(this._toastT);
+    this.setState({ toast: msg });
+    this._toastT = setTimeout(() => this.setState({ toast: '' }), 1800);
+  }
+
+  getTaste() {
+    const A = [...this.state.obAnswers, ...Object.values(this.state.quizAnswers)];
+    const has = (l) => A.includes(l);
+    return {
+      noGluten: has('Gluten and I broke up'),
+      noMuseums: has('Museums are nap factories'),
+      earlyBed: has('In bed by ten, proudly'),
+      jazz: has('Jazz cellar until late'),
+      wine: has('Wine until midnight'),
+      museumLover: has('Museum, obviously') || has('Hours in every wing') || has('Museum sprint'),
+      coffeeFirst: has('Find coffee immediately') || has('Espresso, standing') || has('Oat-milk something, seated'),
+      streetFood: has('Street food goblin'),
+      fancy: has('Michelin or bust'),
+      crowdShy: has('Six people max'),
+      likesButter: has('Butter is a personality') || has('Croissant') || has('Team pain au chocolat') || has('Pain au chocolat'),
+      trapLover: has('Ironically, yes'),
+      trapHater: has('Absolutely not'),
+    };
+  }
+
+  scorePlace(p, T) {
+    const FAMOUS = ['p5', 'p10', 'p15', 'p16', 'p19'];
+    let s = 0;
+    if (T.coffeeFirst && (p.kind === 'Café' || p.kind === 'Boulangerie')) s += 3;
+    if (T.likesButter && p.kind === 'Boulangerie') s += 2;
+    if (T.museumLover && p.accent === 'indigo') s += 3;
+    if (T.streetFood && (p.kind === 'Street food' || p.kind === 'Market')) s += 3;
+    if (T.fancy && (p.kind === 'Bistro' || p.kind === 'Wine bar')) s += 2;
+    if (T.jazz && p.kind === 'Jazz club') s += 3;
+    if (T.wine && (p.kind === 'Wine bar' || p.kind === 'Bar')) s += 3;
+    if (T.crowdShy && FAMOUS.includes(p.id)) s -= 3;
+    if (T.trapHater && FAMOUS.includes(p.id)) s -= 2;
+    if (T.trapLover && FAMOUS.includes(p.id)) s += 1;
+    return s;
+  }
+
+  getDeck() {
+    const { timeOfDay, weather, swiped, quizAnswers } = this.state;
+    const T = this.getTaste();
+    const places = PLACES.filter(p =>
+      p.times.includes(timeOfDay) &&
+      (p.weather === 'any' || p.weather === weather) &&
+      !swiped[p.id] &&
+      !(T.noGluten && (p.kind === 'Boulangerie' || p.id === 'p20')) &&
+      !(T.noMuseums && p.kind === 'Museum') &&
+      !(T.earlyBed && p.kind === 'Jazz club') &&
+      (this.state.cat === 'all' || p.accent === this.state.cat)
+    );
+    const deck = places
+      .map(p => ({ ...p, score: this.scorePlace(p, T) }))
+      .sort((a, b) => b.score - a.score || a.slot - b.slot);
+    const pending = QUIZ.filter(q => !quizAnswers[q.id]);
+    if (pending[0] && deck.length > 2) deck.splice(2, 0, pending[0]);
+    if (pending[1] && deck.length > 5) deck.splice(5, 0, pending[1]);
+    return deck;
+  }
+
+  // ---- drag ----
+  onDown = (e) => {
+    const el = e.currentTarget;
+    if (e.target.closest('button,a')) return;
+    el.setPointerCapture(e.pointerId);
+    this._drag = { el, x0: e.clientX, y0: e.clientY, dx: 0, dy: 0 };
+    el.style.transition = 'none';
+  };
+  onMove = (e) => {
+    const d = this._drag;
+    if (!d) return;
+    d.dx = e.clientX - d.x0; d.dy = e.clientY - d.y0;
+    d.el.style.transform = `translate(${d.dx}px, ${d.dy}px) rotate(${d.dx * 0.06}deg)`;
+    const like = d.el.querySelector('[data-stamp="like"]');
+    const nope = d.el.querySelector('[data-stamp="nope"]');
+    if (like) like.style.opacity = Math.min(1, Math.max(0, d.dx / 80));
+    if (nope) nope.style.opacity = Math.min(1, Math.max(0, -d.dx / 80));
+  };
+  onUp = (e) => {
+    const d = this._drag;
+    if (!d) return;
+    this._drag = null;
+    const id = d.el.getAttribute('data-id');
+    if (Math.abs(d.dx) > 90) {
+      this.fling(d.el, d.dx > 0 ? 'like' : 'nope', id);
+    } else {
+      d.el.style.transition = 'transform .3s ease-out';
+      d.el.style.transform = '';
+      const like = d.el.querySelector('[data-stamp="like"]');
+      const nope = d.el.querySelector('[data-stamp="nope"]');
+      if (like) like.style.opacity = 0;
+      if (nope) nope.style.opacity = 0;
+    }
+  };
+
+  fling(el, dir, id) {
+    const stamp = el.querySelector(`[data-stamp="${dir}"]`);
+    if (stamp) stamp.style.opacity = 1;
+    el.style.transition = 'transform .35s ease-in, opacity .3s';
+    el.style.transform = `translate(${dir === 'like' ? 480 : -480}px, -30px) rotate(${dir === 'like' ? 22 : -22}deg)`;
+    el.style.opacity = '0';
+    setTimeout(() => {
+      // reset node styles before React reuses it for the next card
+      el.style.transition = 'none';
+      el.style.transform = '';
+      el.style.opacity = '1';
+      el.querySelectorAll('[data-stamp]').forEach(s => { s.style.opacity = 0; });
+      this.commitSwipe(id, dir);
+    }, 300);
+  }
+
+  commitSwipe(id, dir) {
+    if (id && id[0] === 'q') {
+      this.setState(s => ({ quizAnswers: { ...s.quizAnswers, [id]: 'skipped' } }));
+      this.showToast('Fine. Keep your secrets.');
+      return;
+    }
+    this.setState(s => ({ swiped: { ...s.swiped, [id]: dir }, swipeCount: s.swipeCount + 1, planStatus: dir === 'like' ? 'draft' : s.planStatus }));
+    if (dir === 'like') this.showToast('Liked. The concierge is drafting.');
+  }
+
+  swipeTop(dir) {
+    const el = document.querySelector('[data-top-card="true"]');
+    if (!el) return;
+    this.fling(el, dir, el.getAttribute('data-id'));
+  }
+
+  answerQuiz(qid, label) {
+    this.setState(s => ({ quizAnswers: { ...s.quizAnswers, [qid]: label } }));
+    this.showToast('Noted. Excellent taste.');
+  }
+
+  sendChatMsg(text) {
+    const t = (text || '').trim();
+    if (!t) return;
+    this.setState(s => ({
+      chat: [...s.chat, { who: 'me', text: t }],
+      chatDraft: '',
+    }));
+    setTimeout(() => {
+      this.setState(s => ({
+        chat: [...s.chat, { who: 'bot', text: REPLIES[s.replyIx % REPLIES.length] }],
+        replyIx: s.replyIx + 1,
+      }));
+    }, 650);
+  }
+
+  getPlanVals(plan, planKm, ctx) {
+    const S = this.state;
+    const ix = S.shuffleIx || 0;
+    // ordering: draft 0 = chronological; shuffles = deterministic re-orders
+    const ordered = [...plan].sort((a, b) =>
+      ix === 0 ? a.slot - b.slot : ((a.slot * 7 + ix * 13) % 17) - ((b.slot * 7 + ix * 13) % 17)
+    );
+    // sequential times from "now", rounded up to the next half hour, 90 min per stop
+    const [h0, m0] = ctx.t.split(':').map(Number);
+    let mins = h0 * 60 + (m0 > 30 ? 60 : 30);
+    const timed = ordered.map(p => {
+      const at = `${Math.floor(mins / 60) % 24}:${String(mins % 60).padStart(2, '0')}`;
+      mins += 90;
+      return { p, at };
+    });
+
+    const msgs = [
+      `Based on your ${plan.length} like${plan.length === 1 ? '' : 's'} and frankly excellent taste, here\u2019s the day. Say the word.`,
+      'Re-drafted. New running order, same excellent taste. Better?',
+      'Draft three. I moved things around so your feet survive. Final answer?',
+      'At this point I\u2019m just showing off. Pick one.',
+    ];
+
+    const draft = plan.length > 0 && S.planStatus !== 'approved';
+    const approved = plan.length > 0 && S.planStatus === 'approved';
+
+    return {
+      planEmpty: plan.length === 0,
+      planDraft: draft,
+      planApproved: approved,
+      draftNo: String(ix + 1).padStart(2, '0'),
+      proposalMsg: msgs[Math.min(ix, msgs.length - 1)],
+      proposalStops: timed.map(({ p, at }) => ({ at, name: p.name })),
+      approvePlan: () => { this.setState({ planStatus: 'approved' }); this.showToast('Plan approved. Go forth.'); },
+      shufflePlan: () => this.setState(s => ({ shuffleIx: (s.shuffleIx || 0) + 1 })),
+      redraftPlan: () => this.setState({ planStatus: 'draft' }),
+      plan: approved ? timed.map(({ p, at }) => {
+        const a = ACCENTS[p.accent];
+        return {
+          at, name: p.name,
+          meta: `${p.kind} · ${p.dist}`,
+          blockStyle: { display: 'flex', gap: 12, alignItems: 'flex-start', background: a.body, padding: '12px 14px' },
+          atStyle: { font: "500 10px 'Saans Mono', monospace", color: a.ink, width: 40, flex: 'none', paddingTop: 3 },
+          metaStyle: { font: "500 9px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, marginTop: 4 },
+          xStyle: { fontSize: 16, color: a.ink, opacity: 0.6 },
+          remove: () => this.setState(s => {
+            const sw = { ...s.swiped }; delete sw[p.id];
+            return { swiped: sw };
+          }),
+        };
+      }) : [],
+      planHasStops: approved,
+      planSub: plan.length === 0
+        ? 'Swipe right and the concierge drafts your day.'
+        : (approved ? 'Locked in. I did the time math so you don\u2019t have to.' : 'The concierge has thoughts. Review the draft.'),
+      planStats: `${plan.length} stop${plan.length === 1 ? '' : 's'} · ${planKm.toFixed(1)} km of strutting`,
+    };
+  }
+
+  renderVals() {
+    const S = this.state;
+    const appName = this.props.appName ?? 'Whim';
+    const sass = this.props.sassLevel ?? 'full';
+    const skipOb = this.props.skipOnboarding ?? false;
+
+    const booted = skipOb || S.obStep >= OB.length;
+    const showSplash = !booted && S.obStep === -1;
+    const showQuiz = !booted && S.obStep >= 0 && S.obStep < OB.length;
+    const ob = OB[Math.min(Math.max(S.obStep, 0), OB.length - 1)];
+
+    const ctx = CTX[S.timeOfDay];
+    const sunny = S.weather === 'sunny';
+    const deck = this.getDeck();
+
+    const stack = deck.slice(0, 3).map((c, i) => {
+      const isTop = i === 0;
+      const isQuiz = !!c.q;
+      const a = isQuiz ? null : ACCENTS[c.accent];
+      return {
+        id: c.id,
+        isTop,
+        isPlace: !isQuiz,
+        isQuiz,
+        name: c.name, kind: c.kind, dist: c.dist, blurb: c.blurb, icon: c.icon,
+        meta: isQuiz ? '' : `${c.kind} · ${c.dist} · ${c.area}${c.score >= 2 ? ' · Very you' : ''}`,
+        rating: isQuiz ? '' : (RATINGS[c.id] || ['4.5','1k'])[0],
+        reviews: isQuiz ? '' : (RATINGS[c.id] || ['4.5','1k'])[1],
+        gmaps: isQuiz ? null : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' Paris')}`,
+        q: c.q,
+        opts: isQuiz ? c.opts.map(o => ({ label: o, go: () => this.answerQuiz(c.id, o) })) : [],
+        onDown: isTop ? this.onDown : null,
+        onMove: isTop ? this.onMove : null,
+        onUp: isTop ? this.onUp : null,
+        wrapStyle: {
+          position: 'absolute', inset: 0,
+          display: 'flex', flexDirection: 'column',
+          background: '#ffffff', border: '1px solid #d4e8da',
+          overflow: 'hidden',
+          zIndex: 10 - i,
+          transform: `translateY(${i * 10}px) scale(${1 - i * 0.035})`,
+          transformOrigin: 'top center',
+          touchAction: 'none', userSelect: 'none',
+          cursor: isTop ? 'grab' : 'default',
+          boxShadow: '0 1px 4px rgba(0,13,5,0.06)',
+        },
+        showIcon: !isQuiz && !S.photos[c.id],
+        artStyle: a ? (S.photos[c.id] ? {
+          height: '44%', flex: 'none', position: 'relative', overflow: 'hidden',
+          borderBottom: '1px solid #002910',
+          backgroundColor: a.bg,
+          backgroundImage: `url("${S.photos[c.id]}")`,
+          backgroundSize: 'cover', backgroundPosition: 'center',
+        } : {
+          height: '44%', flex: 'none', position: 'relative', overflow: 'hidden',
+          borderBottom: '1px solid #002910',
+          backgroundColor: a.bg,
+          backgroundImage: `radial-gradient(${a.dot} 1.5px, transparent 1.5px)`,
+          backgroundSize: '13px 13px',
+        }) : null,
+        artIconWrap: a ? {
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+          width: 84, height: 84, borderRadius: '50%',
+          background: a.chip, border: `1px solid ${a.dot}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        } : null,
+        artIcon: a ? { fontSize: 38, color: a.ink } : null,
+        bodyStyle: a ? { flex: 1, display: 'flex', flexDirection: 'column', padding: '16px 18px 14px', background: a.body } : null,
+        kickerStyle: a ? { font: "500 9px 'Saans Mono', monospace", letterSpacing: '.12em', textTransform: 'uppercase', color: a.ink, marginBottom: 8 } : null,
+        footStyle: a ? { marginTop: 'auto', borderTop: `1px solid ${a.ink}`, paddingTop: 10, display: 'flex', alignItems: 'center', gap: 7 } : null,
+        footIconStyle: a ? { fontSize: 12, color: a.ink } : null,
+        linkStyle: a ? { marginLeft: 'auto', font: "500 9px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, textDecoration: 'none', borderBottom: `1px solid ${a.ink}`, paddingBottom: 1 } : null,
+      };
+    });
+
+    const plan = PLACES.filter(p => S.swiped[p.id] === 'like').sort((x, y) => x.slot - y.slot);
+    const planKm = plan.reduce((n, p) => n + p.km, 0);
+    const likedN = Object.values(S.swiped).filter(v => v === 'like').length;
+    const nopedN = Object.values(S.swiped).filter(v => v === 'nope').length;
+
+    const tabsDef = [
+      { key: 'discover', label: 'Discover', icon: 'ri-compass-3-line' },
+      { key: 'plan', label: 'Plan', icon: 'ri-route-line', badge: plan.length || false },
+      { key: 'chat', label: 'Concierge', icon: 'ri-chat-smile-2-line' },
+      { key: 'you', label: 'You', icon: 'ri-user-smile-line' },
+    ];
+
+    const btnBase = {
+      flex: 1, position: 'relative',
+      font: "500 9.5px 'Saans Mono', monospace", letterSpacing: '.12em', textTransform: 'uppercase',
+      padding: '15px 0 13px', marginTop: -1,
+      background: 'none', border: 'none', cursor: 'pointer',
+    };
+
+    const pills = [...S.obAnswers, ...Object.values(S.quizAnswers).filter(v => v !== 'skipped')];
+
+    const ctlBtn = (active) => ({
+      font: "500 9.5px 'Saans Mono', monospace", letterSpacing: '.05em', textTransform: 'uppercase',
+      padding: '8px 4px', cursor: 'pointer',
+      background: active ? '#002910' : '#ffffff',
+      color: active ? '#f8fffa' : '#002910',
+      border: active ? '1px solid #002910' : '1px solid #d4e8da',
+    });
+
+    return {
+      appName,
+      showSplash, showQuiz, showApp: booted,
+      startQuiz: () => this.setState({ obStep: 0 }),
+      obProgress: `${String(Math.min(S.obStep + 1, OB.length)).padStart(2, '0')} / ${String(OB.length).padStart(2, '0')}`,
+      obSec: ob.sec,
+      obBarStyle: { height: '100%', background: '#00ff64', width: `${Math.round((Math.max(S.obStep, 0) / OB.length) * 100)}%`, transition: 'width .3s ease-out' },
+      obQuestion: ob.q, obSub: ob.sub,
+      obOptions: ob.opts.map(o => ({
+        label: o,
+        go: () => {
+          this.setState(s => ({ obStep: s.obStep + 1, obAnswers: [...s.obAnswers, o] }));
+          if (S.obStep + 1 === OB.length) this.showToast('Calibrated. The deck now discriminates.');
+        },
+      })),
+
+      ctxLine: `Paris · Friday · ${ctx.t} · ${sunny ? 'Sunny 21°' : 'Rain 16°'}`,
+      ctxIcon: sunny ? 'ri-sun-line' : 'ri-rainy-line',
+      greeting: sass === 'polite'
+        ? `Good ${S.timeOfDay}. Here\u2019s what\u2019s nearby.`
+        : (sunny ? ctx.greetSunny : ctx.greetRainy),
+
+      tabDiscover: S.tab === 'discover', tabPlan: S.tab === 'plan',
+      tabChat: S.tab === 'chat', tabYou: S.tab === 'you',
+      tabs: tabsDef.map(t => ({
+        ...t,
+        go: () => this.setState({ tab: t.key }),
+        style: {
+          ...btnBase,
+          color: S.tab === t.key ? '#002910' : '#a5aab6',
+          borderTop: S.tab === t.key ? '2px solid #002910' : '2px solid transparent',
+        },
+      })),
+
+      catChips: [
+        { key: 'all', label: 'All', bg: '#ffffff', ink: '#002910' },
+        { key: 'pink', label: 'Food', bg: '#fee7fd', ink: '#852952' },
+        { key: 'indigo', label: 'Culture', bg: '#e5e5ff', ink: '#1b1b8f' },
+        { key: 'green', label: 'Outdoors', bg: '#ccffe0', ink: '#057a28' },
+        { key: 'yellow', label: 'Nights', bg: '#EEFF8C', ink: '#5c6a0a' },
+      ].map(c => {
+        const active = S.cat === c.key;
+        return {
+          label: c.label,
+          go: () => this.setState({ cat: active ? 'all' : c.key }),
+          style: {
+            font: "500 10px 'Saans', sans-serif", padding: '5px 10px', cursor: 'pointer',
+            background: active ? '#002910' : c.bg,
+            color: active ? '#f8fffa' : c.ink,
+            border: active ? '1px solid #002910' : '1px solid rgba(0,41,16,.12)',
+          },
+        };
+      }),
+
+      stack, deckEmpty: deck.length === 0,
+      swipeLike: () => this.swipeTop('like'),
+      swipeNope: () => this.swipeTop('nope'),
+
+      ...this.getPlanVals(plan, planKm, ctx),
+
+      chat: S.chat.map(m => ({
+        text: m.text,
+        speaker: m.who === 'me' ? 'You' : 'The concierge',
+        rowStyle: { display: 'flex', flexDirection: 'column', gap: 4, alignItems: m.who === 'me' ? 'flex-end' : 'flex-start' },
+        labelStyle: {
+          font: "500 8.5px 'Saans Mono', monospace", letterSpacing: '.14em', textTransform: 'uppercase',
+          color: m.who === 'me' ? '#676c79' : '#057a28',
+        },
+        textStyle: m.who === 'me'
+          ? { maxWidth: '80%', font: "400 14px/1.5 'Saans', sans-serif", color: '#01200d', textAlign: 'right' }
+          : { maxWidth: '86%', font: "italic 400 15.5px/1.5 'Serrif VF', Georgia, serif", color: '#002910' },
+      })),
+      chips: ['Plan my evening', 'I\u2019m hungry', 'Surprise me'].map(label => ({
+        label, go: () => this.sendChatMsg(label),
+      })),
+      chatDraft: S.chatDraft,
+      onDraft: (e) => this.setState({ chatDraft: e.target.value }),
+      onChatKey: (e) => { if (e.key === 'Enter') this.sendChatMsg(S.chatDraft); },
+      sendChat: () => this.sendChatMsg(S.chatDraft),
+
+      youCalib: `${S.obAnswers.length} questions · ${S.swipeCount} swipes`,
+      tastePills: pills.length ? pills : ['Blank slate', 'Mysterious', 'Jury\u2019s out'],
+      youStats: [
+        { label: 'Liked', val: `${likedN}` },
+        { label: 'Passed on', val: `${nopedN}` },
+        { label: 'Croissant loyalty', val: S.quizAnswers.q1 === 'Croissant' ? '100%' : (S.quizAnswers.q1 ? 'BETRAYED' : 'TBD') },
+        { label: 'Tourist-trap tolerance', val: S.quizAnswers.q2 === 'Ironically, yes' ? 'HIGH' : (S.quizAnswers.q2 ? 'ZERO' : 'TBD') },
+      ],
+      resetTaste: () => {
+        this.setState({ swiped: {}, quizAnswers: {}, swipeCount: 0, obAnswers: [], obStep: -1, tab: 'discover' });
+        this.showToast('Taste file shredded.');
+      },
+
+      toast: S.toast,
+
+      timeOpts: ['morning', 'afternoon', 'evening', 'night'].map(k => ({
+        label: k, go: () => this.setState({ timeOfDay: k }), style: ctlBtn(S.timeOfDay === k),
+      })),
+      weatherOpts: ['sunny', 'rainy'].map(k => ({
+        label: k, go: () => this.setState({ weather: k }), style: ctlBtn(S.weather === k),
+      })),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
