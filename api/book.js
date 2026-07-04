@@ -1,48 +1,62 @@
-// Table lookup via TheFork (clearpath/thefork-scraper on Apify) — Paris-native
-// booking coverage. Returns the restaurant's direct TheFork page, rating on
-// TheFork's 10-scale, average price, and bookability.
-// GET ?name=<restaurant>
-// (The earlier Resy integration returned found:false for nearly all of Paris —
-// Resy barely operates here; TheFork is the local standard.)
-
-export const maxDuration = 120; // actor runs take tens of seconds
+// Table lookup via TheFork (clearpath/thefork-scraper on Apify).
+// TheFork has no per-name search input and is DataDome-protected, so we keep a
+// weekly snapshot of the top Paris restaurants and match names instantly:
+//   GET ?name=<restaurant> -> match from the last successful run (edge-cached)
+//   GET ?refresh=1         -> kick a fresh 150-restaurant Paris run (weekly cron)
 
 const ACTOR = 'clearpath~thefork-scraper';
+
+const normalize = (s) =>
+  String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 
 export default async function handler(req, res) {
   const token = process.env.APIFY_TOKEN;
   if (!token) return res.status(200).json({ ok: false, reason: 'no_key' });
 
-  const name = String(req.query.name || '').slice(0, 80);
-  if (!name) return res.status(400).json({ ok: false, reason: 'bad_params' });
-
-  try {
-    const r = await fetch(
-      `https://api.apify.com/v2/acts/${ACTOR}/run-sync-get-dataset-items?token=${token}&timeout=100`,
-      {
+  if (req.query.refresh) {
+    const secret = process.env.CRON_SECRET;
+    if (secret && req.headers.authorization !== `Bearer ${secret}`) {
+      return res.status(401).json({ ok: false, reason: 'unauthorized' });
+    }
+    try {
+      const r = await fetch(`https://api.apify.com/v2/acts/${ACTOR}/runs?token=${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          startUrls: [{ url: `https://www.thefork.fr/search?queryText=${encodeURIComponent(name)}` }],
-          maxRestaurants: 3,
+          searchLocation: 'Paris',
+          sort: 'popularity',
+          maxRestaurants: 150,
           maxReviews: 0,
           maxPhotos: 0,
           language: 'en',
         }),
-      }
-    );
+      });
+      const j = await r.json();
+      return res.status(200).json({ ok: r.ok, started: j?.data?.id || null });
+    } catch (e) {
+      return res.status(200).json({ ok: false, reason: 'start_failed' });
+    }
+  }
+
+  const name = String(req.query.name || '').slice(0, 80);
+  if (!name) return res.status(400).json({ ok: false, reason: 'bad_params' });
+
+  try {
+    const r = await fetch(`https://api.apify.com/v2/acts/${ACTOR}/runs/last/dataset/items?token=${token}&status=SUCCEEDED&limit=500`);
     if (!r.ok) return res.status(200).json({ ok: false, reason: `apify_${r.status}` });
     const items = await r.json();
     if (!Array.isArray(items) || !items.length) {
-      return res.status(200).json({ ok: true, found: false });
+      return res.status(200).json({ ok: false, reason: 'no_run_yet' });
     }
 
-    const inParis = items.filter((i) => /paris/i.test(String(i.locality || i.formatted_address || '')));
-    const low = name.toLowerCase();
-    const hit = inParis.find((i) => String(i.name || '').toLowerCase().includes(low)) || inParis[0];
+    const want = normalize(name);
+    const hit = items.find((i) => {
+      const got = normalize(i.name);
+      return got && (got === want || got.includes(want) || want.includes(got));
+    });
+    res.setHeader('Cache-Control', 's-maxage=43200, stale-while-revalidate=604800');
     if (!hit) return res.status(200).json({ ok: true, found: false });
 
-    res.setHeader('Cache-Control', 's-maxage=43200, stale-while-revalidate=604800');
     return res.status(200).json({
       ok: true,
       found: true,

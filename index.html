@@ -51,6 +51,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
       <div style="font:italic 400 21px/1.4 'Serrif VF',Georgia,serif; color:#451212; margin-bottom:22px; max-width:280px; text-shadow:0 1px 10px rgba(255,247,242,.75);">Swipe right on Paris.<br>Left on regret.</div>
       <button onClick="{{ startQuiz }}" style="font:500 17px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:18px 46px; cursor:pointer; box-shadow:0 8px 26px rgba(69,18,18,.28);">Allons-y</button>
       <div style="font:400 13px/1.5 'Saans',sans-serif; color:#451212; margin-top:14px; max-width:280px; text-shadow:0 1px 8px rgba(255,247,242,.7);">Ten questions. Then I know you better than your mother does.</div>
+      <div style="flex:none; height:9%;"></div>
     </div>
   </sc-if>
 
@@ -1411,12 +1412,33 @@ class Component extends DCLogic {
 
   ensureReddit(p) {
     this._redditReq = this._redditReq || {};
-    if (p.noLive || this._redditReq[p.id] || this.state.reddit && this.state.reddit[p.id]) return;
+    if (p.noLive || this._redditReq[p.id] || (this.state.reddit && this.state.reddit[p.id])) return;
     this._redditReq[p.id] = true;
+    const store = (threads) => this.setState(s => ({ reddit: { ...(s.reddit || {}), [p.id]: threads } }));
     fetch(`/api/reddit?q=${encodeURIComponent(p.name)}`)
       .then(r => (r.ok ? r.json() : null))
       .then(j => {
-        if (j && j.ok) this.setState(s => ({ reddit: { ...(s.reddit || {}), [p.id]: j.threads } }));
+        if (j && j.ok) return store(j.threads);
+        // server IPs are blocked by reddit/pullpush; the browser isn't — go direct
+        const u = `https://api.pullpush.io/reddit/search/submission/?q=${encodeURIComponent(p.name)}&subreddit=paris,ParisTravelGuide,AskParis&size=10`;
+        return fetch(u)
+          .then(r2 => (r2.ok ? r2.json() : null))
+          .then(j2 => {
+            if (!j2 || !Array.isArray(j2.data)) return;
+            const low = p.name.toLowerCase();
+            const threads = j2.data
+              .filter(d => d && d.title)
+              .map(d => ({
+                title: String(d.title).slice(0, 120),
+                ups: d.score || 0,
+                sub: d.subreddit || '',
+                url: d.permalink ? `https://www.reddit.com${d.permalink}` : '#',
+                hit: (String(d.title) + ' ' + String(d.selftext || '')).toLowerCase().includes(low),
+              }))
+              .sort((a, b) => (b.hit - a.hit) || (b.ups - a.ups))
+              .slice(0, 3);
+            store(threads);
+          });
       })
       .catch(() => {});
   }
