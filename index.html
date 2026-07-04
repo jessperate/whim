@@ -123,7 +123,8 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
                     <i class="ri-star-fill" style="{{ card.footIconStyle }}"></i>
                     <span style="font:500 13px 'Saans Mono',monospace; color:#002910;">{{ card.rating }}</span>
                     <span style="font:400 13px 'Saans',sans-serif; color:#01200d; opacity:.65;">{{ card.reviews }}</span>
-                    <a href="{{ card.gmaps }}" target="_blank" style="{{ card.linkStyle }}">Read them</a>
+                    <button onClick="{{ card.openDetail }}" style="{{ card.linkStyle }}">Details</button>
+                    <button onClick="{{ card.heart }}" aria-label="Save for later" style="{{ card.heartStyle }}"><i class="{{ card.heartIcon }}"></i></button>
                   </div>
                 </div>
                 <div data-stamp="like" style="position:absolute; top:18px; left:16px; font:500 24px 'Saans Mono',monospace; letter-spacing:.06em; color:#00cc50; border:3px solid #00cc50; padding:4px 12px; transform:rotate(-10deg); opacity:0; background:rgba(248,255,250,.85);">OUI</div>
@@ -169,7 +170,7 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
             <div style="font:italic 400 17px/1.5 'Serrif VF',Georgia,serif; color:#002910;">{{ proposalMsg }}</div>
             <div style="display:flex; flex-direction:column; gap:8px;">
               <sc-for list="{{ proposalStops }}" as="ps" hint-placeholder-count="3">
-                <div style="{{ ps.rowStyle }}">
+                <div onClick="{{ ps.open }}" style="{{ ps.rowStyle }}">
                   <span style="{{ ps.atStyle }}">{{ ps.at }}</span>
                   <span style="font:700 16px 'Saans',sans-serif; color:#002910;">{{ ps.name }}</span>
                 </div>
@@ -191,7 +192,7 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
           <sc-for list="{{ plan }}" as="stop" hint-placeholder-count="3">
             <div style="{{ stop.blockStyle }}">
               <span style="{{ stop.atStyle }}">{{ stop.at }}</span>
-              <div style="flex:1;">
+              <div onClick="{{ stop.open }}" style="flex:1; cursor:pointer;">
                 <div style="font:700 16px/1.25 'Saans',sans-serif; color:#002910;">{{ stop.name }}</div>
                 <div style="{{ stop.metaStyle }}">{{ stop.meta }}</div>
               </div>
@@ -218,6 +219,16 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
             <div style="{{ m.rowStyle }}">
               <div style="{{ m.labelStyle }}">{{ m.speaker }}</div>
               <div style="{{ m.textStyle }}">{{ m.text }}</div>
+              <sc-for list="{{ m.cards }}" as="pc" hint-placeholder-count="1">
+                <div onClick="{{ pc.open }}" style="{{ pc.style }}">
+                  <div style="{{ pc.thumb }}"><i class="{{ pc.thumbIcon }}" style="{{ pc.thumbIconStyle }}"></i></div>
+                  <div style="flex:1; min-width:0;">
+                    <div style="font:700 14px 'Saans',sans-serif; color:#002910;">{{ pc.name }}</div>
+                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; margin-top:3px;">{{ pc.meta }}</div>
+                  </div>
+                  <i class="ri-arrow-right-s-line" style="font-size:18px; color:#008c44;"></i>
+                </div>
+              </sc-for>
             </div>
           </sc-for>
         </div>
@@ -251,6 +262,24 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
             </div>
           </sc-for>
         </div>
+        <sc-if value="{{ savedAny }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:24px;">
+            <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; margin-bottom:10px;">
+              <i class="ri-folder-heart-line" style="font-size:14px;"></i>{{ savedCity }} · Saved for later ({{ savedCount }})
+            </div>
+            <div style="border:1px solid #d4e8da;">
+              <sc-for list="{{ saved }}" as="sv" hint-placeholder-count="2">
+                <div style="display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #d4e8da;">
+                  <div onClick="{{ sv.open }}" style="flex:1; min-width:0; cursor:pointer;">
+                    <div style="font:700 15px 'Saans',sans-serif; color:#002910;">{{ sv.name }}</div>
+                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#057a28; margin-top:3px;">{{ sv.meta }}</div>
+                  </div>
+                  <button onClick="{{ sv.remove }}" aria-label="Remove from saved" style="border:none; background:none; cursor:pointer; padding:6px;"><i class="ri-heart-3-fill" style="font-size:16px; color:#c54b9b;"></i></button>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
         <button onClick="{{ resetTaste }}" style="margin-top:22px; font:500 13px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#fee7fd; color:#852952; border:none; border-radius:8px; padding:14px 20px; cursor:pointer;" style-hover="background:#fff7ff;">Wipe my taste file</button>
         <div style="font:400 13px/1.5 'Saans',sans-serif; color:#676c79; margin-top:10px;">Fresh start. I'll pretend the croissant thing never happened.</div>
 
@@ -270,6 +299,61 @@ body { margin:0; background:#e9e6df; font-family:'Saans',system-ui,sans-serif; o
             </sc-for>
           </div>
           <div style="font:400 13px/1.55 'Saans',sans-serif; color:#676c79; margin-top:14px;">The deck re-filters live. Morning + sunny = pastries. Rain = museums. Night = decisions you'll defend later.</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- detail sheet -->
+    <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; z-index:60; background:#f8fffa; display:flex; flex-direction:column;">
+        <div style="height:42%; flex:none; position:relative; border-bottom:1px solid #002910; background:#eef9f3; overflow:hidden;">
+          <sc-if value="{{ dHasPhotos }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; height:100%; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
+              <sc-for list="{{ dPhotos }}" as="ph" hint-placeholder-count="1">
+                <div style="{{ ph.style }}"></div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ dNoPhotos }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ dArtStyle }}"><i class="{{ dArtIcon }}" style="{{ dArtIconStyle }}"></i></div>
+          </sc-if>
+          <sc-if value="{{ dSwipeHint }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; bottom:10px; right:12px; font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; background:rgba(0,41,16,.78); color:#f8fffa; padding:5px 9px;">{{ dSwipeHint }}</div>
+          </sc-if>
+          <button onClick="{{ dClose }}" aria-label="Close details" style="position:absolute; top:12px; right:12px; width:38px; height:38px; border-radius:50%; border:1px solid #002910; background:#f8fffa; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-close-line" style="font-size:20px; color:#002910;"></i></button>
+        </div>
+        <div style="flex:1; overflow:auto; padding:18px 20px 24px;">
+          <div style="font:500 9.5px 'Saans Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#057a28;">{{ dKicker }}</div>
+          <div style="font:400 30px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#002910; margin:8px 0 8px;">{{ dName }}</div>
+          <div style="font:italic 400 16px/1.45 'Serrif VF',Georgia,serif; color:#01200d;">{{ dBlurb }}</div>
+          <div style="display:flex; align-items:center; gap:7px; border-top:1px solid #d4e8da; margin-top:14px; padding-top:12px;">
+            <i class="ri-star-fill" style="font-size:13px; color:#057a28;"></i>
+            <span style="font:500 14px 'Saans Mono',monospace; color:#002910;">{{ dRating }}</span>
+            <span style="font:400 13px 'Saans',sans-serif; color:#676c79;">{{ dRatingLabel }}</span>
+            <a href="{{ dMaps }}" target="_blank" rel="noopener" style="margin-left:auto; font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#008c44; text-decoration:none; border-bottom:1px solid #008c44; padding-bottom:1px;">Open in Maps</a>
+          </div>
+          <div style="display:flex; gap:10px; margin:14px 0 6px;">
+            <button onClick="{{ dHeart }}" style="{{ dHeartStyle }}"><i class="{{ dHeartIcon }}" style="font-size:16px;"></i>{{ dHeartLabel }}</button>
+            <button onClick="{{ dPlan }}" style="{{ dPlanStyle }}">{{ dPlanLabel }}</button>
+          </div>
+          <sc-if value="{{ dBookable }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; gap:10px; margin-bottom:6px;">
+              <a href="{{ dBookFork }}" target="_blank" rel="noopener" style="flex:1.4; text-align:center; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#002910; border:1px solid #002910; border-radius:58px; padding:12px 6px; text-decoration:none;">Book a table <span style="font:500 8.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#057a28;">TheFork</span></a>
+              <a href="{{ dBookOT }}" target="_blank" rel="noopener" style="flex:1; text-align:center; font:500 13px 'Saans',sans-serif; background:#ffffff; color:#676c79; border:1px solid #d4e8da; border-radius:58px; padding:12px 6px; text-decoration:none;">OpenTable</a>
+            </div>
+          </sc-if>
+          <sc-if value="{{ dLoadingReviews }}" hint-placeholder-val="{{ false }}">
+            <div style="font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; margin-top:12px;">Fetching the gossip…</div>
+          </sc-if>
+          <sc-if value="{{ dNoReviews }}" hint-placeholder-val="{{ false }}">
+            <div style="font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; margin-top:12px;">{{ dNoReviews }}</div>
+          </sc-if>
+          <sc-for list="{{ dReviews }}" as="rv" hint-placeholder-count="2">
+            <div style="border-top:1px solid #d4e8da; padding:12px 0 2px; margin-top:10px;">
+              <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.04em; color:#057a28;">{{ rv.head }}</div>
+              <div style="font:italic 400 14.5px/1.5 'Serrif VF',Georgia,serif; color:#01200d; margin-top:6px;">{{ rv.text }}</div>
+            </div>
+          </sc-for>
         </div>
       </div>
     </sc-if>
@@ -410,6 +494,7 @@ function restoreState() {
       swipeCount: s.swipeCount || 0,
       planStatus: s.planStatus === 'approved' ? 'approved' : 'draft',
       chat: Array.isArray(s.chat) && s.chat.length ? s.chat.slice(-30) : undefined,
+      hearts: s.hearts || {},
     };
   } catch (e) { return {}; }
 }
@@ -428,7 +513,7 @@ class Component extends DCLogic {
     ],
     chatDraft: '', replyIx: 0,
     toast: '',
-    photos: {}, live: {}, pulse: [],
+    photos: {}, live: {}, pulse: [], hearts: {}, detail: null, details: {},
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -439,6 +524,7 @@ class Component extends DCLogic {
         obStep: S.obStep, obAnswers: S.obAnswers, quizAnswers: S.quizAnswers,
         swiped: S.swiped, swipeCount: S.swipeCount, planStatus: S.planStatus,
         chat: S.chat.filter(m => !m.typing).slice(-30),
+        hearts: S.hearts,
       }));
     } catch (e) {}
   }
@@ -569,6 +655,53 @@ class Component extends DCLogic {
       .catch(() => {});
   }
 
+  openDetail(id) {
+    const p = PLACES.find(x => x.id === id);
+    if (!p) return;
+    this.setState({ detail: { id } });
+    this.ensureDetails(p);
+  }
+
+  closeDetail() {
+    this.setState({ detail: null });
+  }
+
+  ensureDetails(p) {
+    if (p.noLive) return;
+    this._detReq = this._detReq || {};
+    if (this._detReq[p.id] || this.state.details[p.id]) return;
+    this._detReq[p.id] = true;
+    fetch(`/api/details?name=${encodeURIComponent(p.fsq || p.name)}&ll=${p.lat},${p.lng}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => {
+        if (j && j.ok) this.setState(s => ({ details: { ...s.details, [p.id]: j } }));
+        else this._detReq[p.id] = false;
+      })
+      .catch(() => { this._detReq[p.id] = false; });
+  }
+
+  toggleHeart(id) {
+    const was = !!this.state.hearts[id];
+    this.setState(s => {
+      const hearts = { ...s.hearts };
+      if (was) { delete hearts[id]; }
+      else { hearts[id] = Date.now(); }
+      return { hearts };
+    });
+    this.showToast(was ? 'Unsaved. Cold, but fine.' : 'Saved for later. The folder knows.');
+  }
+
+  togglePlan(id) {
+    const liked = this.state.swiped[id] === 'like';
+    this.setState(s => {
+      const swiped = { ...s.swiped };
+      if (liked) delete swiped[id];
+      else swiped[id] = 'like';
+      return { swiped, planStatus: liked ? s.planStatus : 'draft' };
+    });
+    this.showToast(liked ? 'Out of the plan.' : 'In the plan. The concierge is drafting.');
+  }
+
   componentDidUpdate() {
     const el = document.querySelector('[data-chat-scroll]');
     if (el) el.scrollTop = el.scrollHeight;
@@ -662,6 +795,12 @@ class Component extends DCLogic {
     if (!d) return;
     this._drag = null;
     const id = d.el.getAttribute('data-id');
+    if (Math.abs(d.dx) < 8 && Math.abs(d.dy) < 8) {
+      d.el.style.transition = 'none';
+      d.el.style.transform = '';
+      if (id && id[0] !== 'q') this.openDetail(id);
+      return;
+    }
     if (Math.abs(d.dx) > 90) {
       this.fling(d.el, d.dx > 0 ? 'like' : 'nope', id);
     } else {
@@ -725,8 +864,10 @@ class Component extends DCLogic {
     const taste = [...S.obAnswers, ...Object.values(S.quizAnswers).filter(v => v !== 'skipped')];
     const done = (reply) => {
       this._chatBusy = false;
+      const low = reply.toLowerCase();
+      const placeIds = PLACES.filter(p => low.includes(p.name.toLowerCase())).slice(0, 3).map(p => p.id);
       this.setState(s => ({
-        chat: s.chat.map(m => (m.typing ? { who: 'bot', text: reply } : m)),
+        chat: s.chat.map(m => (m.typing ? { who: 'bot', text: reply, placeIds } : m)),
         replyIx: s.replyIx + 1,
       }));
     };
@@ -787,7 +928,8 @@ class Component extends DCLogic {
         const a = ACCENTS[p.accent];
         return {
           at, name: p.name,
-          rowStyle: { display: 'flex', gap: 10, alignItems: 'baseline', background: a.body, padding: '12px 14px' },
+          open: () => this.openDetail(p.id),
+          rowStyle: { display: 'flex', gap: 10, alignItems: 'baseline', background: a.body, padding: '12px 14px', cursor: 'pointer' },
           atStyle: { font: "500 10px 'Saans Mono', monospace", color: a.ink, width: 42, flex: 'none' },
         };
       }),
@@ -798,6 +940,7 @@ class Component extends DCLogic {
         const a = ACCENTS[p.accent];
         return {
           at, name: p.name,
+          open: () => this.openDetail(p.id),
           meta: `${p.kind} · ${p.dist}`,
           blockStyle: { display: 'flex', gap: 12, alignItems: 'flex-start', background: a.body, padding: '12px 14px' },
           atStyle: { font: "500 10px 'Saans Mono', monospace", color: a.ink, width: 40, flex: 'none', paddingTop: 3 },
@@ -817,6 +960,65 @@ class Component extends DCLogic {
         ? 'Swipe right and the concierge drafts your day.'
         : (approved ? 'Locked in. I did the time math so you don\u2019t have to.' : 'The concierge has thoughts. Review the draft.'),
       planStats: `${plan.length} stop${plan.length === 1 ? '' : 's'} · ${planKm.toFixed(1)} km of strutting`,
+    };
+  }
+
+  getDetailVals(ctx) {
+    const S = this.state;
+    const id = S.detail && S.detail.id;
+    const p = id ? PLACES.find(x => x.id === id) : null;
+    if (!p) return { detailOpen: false, dPhotos: [], dReviews: [], dHasPhotos: false, dNoPhotos: false, dSwipeHint: '', dLoadingReviews: false, dNoReviews: '', dBookable: false };
+
+    const dd = S.details[p.id];
+    const live = S.live[p.id];
+    const fallback = RATINGS[p.id] || ['4.5', '1k'];
+    const a = ACCENTS[p.accent];
+    const d = this.distFor(p);
+    const hearted = !!S.hearts[p.id];
+    const inPlan = S.swiped[p.id] === 'like';
+    const openNow = dd ? dd.openNow : (live ? live.openNow : null);
+
+    const photoUrls = (dd && dd.photos && dd.photos.length ? dd.photos : (S.photos[p.id] ? [S.photos[p.id]] : []));
+    const dPhotos = photoUrls.map(u => ({
+      style: { flex: 'none', width: '100%', height: '100%', scrollSnapAlign: 'start', backgroundImage: `url("${u}")`, backgroundSize: 'cover', backgroundPosition: 'center' },
+    }));
+
+    const reviews = (dd && dd.reviews) || [];
+    const stars = n => (n == null ? '' : '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n)));
+
+    return {
+      detailOpen: true,
+      dName: p.name,
+      dKicker: `${p.kind} · ${p.area} · ${d.dist}${openNow != null ? (openNow ? ' · Open now' : ' · Closed now') : ''}`,
+      dBlurb: p.blurb,
+      dRating: (dd && dd.rating) || (live && live.rating) || fallback[0],
+      dRatingLabel: dd && dd.ratings != null ? `${fmtCount(dd.ratings)} Google reviews` : `${fallback[1]} reviews`,
+      dHasPhotos: dPhotos.length > 0,
+      dNoPhotos: dPhotos.length === 0,
+      dPhotos,
+      dSwipeHint: dPhotos.length > 1 ? `${dPhotos.length} photos — swipe` : '',
+      dArtStyle: { flex: 'none', width: '100%', height: '100%', backgroundColor: a.bg, backgroundImage: `radial-gradient(${a.dot} 1.5px, transparent 1.5px)`, backgroundSize: '13px 13px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+      dArtIcon: p.icon,
+      dArtIconStyle: { fontSize: 44, color: a.ink },
+      dLoadingReviews: !p.noLive && !dd,
+      dReviews: reviews.map(rv => ({
+        head: `${stars(rv.rating)}  ${rv.author} · ${rv.when}`,
+        text: `\u201c${rv.text}\u201d`,
+      })),
+      dNoReviews: p.noLive ? 'No reviews. It\u2019s a walk \u2014 take it up with the pavement.' : (dd && !reviews.length ? 'Google is being shy about this one.' : ''),
+      dHeartIcon: hearted ? 'ri-heart-3-fill' : 'ri-heart-add-line',
+      dHeartLabel: hearted ? 'Saved' : 'Save for later',
+      dHeartStyle: { flex: 1, font: "500 14px 'Saans', sans-serif", background: hearted ? '#fee7fd' : '#ffffff', color: hearted ? '#852952' : '#002910', border: '1px solid ' + (hearted ? '#c54b9b' : '#002910'), borderRadius: 58, padding: '13px 8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 },
+      dPlanLabel: inPlan ? 'In your plan ✓' : 'Add to plan',
+      dPlanStyle: { flex: 1, font: "500 14px 'Saans', sans-serif", background: inPlan ? '#002910' : '#00ff64', color: inPlan ? '#f8fffa' : '#002910', border: 'none', borderRadius: 58, padding: '13px 8px', cursor: 'pointer' },
+      dHeart: () => this.toggleHeart(p.id),
+      dPlan: () => this.togglePlan(p.id),
+      dClose: () => this.closeDetail(),
+      dMaps: (dd && dd.gmaps) || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + ' Paris')}`,
+      // Paris = TheFork territory; OpenTable as the fallback for visitors who live in that app
+      dBookable: ['Bistro', 'Café', 'Wine bar', 'Cocktail bar', 'Bar', 'Crêperie'].includes(p.kind),
+      dBookFork: `https://www.thefork.fr/search?queryText=${encodeURIComponent(p.name)}`,
+      dBookOT: `https://www.opentable.com/s?term=${encodeURIComponent(p.name + ' Paris')}&covers=2`,
     };
   }
 
@@ -854,6 +1056,10 @@ class Component extends DCLogic {
         rating: isQuiz ? '' : ((live && live.rating) || fallback[0]),
         reviews: isQuiz ? '' : (live && live.ratings != null ? `${fmtCount(live.ratings)} Google reviews` : `${fallback[1]} reviews`),
         gmaps: isQuiz ? null : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' Paris')}`,
+        openDetail: isQuiz ? null : (() => this.openDetail(c.id)),
+        heart: isQuiz ? null : (() => this.toggleHeart(c.id)),
+        heartIcon: isQuiz ? '' : (S.hearts[c.id] ? 'ri-heart-3-fill' : 'ri-heart-add-line'),
+        heartStyle: a ? { border: 'none', background: 'none', cursor: 'pointer', padding: '4px 0 4px 10px', fontSize: 17, color: S.hearts[c.id] ? '#c54b9b' : a.ink } : null,
         q: c.q,
         opts: isQuiz ? c.opts.map(o => ({ label: o, go: () => this.answerQuiz(c.id, o) })) : [],
         onDown: isTop ? this.onDown : null,
@@ -896,7 +1102,7 @@ class Component extends DCLogic {
         kickerStyle: a ? { font: "500 9px 'Saans Mono', monospace", letterSpacing: '.12em', textTransform: 'uppercase', color: a.ink, marginBottom: 8 } : null,
         footStyle: a ? { marginTop: 'auto', borderTop: `1px solid ${a.ink}`, paddingTop: 10, display: 'flex', alignItems: 'center', gap: 7 } : null,
         footIconStyle: a ? { fontSize: 12, color: a.ink } : null,
-        linkStyle: a ? { marginLeft: 'auto', font: "500 9px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, textDecoration: 'none', borderBottom: `1px solid ${a.ink}`, paddingBottom: 1 } : null,
+        linkStyle: a ? { marginLeft: 'auto', font: "500 9px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, background: 'none', border: 'none', cursor: 'pointer', borderBottom: `1px solid ${a.ink}`, padding: '0 0 1px' } : null,
       };
     });
 
@@ -1004,6 +1210,22 @@ class Component extends DCLogic {
 
       chat: S.chat.map(m => ({
         text: m.text,
+        cards: (m.placeIds || []).map(id => {
+          const p = PLACES.find(x => x.id === id);
+          if (!p) return null;
+          const a = ACCENTS[p.accent];
+          return {
+            name: p.name,
+            meta: `${p.kind} · ${this.distFor(p).dist}`,
+            open: () => this.openDetail(p.id),
+            style: { display: 'flex', alignItems: 'center', gap: 10, background: '#ffffff', border: '1px solid #d4e8da', padding: '9px 12px 9px 9px', cursor: 'pointer', maxWidth: '86%', marginTop: 6 },
+            thumb: S.photos[p.id]
+              ? { width: 46, height: 46, flex: 'none', backgroundImage: `url("${S.photos[p.id]}")`, backgroundSize: 'cover', backgroundPosition: 'center', border: `1px solid ${a.dot}` }
+              : { width: 46, height: 46, flex: 'none', background: a.bg, backgroundImage: `radial-gradient(${a.dot} 1px, transparent 1px)`, backgroundSize: '8px 8px', border: `1px solid ${a.dot}`, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+            thumbIcon: p.icon,
+            thumbIconStyle: { fontSize: 20, color: a.ink, display: S.photos[p.id] ? 'none' : 'block' },
+          };
+        }).filter(Boolean),
         speaker: m.who === 'me' ? 'You' : 'The concierge',
         rowStyle: { display: 'flex', flexDirection: 'column', gap: 4, alignItems: m.who === 'me' ? 'flex-end' : 'flex-start' },
         labelStyle: {
@@ -1038,6 +1260,20 @@ class Component extends DCLogic {
       },
 
       toast: S.toast,
+
+      ...this.getDetailVals(ctx),
+
+      savedAny: PLACES.some(p => S.hearts[p.id]),
+      savedCity: 'Paris',
+      savedCount: String(PLACES.filter(p => S.hearts[p.id]).length),
+      saved: PLACES.filter(p => S.hearts[p.id])
+        .sort((a, b) => S.hearts[a.id] - S.hearts[b.id])
+        .map(p => ({
+          name: p.name,
+          meta: `${p.kind} · ${this.distFor(p).dist}`,
+          open: () => this.openDetail(p.id),
+          remove: () => this.toggleHeart(p.id),
+        })),
 
       timeOpts: [null, 'morning', 'afternoon', 'evening', 'night'].map(k => ({
         label: k || 'Auto (live)',
