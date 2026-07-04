@@ -846,7 +846,16 @@ class Component extends DCLogic {
         const gplaces = { ...this.state.gplaces };
         j.places.forEach(g => {
           if (curated.has(g.name.toLowerCase())) return;
-          const meta = WILD_KIND[g.type] || WILD_KIND.restaurant;
+          const t = String(g.type || '');
+          const meta = WILD_KIND[t]
+            || (/museum|gallery|cultural|art/.test(t) ? WILD_KIND.museum
+            : /park|garden/.test(t) ? WILD_KIND.park
+            : /wine/.test(t) ? WILD_KIND.wine_bar
+            : /bar|pub|night/.test(t) ? WILD_KIND.bar
+            : /cafe|coffee|tea/.test(t) ? WILD_KIND.cafe
+            : /bakery|dessert|ice_cream|patisserie/.test(t) ? WILD_KIND.bakery
+            : /book/.test(t) ? WILD_KIND.book_store
+            : WILD_KIND.restaurant);
           const id = 'g_' + g.id;
           gplaces[id] = {
             id, name: g.name, kind: meta.kind, icon: meta.icon, accent: meta.accent,
