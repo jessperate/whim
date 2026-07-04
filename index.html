@@ -813,13 +813,19 @@ class Component extends DCLogic {
 
   // Lazily fetch live rating / open-now for a card as it enters the stack.
   ensureLive(p) {
-    if (p.noLive || p.wild) return;
+    if (p.noLive) return;
     this._liveReq = this._liveReq || {};
     if (this._liveReq[p.id]) return;
     this._liveReq[p.id] = true;
     fetch(`/api/places?name=${encodeURIComponent(p.fsq || p.name)}&ll=${p.lat},${p.lng}`)
       .then(r => (r.ok ? r.json() : null))
-      .then(j => { if (j && j.ok) this.setState(s => ({ live: { ...s.live, [p.id]: j } })); })
+      .then(j => {
+        if (!j || !j.ok) return;
+        this.setState(s => ({
+          live: { ...s.live, [p.id]: j },
+          photos: j.photo && !s.photos[p.id] ? { ...s.photos, [p.id]: j.photo } : s.photos,
+        }));
+      })
       .catch(() => {});
   }
 

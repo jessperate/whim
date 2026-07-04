@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': key,
-        'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.currentOpeningHours.openNow',
+        'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.currentOpeningHours.openNow,places.photos',
       },
       body: JSON.stringify({
         textQuery: name,
@@ -35,6 +35,18 @@ export default async function handler(req, res) {
     const place = j.places && j.places[0];
     if (!place) return res.status(200).json({ ok: false, reason: 'not_found' });
 
+    // One card-sized photo for spots Wikipedia has nothing for.
+    let photo = null;
+    const ph = place.photos && place.photos[0];
+    if (ph?.name) {
+      photo = await fetch(`https://places.googleapis.com/v1/${ph.name}/media?maxWidthPx=800&skipHttpRedirect=true`, {
+        headers: { 'X-Goog-Api-Key': key },
+      })
+        .then((pr) => (pr.ok ? pr.json() : null))
+        .then((pj) => pj?.photoUri || null)
+        .catch(() => null);
+    }
+
     // Ratings and hours are stable enough to cache at the edge for a day.
     res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=604800');
     return res.status(200).json({
@@ -43,6 +55,7 @@ export default async function handler(req, res) {
       rating: place.rating != null ? place.rating.toFixed(1) : null,
       ratings: place.userRatingCount ?? null,
       openNow: place.currentOpeningHours?.openNow ?? null,
+      photo,
       match: place.displayName?.text ?? null,
     });
   } catch (e) {
