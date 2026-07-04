@@ -1452,15 +1452,39 @@ class Component extends DCLogic {
     if (!p) return;
     const live = this.state.details[id] || this.state.live[id] || {};
     const rating = live.rating || (RATINGS[id] || [])[0] || (p.grating || '');
-    const text = `${p.name} — ${p.kind}, ${p.area}, Paris. ${p.blurb} ${rating ? rating + '★. ' : ''}https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + ' Paris')} — found on Whim`;
+    const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + ' Paris')}`;
+    const body = `${p.name} — ${p.kind}, ${p.area}, Paris. ${p.blurb}${rating ? ` ${rating}★.` : ''} Found on Whim.`;
+    // native share sheet on mobile; clipboard on desktop
+    if (navigator.share) {
+      navigator.share({ title: `${p.name} — Whim`, text: body, url: maps })
+        .then(() => this.showToast('Sent. Excellent taste travels.'))
+        .catch((e) => {
+          if (e && e.name === 'AbortError') return; // user closed the sheet
+          this.copyShare(`${body} ${maps}`);
+        });
+      return;
+    }
+    this.copyShare(`${body} ${maps}`);
+  }
+
+  copyShare(text) {
     const done = () => this.showToast('Copied. Send it to someone with taste.');
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done).catch(() => this.showToast('Couldn’t copy. Rude.'));
-    } else {
+    const fail = () => this.showToast('Couldn’t share. Rude.');
+    const legacy = () => {
       const ta = document.createElement('textarea');
-      ta.value = text; document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); done(); } catch (e) { this.showToast('Couldn’t copy. Rude.'); }
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0'; ta.readOnly = false;
+      document.body.appendChild(ta);
+      ta.focus(); ta.select(); ta.setSelectionRange(0, text.length);
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { /* fall through */ }
       document.body.removeChild(ta);
+      ok ? done() : fail();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(legacy);
+    } else {
+      legacy();
     }
   }
 
