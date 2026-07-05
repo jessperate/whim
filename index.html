@@ -199,10 +199,15 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
         <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">{{ planKicker }}</div>
         <div style="font:400 32px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:9px 0 5px;">{{ planTitle }}</div>
         <div style="font:italic 400 16px/1.5 'Serrif VF',Georgia,serif; color:#676c79; margin-bottom:20px;">{{ planSub }}</div>
+        <div style="display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; margin-bottom:18px;">
+          <sc-for list="{{ moodChips }}" as="mc" hint-placeholder-count="5">
+            <button onClick="{{ mc.go }}" style="{{ mc.style }}">{{ mc.label }}</button>
+          </sc-for>
+        </div>
         <sc-if value="{{ planEmpty }}" hint-placeholder-val="{{ false }}">
           <div style="border:1px dashed #f2d3c6; padding:30px 22px; text-align:center; background:#fff7f2;">
             <div style="font:400 22px/1.2 'Serrif VF',Georgia,serif; color:#451212; margin-bottom:8px;">Nothing yet</div>
-            <div style="font:400 15px/1.55 'Saans',sans-serif; color:#676c79;">Swipe right on literally anything and I'll draft your day. That's the whole deal.</div>
+            <div style="font:400 15px/1.55 'Saans',sans-serif; color:#676c79;">Swipe right or heart a few spots. Each morning I'll arrange your day from everything you've saved. That's the whole deal.</div>
           </div>
         </sc-if>
         <sc-if value="{{ planDraft }}" hint-placeholder-val="{{ false }}">
@@ -943,6 +948,9 @@ function restoreState() {
       name: typeof s.name === 'string' ? s.name.slice(0, 40) : '',
       bio: typeof s.bio === 'string' ? s.bio.slice(0, 160) : '',
       pendingInvite: typeof s.pendingInvite === 'string' ? s.pendingInvite : undefined,
+      planMood: typeof s.planMood === 'string' ? s.planMood : 'mix',
+      planSkips: s.planSkips || {},
+      planDay: typeof s.planDay === 'string' ? s.planDay : '',
       avatar: typeof s.avatar === 'string' && s.avatar.startsWith('data:image/') ? s.avatar : null,
       myReviews: s.myReviews || {},
       gplaces: s.gplaces || {},
@@ -982,6 +990,7 @@ class Component extends DCLogic {
     pendingInvite: null,
     range: 'city',
     city: null, tzName: null, global: false,
+    planMood: 'mix', planSkips: {}, planDay: '',
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -997,6 +1006,7 @@ class Component extends DCLogic {
         name: S.name,
         bio: S.bio, avatar: S.avatar,
         pendingInvite: S.pendingInvite,
+        planMood: S.planMood, planSkips: S.planSkips, planDay: S.planDay,
         myReviews: S.myReviews,
         // keep only the dynamic places the user has acted on
         gplaces: Object.fromEntries(Object.entries(S.gplaces).filter(([id, g]) => g.custom || S.swiped[id] === 'like' || S.hearts[id] || S.myReviews[id])),
@@ -2263,9 +2273,16 @@ class Component extends DCLogic {
       this.showToast('Fine. Keep your secrets.');
       return;
     }
-    this.setState(s => ({ swiped: { ...s.swiped, [id]: dir }, swipeCount: s.swipeCount + 1, planStatus: dir === 'like' ? 'draft' : s.planStatus }));
+    this.setState(s => {
+      const next = { swiped: { ...s.swiped, [id]: dir }, swipeCount: s.swipeCount + 1 };
+      if (dir === 'like' && !s.hearts[id]) next.hearts = { ...s.hearts, [id]: Date.now() };
+      return next;
+    });
     this.dbPush('swipes', { place_id: id, direction: dir, place: this.placeSnapshot(id) });
-    if (dir === 'like') this.showToast('Liked. The concierge is drafting.');
+    if (dir === 'like') {
+      this.dbPush('hearts', { place_id: id, place: this.placeSnapshot(id) });
+      this.showToast('Saved for later. The concierge will work it in.');
+    }
   }
 
   swipeTop(dir) {
@@ -2355,24 +2372,62 @@ class Component extends DCLogic {
       .catch(() => done(OFFLINE[S.replyIx % OFFLINE.length]));
   }
 
+  // each morning the concierge arranges the day from everything saved —
+  // date-seeded so it's stable all day and fresh tomorrow; mood re-mixes it
+  arrangeDay(ctx) {
+    const S = this.state;
+    const mood = S.planMood || 'mix';
+    const today = new Intl.DateTimeFormat('en-CA').format(new Date());
+    const skips = new Set(S.planSkips[today] || []);
+    const T = this.getTaste();
+    const FAMOUS = ['p5', 'p10', 'p15', 'p16', 'p19', 'p21', 'p42'];
+    const pool = Object.keys(S.hearts)
+      .filter(id => !skips.has(id))
+      .map(id => this.findPlace(id)).filter(Boolean)
+      .map(p => ({ ...p, ...this.distFor(p) }));
+    const seed = today + mood + (S.shuffleIx || 0);
+    const jit = id => ((strHash(id + seed) % 1000) / 1000) * 2 - 1;
+    const MOODS = {
+      mix: { n: 4, fit: () => 0 },
+      lazy: { n: 3, fit: p => (['Café', 'Park', 'Bakery', 'Boulangerie', 'Wine bar', 'Pâtisserie', 'Bookshop'].includes(p.kind) ? 3 : 0) - p.km * 0.8 },
+      explore: { n: 5, fit: p => (p.wild || p.custom ? 3 : 0) + (p.kind === 'Oddity' ? 2 : 0) + (T.offPath && p.km > 1.5 ? 1 : 0) },
+      sightsee: { n: 5, fit: p => (['Landmark', 'Museum', 'Viewpoint', 'Gallery', 'Church'].includes(p.kind) ? 3 : 0) + (FAMOUS.includes(p.id) ? 2 : 0) },
+      walkathon: { n: 8, fit: () => 1 },
+      shop: { n: 4, fit: p => (p.accent === 'lilac' || ['Vintage shop', 'Bookshop', 'Market', 'Concept store', 'Flea market', 'Boutique'].includes(p.kind) ? 4 : -2) },
+    };
+    const m = MOODS[mood] || MOODS.mix;
+    const picked = pool
+      .map(p => ({ ...p, _s: m.fit(p) + this.scorePlace(p, T) * 0.3 + jit(p.id) }))
+      .sort((a, b) => b._s - a._s)
+      .slice(0, m.n);
+    // walking order: nearest-neighbor chain so the day flows on foot
+    const route = [];
+    const rest = [...picked];
+    let cur = rest.shift();
+    while (cur) {
+      route.push(cur);
+      rest.sort((a, b) => haversineKm(cur, a) - haversineKm(cur, b));
+      cur = rest.shift();
+    }
+    return route;
+  }
+
   getPlanVals(plan, planKm, ctx) {
     const S = this.state;
     const ix = S.shuffleIx || 0;
-    // ordering: draft 0 = chronological; shuffles = deterministic re-orders
-    const ordered = [...plan].sort((a, b) =>
-      ix === 0 ? a.slot - b.slot : ((a.slot * 7 + ix * 13) % 17) - ((b.slot * 7 + ix * 13) % 17)
-    );
+    // the arranger already ordered the day for walking; shuffle re-mixes the
+    // whole arrangement upstream (new seed), so no re-sort here
+    const ordered = [...plan];
     // 4 stops a day: today runs from "now" (next half hour, 90 min per stop),
     // later days start at a civilized 10:00
-    const PER_DAY = 4;
+    const PER_DAY = 99; // the concierge arranges one day at a time now
     const [h0, m0] = ctx.clock.split(':').map(Number);
     const removeStop = (p) => {
-      this.setState(s => {
-        const sw = { ...s.swiped }; delete sw[p.id];
-        return { swiped: sw };
-      });
-      this.dbDrop('swipes', p.id);
-      this.showToast(`${p.name} is off the list.`);
+      const today = new Intl.DateTimeFormat('en-CA').format(new Date());
+      this.setState(s => ({
+        planSkips: { ...s.planSkips, [today]: [...(s.planSkips[today] || []), p.id] },
+      }));
+      this.showToast(`${p.name} is off today\u2019s plan \u2014 still saved.`);
     };
     const mkRow = (p, at) => {
       const a = ACCENTS[p.accent];
@@ -2404,15 +2459,18 @@ class Component extends DCLogic {
       };
     });
 
+    const savedN = Object.keys(S.hearts).length;
     const msgs = [
-      `Based on your ${plan.length} like${plan.length === 1 ? '' : 's'} and frankly excellent taste, here\u2019s the day. Say the word.`,
+      `Arranged this morning from your ${savedN} save${savedN === 1 ? '' : 's'}. Frankly excellent taste. Say the word.`,
       'Re-drafted. New running order, same excellent taste. Better?',
       'Draft three. I moved things around so your feet survive. Final answer?',
       'At this point I\u2019m just showing off. Pick one.',
     ];
 
-    const draft = plan.length > 0 && S.planStatus !== 'approved';
-    const approved = plan.length > 0 && S.planStatus === 'approved';
+    const todayStr = new Intl.DateTimeFormat('en-CA').format(new Date());
+    const approvedToday = S.planStatus === 'approved' && S.planDay === todayStr;
+    const draft = plan.length > 0 && !approvedToday;
+    const approved = plan.length > 0 && approvedToday;
 
     return {
       planEmpty: plan.length === 0,
@@ -2420,10 +2478,27 @@ class Component extends DCLogic {
       planApproved: approved,
       draftNo: String(ix + 1).padStart(2, '0'),
       proposalMsg: msgs[Math.min(ix, msgs.length - 1)],
+      moodChips: [
+        { key: 'mix', label: 'House mix' },
+        { key: 'lazy', label: 'Lazy day' },
+        { key: 'explore', label: 'Explore' },
+        { key: 'sightsee', label: 'Sightsee' },
+        { key: 'walkathon', label: 'Walkathon' },
+        { key: 'shop', label: 'Shop' },
+      ].map(mc => ({
+        ...mc,
+        go: () => this.setState({ planMood: mc.key, planStatus: 'draft' }),
+        style: {
+          flex: 'none', font: "500 13px 'Saans Mono',monospace", letterSpacing: '.03em', textTransform: 'uppercase',
+          background: S.planMood === mc.key ? '#451212' : '#ffffff',
+          color: S.planMood === mc.key ? '#fff5ee' : '#451212',
+          border: '1px solid #451212', borderRadius: '58px', padding: '11px 14px', cursor: 'pointer', whiteSpace: 'nowrap',
+        },
+      })),
       planDays,
       planKicker: `${chunks.length > 1 ? `${chunks.length} days` : 'Today'} · ${(this.state.city && this.state.city.name) || 'Paris'}`,
       planTitle: chunks.length > 1 ? `Your ${chunks.length}-day plan` : 'Your day plan',
-      approvePlan: () => { this.setState({ planStatus: 'approved' }); this.showToast('Plan approved. Go forth.'); },
+      approvePlan: () => { this.setState({ planStatus: 'approved', planDay: todayStr }); this.showToast('Plan approved. Go forth.'); },
       shufflePlan: () => this.setState(s => ({ shuffleIx: (s.shuffleIx || 0) + 1 })),
       redraftPlan: () => this.setState({ planStatus: 'draft' }),
       planHasStops: approved,
@@ -2435,7 +2510,7 @@ class Component extends DCLogic {
           })()
         : null,
       planSub: plan.length === 0
-        ? 'Swipe right and the concierge drafts your day.'
+        ? 'Swipe right or heart a few spots \u2014 each morning I arrange your day from your saves.'
         : (approved ? 'Locked in. I did the time math so you don\u2019t have to.' : 'The concierge has thoughts. Review the draft.'),
       planStats: `${plan.length} stop${plan.length === 1 ? '' : 's'} · ${planKm.toFixed(1)} km of strutting`,
     };
@@ -2682,10 +2757,8 @@ class Component extends DCLogic {
       };
     });
 
-    const plan = PLACES.concat(Object.values(S.gplaces)).filter(p => S.swiped[p.id] === 'like')
-      .map(p => ({ ...p, ...this.distFor(p) }))
-      .sort((x, y) => x.slot - y.slot);
-    const planKm = plan.reduce((n, p) => n + p.km, 0);
+    const plan = this.arrangeDay(ctx);
+    const planKm = plan.reduce((n, p, i) => n + (i ? haversineKm(plan[i - 1], p) : 0), 0);
     const likedN = Object.values(S.swiped).filter(v => v === 'like').length;
     const nopedN = Object.values(S.swiped).filter(v => v === 'nope').length;
 

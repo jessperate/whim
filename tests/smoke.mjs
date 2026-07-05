@@ -289,6 +289,7 @@ try {
   results.push('DEBUG has "your day plan": ' + afterTab.includes('your day plan') + ', has "nothing yet": ' + afterTab.includes('nothing yet'));
   const planTxt = await page.evaluate(() => document.body.innerText);
   check('plan drafts after likes', planTxt.toLowerCase().includes('concierge proposes'), planTxt.toLowerCase().includes('concierge proposes') ? '' : planTxt.slice(0, 200));
+  check('plan mood chips render', ['lazy day', 'walkathon', 'sightsee', 'shop', 'house mix'].every((m) => planTxt.toLowerCase().includes(m)));
 
   // every draft row is individually deletable
   const beforeRows = await page.evaluate(() => document.querySelectorAll('button[aria-label="Remove stop"]').length);
@@ -384,7 +385,7 @@ try {
   await clickByText('You');
   await new Promise((r) => setTimeout(r, 300));
   const youTxt2 = await page.evaluate(() => document.body.innerText.toLowerCase());
-  check('Paris saved-for-later folder appears', /saved for later \(\s*1\s*\)/.test(youTxt2));
+  check('Paris saved-for-later folder appears', /saved for later \(\s*3\s*\)/.test(youTxt2)); // detail-sheet heart + two swipe-likes (which auto-save now)
 
   // add-your-own-spot flow
   await clickByText('Add your own spot');
@@ -409,7 +410,7 @@ try {
   });
   await new Promise((r) => setTimeout(r, 400));
   const repTxt = await page.evaluate(() => document.body.innerText.toLowerCase());
-  check('own spot lands in saved folder', repTxt.includes('chez testeur') && /saved for later \(\s*2\s*\)/.test(repTxt));
+  check('own spot lands in saved folder', repTxt.includes('chez testeur') && /saved for later \(\s*4\s*\)/.test(repTxt));
 
   // deep cuts: enter from You tab, answer one, exit
   await clickByText('Answer the deep cuts');
@@ -482,7 +483,7 @@ try {
     const tab = [...document.querySelectorAll('button')].find((x) => /plan\s*\(/i.test(x.innerText));
     return tab ? tab.innerText.trim() : '';
   });
-  check('chat card adds to plan', /plan\s*\(\s*2\s*\)/i.test(planBadge), planBadge); // 2 likes - 1 deleted row + 1 chat like
+  check('chat card adds to plan', /plan\s*\(\s*3\s*\)/i.test(planBadge), planBadge); // saves (2 likes + own spot + chat like) minus one skipped row
 
   // tap the chat card to open the sheet
   await page.evaluate(() => {
