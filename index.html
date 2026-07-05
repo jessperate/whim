@@ -2258,7 +2258,22 @@ class Component extends DCLogic {
           feedback: S.chat.filter(m => m.fb).slice(-5).map(m => ({ text: String(m.text).slice(0, 90), verdict: m.fb })),
           taste, liked, deck,
           pulse: S.pulse.slice(0, 6).map(p => ({ text: p.text, spot: p.spot })),
-          places: PLACES.map(p => ({ name: p.name, kind: p.kind, area: p.area })),
+          places: (() => {
+            const spotFor = (p) => {
+              const lv = S.live[p.id] || {};
+              const open = typeof lv.openNow === 'boolean' ? lv.openNow : (typeof p.openNow === 'boolean' ? p.openNow : undefined);
+              return {
+                name: p.name, kind: p.kind, area: p.area,
+                km: +this.distFor(p).km.toFixed(1),
+                late: (Array.isArray(p.times) && p.times.includes('night')) || undefined,
+                open,
+              };
+            };
+            const dyn = Object.values(S.gplaces)
+              .filter(g => g.lat && !String(g.id).startsWith('hp_'))
+              .map(spotFor).sort((a, b) => a.km - b.km).slice(0, 25);
+            return [...PLACES.map(spotFor), ...dyn];
+          })(),
         },
       }),
     })

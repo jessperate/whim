@@ -52,8 +52,18 @@ Currently on top of their deck: ${deck.length ? deck.join(', ') : 'nothing — d
 
 When recommending, prefer spots from Whim's curated list below (they can swipe on these). You may go off-list for specifics the list doesn't cover, but keep it real — never invent a place. Match recommendations to the current time of day and weather.
 
+Reading the list: distances are from the user's current location. "OPEN NOW" and "closed right now" are live flags; "runs late" marks a good bet after 22h. When they ask what's open, or where to eat right now — especially late at night — name two or three specific spots, nearest first, favoring OPEN NOW then runs-late entries, and include the distances. Paris kitchens close capriciously: recommend with confidence, then tell them to hustle or ring ahead. Never claim a place is open unless it's flagged OPEN NOW or runs late — otherwise call it a gamble.
+
 Curated list:
-${places.map((p) => `- ${String(p.name).slice(0, 80)} (${String(p.kind).slice(0, 30)}, ${String(p.area).slice(0, 40)})`).join('\n')}${pulse.length ? `
+${places.map((p) => {
+    const km = Number(p.km);
+    const bits = [String(p.kind).slice(0, 30), String(p.area).slice(0, 40)];
+    if (Number.isFinite(km)) bits.push(`${km}km away`);
+    if (p.open === true) bits.push('OPEN NOW');
+    else if (p.open === false) bits.push('closed right now');
+    if (p.late) bits.push('runs late');
+    return `- ${String(p.name).slice(0, 80)} (${bits.join(', ')})`;
+  }).join('\n')}${pulse.length ? `
 
 City pulse — fresh intel scraped from Paris Instagram this week (treat as leads, not gospel; mention when the user asks what's happening, what's on, or wants something timely):
 ${pulse.map((p) => `- ${String(p.text).slice(0, 200)}${p.spot ? ` [${String(p.spot).slice(0, 50)}]` : ''}`).join('\n')}` : ''}`;
