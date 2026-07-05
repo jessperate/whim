@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy — Whim</title>
+<meta name="description" content="How Whim handles your data: what we collect, where it lives, and who can see it.">
+<link rel="icon" href="/apple-touch-icon.png">
+<style>
+  body { margin: 0; background: #fff7f2; color: #451212; font: 400 16px/1.6 Georgia, 'Times New Roman', serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 40px 22px 70px; }
+  .kicker { font: 500 11px/1 ui-monospace, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; color: #c0361c; }
+  h1 { font: 400 40px/1.05 Georgia, serif; letter-spacing: -0.02em; margin: 10px 0 6px; }
+  .date { font: 400 13px/1.5 -apple-system, 'Helvetica Neue', sans-serif; color: #676c79; margin-bottom: 34px; }
+  h2 { font: 400 22px/1.2 Georgia, serif; letter-spacing: -0.01em; margin: 34px 0 8px; color: #451212; }
+  p, li { font: 400 15.5px/1.65 -apple-system, 'Helvetica Neue', sans-serif; color: #38100c; }
+  ul { padding-left: 20px; }
+  li { margin: 6px 0; }
+  a { color: #c0361c; }
+  .card { border: 1px solid #f2d3c6; padding: 14px 16px; margin: 14px 0; }
+  .card p { margin: 4px 0; }
+  .home { display: inline-block; margin-top: 40px; font: 500 14px -apple-system, sans-serif; color: #fff5ee; background: #e8432c; text-decoration: none; border-radius: 58px; padding: 12px 22px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="kicker">Whim · The fine print</div>
+  <h1>Privacy policy</h1>
+  <div class="date">Effective 5 July 2026 · whim-eta.vercel.app</div>
+
+  <p>Whim is a pocket concierge for Paris. It works best when it knows your taste,
+  where you're standing, and what the sky is doing — so it handles personal data.
+  Here is all of it, in plain language.</p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li><strong>Your taste file</strong> — answers to the taste questions, swipes, saves (hearts), and reviews you write.</li>
+    <li><strong>Your profile</strong> — a name, an optional photo, an optional short bio, and a handle if you create an account.</li>
+    <li><strong>Your location</strong> — only while the app is open, only if you grant it, and only to measure distances to places and fetch nearby suggestions. It is never stored on our servers.</li>
+    <li><strong>Concierge chats</strong> — messages you send the concierge, kept on your device so the conversation has memory.</li>
+  </ul>
+
+  <h2>Where it lives</h2>
+  <div class="card">
+    <p><strong>Without an account:</strong> everything stays in your browser's local storage, on your device. Nothing is uploaded.</p>
+    <p><strong>With an account:</strong> your taste file and profile sync to our database (hosted by Supabase) so they survive a lost phone and power the friends features.</p>
+  </div>
+
+  <h2>Who can see what</h2>
+  <ul>
+    <li><strong>Strangers: nothing.</strong> Database rules block anyone who isn't you from reading your data.</li>
+    <li><strong>Accepted friends</strong> — and only accepted friends — can see your photo, name, bio, the places you've liked, your saved lists, and your reviews. Unfriending someone cuts their access immediately.</li>
+    <li>Your handle and display name are findable by exact search, so friends can add you.</li>
+  </ul>
+
+  <h2>Your contacts</h2>
+  <p>The "invite your contacts" feature runs entirely on your phone: the contact
+  picker and the message it composes never touch our servers. We do not upload,
+  read, or store your address book. Ever.</p>
+
+  <h2>Services we lean on</h2>
+  <ul>
+    <li><strong>Google Sign-In</strong> for accounts (governed by Google's own policy).</li>
+    <li><strong>Google Places</strong> for ratings, photos and discovery — coordinate queries pass through our server, without your identity attached.</li>
+    <li><strong>Anthropic's Claude</strong> powers the concierge — your chat messages and taste context are sent to it to compose replies.</li>
+    <li><strong>Open-Meteo</strong> for weather (coordinates only).</li>
+    <li><strong>Vercel</strong> hosts the app and keeps standard, short-lived server logs.</li>
+  </ul>
+
+  <h2>What we don't do</h2>
+  <ul>
+    <li>No ads, no trackers, no analytics pixels.</li>
+    <li>No selling or renting data to anyone, in any form.</li>
+    <li>No reading your data ourselves except to fix a problem you report.</li>
+  </ul>
+
+  <h2>Deleting your data</h2>
+  <p>"Wipe my taste file" in the You tab erases everything on your device. To
+  delete a synced account and every row attached to it, email
+  <a href="mailto:jessica@airops.com">jessica@airops.com</a> and it will be
+  removed within 30 days.</p>
+
+  <h2>Changes</h2>
+  <p>If this policy changes, the date at the top changes with it. Material
+  changes get an in-app notice, not a silent edit.</p>
+
+  <a class="home" href="/">← Back to Whim</a>
+</main>
+</body>
+</html>

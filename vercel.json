@@ -17,6 +17,10 @@
     {
       "source": "/p/:id",
       "destination": "/api/p?id=:id"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
     }
   ]
 }
