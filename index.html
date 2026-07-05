@@ -769,7 +769,7 @@ function strHash(s) {
 }
 
 const WILD_KIND = {
-  restaurant: { kind: 'Restaurant', icon: 'ri-restaurant-line', accent: 'pink', times: ['afternoon', 'evening'] },
+  restaurant: { kind: 'Restaurant', icon: 'ri-restaurant-line', accent: 'pink', times: ['afternoon', 'evening', 'night'] },
   cafe: { kind: 'Café', icon: 'ri-cup-line', accent: 'pink', times: ['morning', 'afternoon'] },
   bakery: { kind: 'Boulangerie', icon: 'ri-cake-2-line', accent: 'pink', times: ['morning'] },
   bar: { kind: 'Bar', icon: 'ri-goblet-line', accent: 'yellow', times: ['evening', 'night'] },
@@ -1445,7 +1445,7 @@ class Component extends DCLogic {
             const id = 'tf_' + strHash(g.name);
             gplaces[id] = {
               id, name: g.name, kind: 'Restaurant', icon: kindIcon(id, 'Restaurant', 'ri-restaurant-line'), accent: 'pink',
-              times: ['afternoon', 'evening'], weather: 'any', kids: false,
+              times: ['afternoon', 'evening', 'night'], weather: 'any', kids: false,
               area: (g.cuisine || 'Paris'), lat: g.lat, lng: g.lng,
               blurb: [
                 `${g.cuisine || 'Dinner'}, rated ${g.rating}/10 by people who actually booked. So can you — right from here.`,
@@ -1755,7 +1755,8 @@ class Component extends DCLogic {
     if (!e || (this._sessionSeen || {})[id]) return 0; // don't penalize mid-session
     const days = (Date.now() - e.at) / 86400000;
     if (days > 5) return 0.5;
-    return Math.min(5, 2.5 * e.n);
+    if (days > 2) return Math.min(3, 1.5 * e.n);
+    return Math.min(7, 3 * e.n);
   }
 
   componentDidUpdate() {
@@ -1896,7 +1897,7 @@ class Component extends DCLogic {
       .map(p => ({ ...p, ...this.distFor(p) }))
       .filter(p => p.km < 3.5)
       .sort((a, b) => strHash(a.id + this._seed) - strHash(b.id + this._seed))
-      .slice(0, 8);
+      .slice(0, 12);
 
     let deck = places
       .map(p => ({ ...p, ...this.distFor(p) }))
@@ -1915,6 +1916,23 @@ class Component extends DCLogic {
       quota.push(rest.splice(ix, 1)[0]);
     }
     deck = quota;
+
+    // thin-hour backfill: late at night (or odd hours) the strict pool runs
+    // out fast — append the best off-hours cards, labeled, instead of cycling
+    // the same few
+    if (!nowMode && deck.length < 12) {
+      const have = new Set(deck.map(p => p.id));
+      const extras = PLACES.concat(Object.values(this.state.gplaces))
+        .filter(p => !have.has(p.id) && !p.q && !swiped[p.id] && !fitsNow(p) &&
+          !(T.noGluten && (p.kind === 'Boulangerie' || p.kind === 'Crêperie' || p.id === 'p20')) &&
+          !(T.noMuseums && (p.kind === 'Museum' || p.kind === 'Gallery')) &&
+          (this.state.cat === 'all' || (this.state.cat === 'family' ? !!p.kids : p.accent === this.state.cat)))
+        .map(p => ({ ...p, ...this.distFor(p), score: this.scorePlace(p, T) - this.seenPenalty(p.id), notNow: true }))
+        .filter(p => p.score > -3 && (!p.wild || p.km < 3.5))
+        .sort((a, b) => (b.score + jit(b.id)) - (a.score + jit(a.id)))
+        .slice(0, 12 - deck.length);
+      deck.push(...extras);
+    }
 
     // keep discovery alive: guarantee a wildcard in the two always-visible
     // slots (the quiz check-in takes slot 3 when pending)
