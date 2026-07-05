@@ -249,3 +249,6 @@ begin
 end $$;
 revoke execute on function public.claim_invite(text) from anon, public;
 grant execute on function public.claim_invite(text) to authenticated;
+
+-- 2026-07-06: named lists — a heart can live in a user-named folder.
+alter table public.hearts add column if not exists list text;

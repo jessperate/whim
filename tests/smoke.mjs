@@ -174,6 +174,18 @@ try {
   await page.waitForFunction(() => document.body.innerText.toLowerCase().includes('discover'), { timeout: 8000 });
   check('onboarding completes into app', true);
 
+  // pin the clock: real time varies per run (a midnight run gets a thin night
+  // deck and everything downstream shifts) — the demo override fixes the hour
+  await clickByText('You');
+  await new Promise((r) => setTimeout(r, 300));
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll('button')].find((x) => x.innerText.trim().toLowerCase() === 'afternoon');
+    if (b) b.click();
+  });
+  await new Promise((r) => setTimeout(r, 200));
+  await clickByText('Discover');
+  await new Promise((r) => setTimeout(r, 400));
+
   // masthead context line: real clock + weather label present
   const ctxLine = await page.evaluate(() => {
     const m = document.body.innerText.match(/Paris · \w+ · \d{1,2}:\d{2} · [^\n]+/i);
@@ -383,6 +395,37 @@ try {
   check('own review renders in sheet', revTxt.includes('life-changing butter situation'));
   check('similar nearby section', revTxt.includes('similar, nearby'));
 
+  // ---- named lists: create one, file a spot, folder shows it ----
+  await clickByText('You');
+  await new Promise((r) => setTimeout(r, 300));
+  await clickByText('New list');
+  await page.waitForFunction(() => [...document.querySelectorAll('input')].some((i) => i.placeholder && i.placeholder.includes('unique')), { timeout: 3000 });
+  await page.evaluate(() => {
+    const input = [...document.querySelectorAll('input')].find((i) => i.placeholder.includes('unique'));
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+    setter.call(input, 'Honeymoon');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => x.getAttribute('aria-label') === 'Create list'); b && b.click(); });
+  await new Promise((r) => setTimeout(r, 400));
+  const youL = await page.evaluate(() => document.body.innerText.toLowerCase());
+  check('new list created', /honeymoon\s*\(\s*0\s*\)/.test(youL));
+  // file the deep-linked bar under it from its sheet
+  await page.goto('http://127.0.0.1:8199/?place=p13&n=Le%20Baron%20Rouge&k=Wine%20bar', { waitUntil: 'networkidle2' });
+  await new Promise((r) => setTimeout(r, 800));
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll('button')].find((x) => x.innerText.trim().toLowerCase() === 'honeymoon');
+    if (b) b.click();
+  });
+  await new Promise((r) => setTimeout(r, 400));
+  await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => x.getAttribute('aria-label') === 'Close friend view' || /ri-close/.test(x.innerHTML)); });
+  await clickByText('You');
+  await new Promise((r) => setTimeout(r, 300));
+  const youL2 = await page.evaluate(() => document.body.innerText.toLowerCase());
+  check('spot filed into the named list', /honeymoon\s*\(\s*1\s*\)/.test(youL2), (youL2.match(/honeymoon[^\n]*/) || [''])[0]);
+
+
   // heart from the sheet, then close
   await clickByText('Save for later');
   await new Promise((r) => setTimeout(r, 250));
@@ -398,7 +441,7 @@ try {
   await clickByText('You');
   await new Promise((r) => setTimeout(r, 300));
   const youTxt2 = await page.evaluate(() => document.body.innerText.toLowerCase());
-  check('Paris saved-for-later folder appears', /saved for later \(\s*3\s*\)/.test(youTxt2)); // detail-sheet heart + two swipe-likes (which auto-save now)
+  check('Paris saved-for-later folder appears', /saved for later \(\s*2\s*\)/.test(youTxt2)); // 3 saves minus p13, filed under Honeymoon by the lists test
 
   // add-your-own-spot flow
   await clickByText('Add your own spot');
@@ -423,7 +466,7 @@ try {
   });
   await new Promise((r) => setTimeout(r, 400));
   const repTxt = await page.evaluate(() => document.body.innerText.toLowerCase());
-  check('own spot lands in saved folder', repTxt.includes('chez testeur') && /saved for later \(\s*4\s*\)/.test(repTxt));
+  check('own spot lands in saved folder', repTxt.includes('chez testeur') && /saved for later \(\s*3\s*\)/.test(repTxt));
 
   // deep cuts: enter from You tab, answer one, exit
   await clickByText('Answer the deep cuts');

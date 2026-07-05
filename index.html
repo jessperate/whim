@@ -387,22 +387,38 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
           </div>
         </sc-if>
         <button onClick="{{ openAdd }}" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:22px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px dashed #451212; border-radius:58px; padding:14px; cursor:pointer;"><i class="ri-map-pin-add-line" style="font-size:16px;"></i>Add your own spot</button>
-        <sc-if value="{{ savedAny }}" hint-placeholder-val="{{ false }}">
-          <div style="margin-top:24px;">
-            <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;">
-              <i class="ri-folder-heart-line" style="font-size:14px;"></i>{{ savedCity }} · Saved for later ({{ savedCount }})
-            </div>
-            <div style="border:1px solid #f2d3c6;">
-              <sc-for list="{{ saved }}" as="sv" hint-placeholder-count="2">
-                <div style="display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #f2d3c6;">
-                  <div onClick="{{ sv.open }}" style="flex:1; min-width:0; cursor:pointer;">
-                    <div style="font:700 15px 'Saans',sans-serif; color:#451212;">{{ sv.name }}</div>
-                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ sv.meta }}</div>
-                  </div>
-                  <button onClick="{{ sv.remove }}" aria-label="Remove from saved" style="border:none; background:none; cursor:pointer; padding:6px;"><i class="ri-heart-3-fill" style="font-size:16px; color:#c54b9b;"></i></button>
+        <sc-if value="{{ foldersAny }}" hint-placeholder-val="{{ false }}">
+          <sc-for list="{{ folders }}" as="fo" hint-placeholder-count="1">
+            <div style="margin-top:24px;">
+              <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;">
+                <i class="{{ fo.icon }}" style="font-size:14px;"></i>{{ fo.title }}
+              </div>
+              <sc-if value="{{ fo.empty }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1px dashed #f2d3c6; padding:14px; font:400 12.5px 'Saans',sans-serif; color:#676c79;">Empty. Open any card and file it here.</div>
+              </sc-if>
+              <sc-if value="{{ fo.any }}" hint-placeholder-val="{{ true }}">
+                <div style="border:1px solid #f2d3c6;">
+                  <sc-for list="{{ fo.items }}" as="sv" hint-placeholder-count="2">
+                    <div style="display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #f2d3c6;">
+                      <div onClick="{{ sv.open }}" style="flex:1; min-width:0; cursor:pointer;">
+                        <div style="font:700 15px 'Saans',sans-serif; color:#451212;">{{ sv.name }}</div>
+                        <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ sv.meta }}</div>
+                      </div>
+                      <button onClick="{{ sv.remove }}" aria-label="Remove from saved" style="border:none; background:none; cursor:pointer; padding:6px;"><i class="ri-heart-3-fill" style="font-size:16px; color:#c54b9b;"></i></button>
+                    </div>
+                  </sc-for>
                 </div>
-              </sc-for>
+              </sc-if>
             </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ listAddClosed }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ listAddOpen }}" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:14px; font:500 13px 'Saans Mono',monospace; letter-spacing:.05em; text-transform:uppercase; background:#ffffff; color:#451212; border:1px dashed #451212; border-radius:58px; padding:12px; cursor:pointer;"><i class="ri-folder-add-line" style="font-size:15px;"></i>New list</button>
+        </sc-if>
+        <sc-if value="{{ listAddShown }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <input value="{{ listDraft }}" onChange="{{ onListDraft }}" onKeyDown="{{ onListKey }}" placeholder="Name it something unique" autofocus style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none;">
+            <button onClick="{{ doCreateList }}" aria-label="Create list" style="width:44px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-check-line" style="font-size:18px; color:#fff5ee;"></i></button>
           </div>
         </sc-if>
         <button onClick="{{ resetTaste }}" style="margin-top:22px; font:500 13px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#fee7fd; color:#852952; border:none; border-radius:8px; padding:14px 20px; cursor:pointer;" style-hover="background:#fff7ff;">Wipe my taste file</button>
@@ -605,6 +621,14 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             <button onClick="{{ dPlan }}" style="{{ dPlanStyle }}">{{ dPlanLabel }}</button>
             <button onClick="{{ dShare }}" aria-label="Share this spot" style="flex:none; width:46px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-share-forward-line" style="font-size:17px;"></i></button>
           </div>
+          <sc-if value="{{ dListRow }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; gap:6px; align-items:center; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; margin-bottom:10px;">
+              <span style="flex:none; font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#676c79;">File under</span>
+              <sc-for list="{{ dListChips }}" as="lc" hint-placeholder-count="2">
+                <button onClick="{{ lc.go }}" style="{{ lc.style }}">{{ lc.label }}</button>
+              </sc-for>
+            </div>
+          </sc-if>
           <sc-if value="{{ dMyReview }}" hint-placeholder-val="{{ false }}">
             <div style="border:1px solid #451212; background:#fff7f2; padding:12px 14px; margin-bottom:10px;">
               <div style="display:flex; align-items:baseline; gap:8px;">
@@ -962,6 +986,8 @@ function restoreState() {
       name: typeof s.name === 'string' ? s.name.slice(0, 40) : '',
       bio: typeof s.bio === 'string' ? s.bio.slice(0, 160) : '',
       pendingInvite: typeof s.pendingInvite === 'string' ? s.pendingInvite : undefined,
+      lists: s.lists || {},
+      listOf: s.listOf || {},
       planMood: typeof s.planMood === 'string' ? s.planMood : 'mix',
       planSkips: s.planSkips || {},
       planDay: typeof s.planDay === 'string' ? s.planDay : '',
@@ -1006,6 +1032,7 @@ class Component extends DCLogic {
     city: null, tzName: null, global: false,
     planMood: 'mix', planSkips: {}, planDay: '',
     expos: {},
+    lists: {}, listOf: {}, listDraft: '', listAdding: false,
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -1022,6 +1049,7 @@ class Component extends DCLogic {
         bio: S.bio, avatar: S.avatar,
         pendingInvite: S.pendingInvite,
         planMood: S.planMood, planSkips: S.planSkips, planDay: S.planDay,
+        lists: S.lists, listOf: S.listOf,
         myReviews: S.myReviews,
         // keep only the dynamic places the user has acted on
         gplaces: Object.fromEntries(Object.entries(S.gplaces).filter(([id, g]) => g.custom || S.swiped[id] === 'like' || S.hearts[id] || S.myReviews[id])),
@@ -1313,7 +1341,7 @@ class Component extends DCLogic {
     const [prof, sw, ht, rv] = await Promise.all([
       sb.from('profiles').select('*').eq('user_id', uid).maybeSingle(),
       sb.from('swipes').select('place_id,direction,place').eq('user_id', uid),
-      sb.from('hearts').select('place_id,place,created_at').eq('user_id', uid),
+      sb.from('hearts').select('place_id,place,created_at,list').eq('user_id', uid).then(r => (r.error ? sb.from('hearts').select('place_id,place,created_at').eq('user_id', uid).then(r2 => Object.assign(r2, { _v1: true })) : r)),
       sb.from('reviews').select('place_id,stars,text,created_at').eq('user_id', uid),
     ]);
     if (prof.error || !prof.data) { this._syncedFor = null; return; }
@@ -1338,7 +1366,18 @@ class Component extends DCLogic {
       // the server copy wins; local-only rows are adopted and pushed up
       const swiped = { ...S.swiped }, hearts = { ...S.hearts }, myReviews = { ...S.myReviews }, gplaces = { ...S.gplaces };
       rows.sw.forEach(r => { swiped[r.place_id] = r.direction; if (r.place) gplaces[r.place_id] = { ...r.place, id: r.place_id }; });
-      rows.ht.forEach(r => { hearts[r.place_id] = Date.parse(r.created_at) || Date.now(); if (r.place) gplaces[r.place_id] = { ...r.place, id: r.place_id }; });
+      this._heartsV2 = !ht._v1;
+      const lists = { ...S.lists }, listOf = { ...S.listOf };
+      rows.ht.forEach(r => {
+        hearts[r.place_id] = Date.parse(r.created_at) || Date.now();
+        if (r.place) gplaces[r.place_id] = { ...r.place, id: r.place_id };
+        if (r.list) {
+          const lid = 'l' + strHash(String(r.list).toLowerCase());
+          if (!lists[lid]) lists[lid] = { name: String(r.list).slice(0, 30) };
+          listOf[r.place_id] = lid;
+        }
+      });
+      Object.assign(next, { lists, listOf });
       rows.rv.forEach(r => { myReviews[r.place_id] = { text: r.text, stars: r.stars, at: Date.parse(r.created_at) || Date.now() }; });
       Object.keys(S.swiped).forEach(id => { if (!rows.sw.some(r => r.place_id === id)) this.dbPush('swipes', { place_id: id, direction: S.swiped[id], place: this.placeSnapshot(id) }); });
       Object.keys(S.hearts).forEach(id => { if (!rows.ht.some(r => r.place_id === id)) this.dbPush('hearts', { place_id: id, place: this.placeSnapshot(id) }); });
@@ -1958,6 +1997,41 @@ class Component extends DCLogic {
     setTimeout(() => this.openDetail(id), 250);
   }
 
+  listNameOf(id) {
+    const lid = this.state.listOf[id];
+    return (lid && this.state.lists[lid] && this.state.lists[lid].name) || null;
+  }
+
+  pushHeart(id) {
+    this.dbPush('hearts', {
+      place_id: id, place: this.placeSnapshot(id),
+      ...(this._heartsV2 ? { list: this.listNameOf(id) } : {}),
+    });
+  }
+
+  createList(rawName) {
+    const name = String(rawName || '').trim().slice(0, 30);
+    if (name.length < 2) { this.showToast('Give the list a real name.'); return null; }
+    const clash = Object.values(this.state.lists).some(l => l.name.toLowerCase() === name.toLowerCase());
+    if (clash) { this.showToast('That list already exists.'); return null; }
+    const lid = 'l' + strHash(name.toLowerCase());
+    this.setState(s => ({ lists: { ...s.lists, [lid]: { name } }, listDraft: '', listAdding: false }));
+    this.showToast(`\u201c${name}\u201d exists. Fill it wisely.`);
+    return lid;
+  }
+
+  assignList(id, lid) {
+    this.setState(s => {
+      const listOf = { ...s.listOf };
+      if (lid) listOf[id] = lid; else delete listOf[id];
+      const hearts = s.hearts[id] ? s.hearts : { ...s.hearts, [id]: Date.now() };
+      return { listOf, hearts };
+    });
+    setTimeout(() => this.pushHeart(id), 50);
+    const name = lid && this.state.lists[lid] ? this.state.lists[lid].name : null;
+    this.showToast(name ? `Filed under \u201c${name}\u201d.` : 'Back in the main folder.');
+  }
+
   toggleHeart(id) {
     const was = !!this.state.hearts[id];
     this.setState(s => {
@@ -1966,8 +2040,10 @@ class Component extends DCLogic {
       else { hearts[id] = Date.now(); }
       return { hearts };
     });
-    if (was) this.dbDrop('hearts', id);
-    else this.dbPush('hearts', { place_id: id, place: this.placeSnapshot(id) });
+    if (was) {
+      this.setState(s => { const listOf = { ...s.listOf }; delete listOf[id]; return { listOf }; });
+      this.dbDrop('hearts', id);
+    } else { this.pushHeart(id); }
     this.showToast(was ? 'Unsaved. Cold, but fine.' : 'Saved for later. The folder knows.');
   }
 
@@ -2652,6 +2728,22 @@ class Component extends DCLogic {
       get dRedditAny() { return this.dReddit.length > 0; },
       dShare: () => this.shareCard(p.id),
       dHeart: () => this.toggleHeart(p.id),
+      dListRow: Object.keys(S.lists).length > 0,
+      dListChips: [
+        { lid: null, label: 'Main folder' },
+        ...Object.entries(S.lists).map(([lid, l]) => ({ lid, label: l.name })),
+      ].map(c => {
+        const active = (S.listOf[p.id] || null) === c.lid && !!S.hearts[p.id];
+        return {
+          label: c.label,
+          go: () => this.assignList(p.id, c.lid),
+          style: {
+            flex: 'none', font: "500 11px 'Saans Mono',monospace", letterSpacing: '.04em', textTransform: 'uppercase',
+            background: active ? '#451212' : '#ffffff', color: active ? '#fff5ee' : '#451212',
+            border: '1px solid #451212', borderRadius: '58px', padding: '8px 12px', cursor: 'pointer', whiteSpace: 'nowrap',
+          },
+        };
+      }),
       dPlan: () => this.togglePlan(p.id),
       dClose: () => this.closeDetail(),
       dMaps: (dd && dd.gmaps) || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + ' Paris')}`,
@@ -3085,7 +3177,33 @@ class Component extends DCLogic {
       addSaveGo: () => this.addSave(),
       addCanSave: !!S.addName.trim(),
 
-      savedAny: PLACES.concat(Object.values(S.gplaces)).some(p => S.hearts[p.id]),
+      folders: (() => {
+        const savedAll = PLACES.concat(Object.values(S.gplaces)).filter(p => S.hearts[p.id])
+          .sort((x, y) => (S.hearts[x.id] || 0) - (S.hearts[y.id] || 0))
+          .map(p => ({
+            name: p.name, id: p.id,
+            meta: `${p.kind} · ${this.distFor(p).dist}`,
+            open: () => this.openDetail(p.id),
+            remove: () => this.toggleHeart(p.id),
+          }));
+        const inList = new Set(Object.keys(S.listOf).filter(id => S.lists[S.listOf[id]]));
+        const main = savedAll.filter(x => !inList.has(x.id));
+        return [
+          { icon: 'ri-folder-heart-line', title: `${(S.city && S.city.name) || 'Paris'} · Saved for later (${main.length})`, items: main, any: main.length > 0, empty: main.length === 0 },
+          ...Object.entries(S.lists).map(([lid, l]) => {
+            const items = savedAll.filter(x => S.listOf[x.id] === lid);
+            return { icon: 'ri-folder-3-line', title: `${l.name} (${items.length})`, items, any: items.length > 0, empty: items.length === 0 };
+          }),
+        ];
+      })(),
+      foldersAny: PLACES.concat(Object.values(S.gplaces)).filter(p => S.hearts[p.id]).length > 0 || Object.keys(S.lists).length > 0,
+      listAddShown: S.listAdding, listAddClosed: !S.listAdding,
+      listAddOpen: () => this.setState({ listAdding: true }),
+      listDraft: S.listDraft,
+      onListDraft: (e) => this.setState({ listDraft: e.target.value.slice(0, 30) }),
+      onListKey: (e) => { if (e.key === 'Enter') this.createList(this.state.listDraft); },
+      doCreateList: () => this.createList(this.state.listDraft),
+      savedAny: PLACES.concat(Object.values(S.gplaces)).filter(p => S.hearts[p.id]).some(p => true),
       savedCity: (S.city && S.city.name) || 'Paris',
       savedCount: String(PLACES.concat(Object.values(S.gplaces)).filter(p => S.hearts[p.id]).length),
       saved: PLACES.concat(Object.values(S.gplaces)).filter(p => S.hearts[p.id])
