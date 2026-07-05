@@ -17,6 +17,7 @@ export default async function handler(req, res) {
   const fieldMask = [
     'places.id', 'places.displayName', 'places.primaryType', 'places.location',
     'places.rating', 'places.userRatingCount', 'places.editorialSummary',
+    'places.currentOpeningHours.openNow',
   ].join(',');
 
   try {
@@ -59,6 +60,7 @@ export default async function handler(req, res) {
         rating: p.rating != null ? p.rating.toFixed(1) : null,
         ratings: p.userRatingCount ?? null,
         blurb: p.editorialSummary?.text || null,
+        openNow: p.currentOpeningHours?.openNow ?? null,
       }))
       .filter((p) => p.name && p.lat != null);
 

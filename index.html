@@ -1507,7 +1507,7 @@ class Component extends DCLogic {
     this._liveReq = this._liveReq || {};
     if (this._liveReq[p.id]) return;
     this._liveReq[p.id] = true;
-    fetch(`/api/places?name=${encodeURIComponent(p.fsq || p.name)}&ll=${p.lat},${p.lng}`)
+    fetch(`/api/places?name=${encodeURIComponent(p.fsq || p.name)}&ll=${p.lat},${p.lng}&h=${Math.floor(Date.now() / 36e5)}`)
       .then(r => (r.ok ? r.json() : null))
       .then(j => {
         if (!j || !j.ok) return;
@@ -2033,8 +2033,14 @@ class Component extends DCLogic {
     // 'Right now' is the opposite: strict to this hour and open-now.
     const nowMode = this.state.cat === 'now';
     const catActive = this.state.cat !== 'all' && !nowMode;
+    const foodMode = this.state.cat === 'pink';
     const fitsNow = p => p.times.includes(ctx.timeOfDay) && (p.weather === 'any' || p.weather === ctx.weather);
-    const openish = p => !nowMode || !this.state.live[p.id] || this.state.live[p.id].openNow !== false;
+    const liveFlag = p => {
+      const l = this.state.live[p.id];
+      if (l && typeof l.openNow === 'boolean') return l.openNow;
+      return typeof p.openNow === 'boolean' ? p.openNow : null;
+    };
+    const openish = p => (!nowMode && !foodMode) || liveFlag(p) !== false;
     const places = PLACES.filter(p =>
       (catActive || fitsNow(p)) &&
       !swiped[p.id] &&
@@ -2065,7 +2071,7 @@ class Component extends DCLogic {
     let deck = places
       .map(p => ({ ...p, ...this.distFor(p) }))
       .concat(wilds)
-      .map(p => ({ ...p, score: this.scorePlace(p, T) + (catActive && fitsNow(p) ? 3 : 0) - this.seenPenalty(p.id), notNow: catActive && !fitsNow(p) }))
+      .map(p => ({ ...p, score: this.scorePlace(p, T) + (catActive && fitsNow(p) ? 3 : 0) + (foodMode && liveFlag(p) === true ? 2.5 : 0) - this.seenPenalty(p.id), notNow: catActive && !fitsNow(p) }))
       .filter(p => p.score > -3) // taste mismatches don't deserve airtime
       .sort((a, b) => (b.score + jit(b.id)) - (a.score + jit(a.id)) || a.km - b.km || (a.slot || 99) - (b.slot || 99));
 
@@ -2091,11 +2097,15 @@ class Component extends DCLogic {
           !(T.noMuseums && (p.kind === 'Museum' || p.kind === 'Gallery')) &&
           (this.state.cat === 'all' || (this.state.cat === 'family' ? !!p.kids : p.accent === this.state.cat)))
         .map(p => ({ ...p, ...this.distFor(p), score: this.scorePlace(p, T) - this.seenPenalty(p.id), notNow: true }))
-        .filter(p => p.score > -3 && (!p.wild || p.km < 3.5))
+        .filter(p => p.score > -3 && openish(p) && (!p.wild || p.km < 3.5))
         .sort((a, b) => (b.score + jit(b.id)) - (a.score + jit(a.id)))
         .slice(0, 12 - deck.length);
       deck.push(...extras);
     }
+
+    // food mode promises "currently open": fetch fresh flags for the deck's
+    // front so unknowns resolve within a beat (closed ones then drop out)
+    if (foodMode) deck.slice(0, 10).forEach(p => { if (liveFlag(p) === null) this.ensureLive(p); });
 
     // keep discovery alive: guarantee a wildcard in the two always-visible
     // slots (the quiz check-in takes slot 3 when pending)

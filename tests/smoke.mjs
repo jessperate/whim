@@ -59,7 +59,9 @@ const server = http.createServer((req, res) => {
   }
   if (url.pathname === '/api/places') {
     res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({ ok: true, rating: '4.9', ratings: 1234, openNow: true, photo: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', lat: 48.8611, lng: 2.3574, match: 'Chez Testeur' }));
+    // one venue reports closed so the Food chip's open-now gate is exercised
+    const closed = /utopie|pain et des/i.test(url.searchParams.get('name') || '');
+    return res.end(JSON.stringify({ ok: true, rating: '4.9', ratings: 1234, openNow: !closed, photo: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', lat: 48.8611, lng: 2.3574, match: 'Chez Testeur' }));
   }
   if (url.pathname === '/api/concierge') {
     res.setHeader('Content-Type', 'application/json');
@@ -191,6 +193,14 @@ try {
   await new Promise((r) => setTimeout(r, 500));
   const shopTxt = await page.evaluate(() => document.body.innerText.toLowerCase());
   check('shopping deck has fashion inventory', /concept store|grand magasin|vintage shop|boutique|brocante/.test(shopTxt));
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll('button')].find((x) => x.innerText.trim().toLowerCase() === 'food');
+    if (b) b.click();
+  });
+  await new Promise((r) => setTimeout(r, 1500)); // let open-now flags resolve
+  const foodTxt = await page.evaluate(() => document.body.innerText);
+  check('Food chip shows cards', /·/.test(foodTxt));
+  check('Food chip hides closed places', !foodTxt.includes('Closed now'));
   await page.evaluate(() => {
     const b = [...document.querySelectorAll('button')].find((x) => x.innerText.trim().toLowerCase() === 'all');
     b && b.click();
