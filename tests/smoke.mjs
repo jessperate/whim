@@ -72,6 +72,7 @@ const server = http.createServer((req, res) => {
       const n = (parsed.context?.places || []).length;
       const msg = (parsed.messages || []).slice(-1)[0]?.text || '';
       if (/wine/i.test(msg)) return res.end(JSON.stringify({ reply: 'MENTION REPLY: try Le Baron Rouge, obviously.' }));
+      if (/shopping/i.test(msg)) return res.end(JSON.stringify({ reply: 'FOLLOWUP: what is the budget, and what are we hunting?', tasteNotes: ['Vintage and friperies', 'Budget under 50 euros'] }));
       res.end(JSON.stringify({ reply: `STUB REPLY (${n} curated places received, taste: ${parsed.context?.taste?.length ?? '?'}, pulse: ${parsed.context?.pulse?.length ?? 0})` }));
     });
   }
@@ -395,6 +396,28 @@ try {
   const chatTxt2 = await page.evaluate(() => document.body.innerText.toLowerCase());
   check('chat place card renders', chatTxt2.includes('wine bar ·'));
   check('concierge greeting personalized', chatTxt2.includes('bonjour, jess'));
+
+  // shopping ask -> follow-up reply + taste notes absorbed into the profile
+  await page.evaluate(() => {
+    const input = document.querySelector('input');
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+    setter.call(input, 'shopping recs?');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await new Promise((r) => setTimeout(r, 150));
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll('button')].find((x) => x.getAttribute('aria-label') === 'Send message');
+    b && b.click();
+  });
+  await page.waitForFunction(() => document.body.innerText.includes('FOLLOWUP'), { timeout: 8000 });
+  await new Promise((r) => setTimeout(r, 500));
+  const absorbed = await page.evaluate(() => {
+    try { return Object.values(JSON.parse(localStorage.getItem('whim-v1')).quizAnswers || {}); }
+    catch (e) { return []; }
+  });
+  check('concierge asks shopping follow-up', true);
+  check('taste notes saved to profile', absorbed.includes('Vintage and friperies') && absorbed.includes('Budget under 50 euros'), absorbed.join('|'));
   const fbIcons = await page.evaluate(() => ({
     up: !!document.querySelector('button[aria-label="Good recommendation"]'),
     down: !!document.querySelector('button[aria-label="Bad recommendation"]'),

@@ -53,6 +53,10 @@ Currently on top of their deck: ${deck.length ? deck.join(', ') : 'nothing — d
 
 When recommending, prefer spots from Whim's curated list below (they can swipe on these). You may go off-list for specifics the list doesn't cover, but keep it real — never invent a place. Match recommendations to the current time of day and weather.
 
+Shopping requests get the boutique treatment: if their taste file doesn't already answer it, ask up to two quick follow-up questions FIRST — price range, style/aesthetic, and what they're hunting (clothes, vintage, design objects, books, gifts) — one short message, then recommend concretely once they answer. Don't re-ask what the taste file already tells you.
+
+Alongside every reply, you may record up to three taste_notes: short, durable facts about this user's taste you just learned (e.g. "Shops vintage, budget under 50 euros", "Prefers minimalist neutrals"). Only NEW information from THIS turn — never restate the existing taste file, never note logistics. When a canonical tag fits exactly, use it verbatim as a note so the app's retrieval wakes up: "Vintage and friperies", "Designer flagships", "Bookshops and paper goods", "Les Puces, obviously", "Natural or nothing", "Michelin or bust", "Street food goblin". Most turns teach you nothing: an empty list is the normal case.
+
 Reading the list: distances are from the user's current location. "OPEN NOW" and "closed right now" are live flags; "runs late" marks a good bet after 22h. When they ask what's open, or where to eat right now — especially late at night — name two or three specific spots, nearest first, favoring OPEN NOW then runs-late entries, and include the distances. Paris kitchens close capriciously: recommend with confidence, then tell them to hustle or ring ahead. Never claim a place is open unless it's flagged OPEN NOW or runs late — otherwise call it a gamble.
 
 Curated list:
@@ -85,9 +89,25 @@ ${pulse.map((p) => `- ${String(p.text).slice(0, 200)}${p.spot ? ` [${String(p.sp
       },
       body: JSON.stringify({
         model: 'gpt-5.1',
-        max_completion_tokens: 600,
+        max_completion_tokens: 700,
         reasoning_effort: 'low',
         messages: [{ role: 'system', content: system }, ...turns.slice(-20)],
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: 'concierge_turn',
+            strict: true,
+            schema: {
+              type: 'object',
+              additionalProperties: false,
+              required: ['reply', 'taste_notes'],
+              properties: {
+                reply: { type: 'string', description: 'The concierge reply, plain prose' },
+                taste_notes: { type: 'array', items: { type: 'string' }, description: '0-3 new durable taste facts learned this turn; usually empty' },
+              },
+            },
+          },
+        },
       }),
     });
     if (!r.ok) {
@@ -96,9 +116,16 @@ ${pulse.map((p) => `- ${String(p.text).slice(0, 200)}${p.spot ? ` [${String(p.sp
       return res.status(502).json({ error: 'concierge_unavailable' });
     }
     const data = await r.json();
-    const reply = (data.choices?.[0]?.message?.content || '').trim();
-    if (!reply) return res.status(502).json({ error: 'concierge_unavailable' });
-    return res.status(200).json({ reply });
+    const raw = (data.choices?.[0]?.message?.content || '').trim();
+    if (!raw) return res.status(502).json({ error: 'concierge_unavailable' });
+    let reply = raw, tasteNotes = [];
+    try {
+      const parsed = JSON.parse(raw);
+      reply = String(parsed.reply || '').trim() || raw;
+      tasteNotes = (Array.isArray(parsed.taste_notes) ? parsed.taste_notes : [])
+        .map((n) => String(n).trim().slice(0, 80)).filter(Boolean).slice(0, 3);
+    } catch (e) { /* model fell back to prose; use it as-is */ }
+    return res.status(200).json({ reply, tasteNotes });
   } catch (e) {
     console.error('concierge error', e?.message);
     return res.status(502).json({ error: 'concierge_unavailable' });

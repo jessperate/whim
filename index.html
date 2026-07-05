@@ -1155,6 +1155,23 @@ class Component extends DCLogic {
     e.target.value = '';
   }
 
+  // things the concierge learns mid-chat join the taste file: stored like
+  // deep-cut answers, so they persist, sync, and feed every future context
+  absorbTasteNotes(notes) {
+    const fresh = notes.map(n => String(n).trim().slice(0, 80)).filter(Boolean).slice(0, 3);
+    if (!fresh.length) return;
+    const existing = new Set([...this.state.obAnswers, ...Object.values(this.state.quizAnswers)].map(v => String(v).toLowerCase()));
+    const add = fresh.filter(n => !existing.has(n.toLowerCase()));
+    if (!add.length) return;
+    this.setState(s => {
+      const quizAnswers = { ...s.quizAnswers };
+      add.forEach(n => { quizAnswers['c' + strHash(n)] = n; });
+      return { quizAnswers };
+    });
+    setTimeout(() => this.pushProfile(), 300);
+    this.showToast('Noted. Your taste file just got sharper.');
+  }
+
   saveProfile() {
     this.persist();
     this.pushProfile(true);
@@ -2299,7 +2316,10 @@ class Component extends DCLogic {
       }),
     })
       .then(r => (r.ok ? r.json() : null))
-      .then(j => done((j && j.reply) || OFFLINE[S.replyIx % OFFLINE.length]))
+      .then(j => {
+        if (j && Array.isArray(j.tasteNotes) && j.tasteNotes.length) this.absorbTasteNotes(j.tasteNotes);
+        done((j && j.reply) || OFFLINE[S.replyIx % OFFLINE.length]);
+      })
       .catch(() => done(OFFLINE[S.replyIx % OFFLINE.length]));
   }
 
