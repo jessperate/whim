@@ -88,6 +88,18 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             {{ opt.label }}<i class="ri-arrow-right-line" style="font-size:18px; color:#d1401f; flex:none;"></i>
           </button>
         </sc-for>
+        <sc-if value="{{ obFreeClosed }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ obFreeOpenGo }}" style="font:italic 400 17px 'Serrif VF',Georgia,serif; text-align:left; background:#ffffff; color:#676c79; border:1px dashed #d8b6a6; padding:18px 20px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:12px;" style-hover="background:#fdece4;">
+            In my own words…<i class="ri-quill-pen-line" style="font-size:18px; color:#d1401f; flex:none;"></i>
+          </button>
+        </sc-if>
+        <sc-if value="{{ obFreeShown }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; gap:8px;">
+            <input value="{{ obFree }}" onChange="{{ onObFree }}" onKeyDown="{{ onObFreeKey }}" placeholder="Say it your way" autofocus style="flex:1; min-width:0; font:400 16px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:17px 18px; outline:none; border-radius:0; -webkit-appearance:none;">
+            <button onClick="{{ obFreeGo }}" aria-label="Use my answer" style="width:56px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-arrow-right-line" style="font-size:20px; color:#fff5ee;"></i></button>
+          </div>
+          <div style="font:400 12.5px 'Saans',sans-serif; color:#676c79; margin-top:8px;">The concierge reads every word of this. Choose them well.</div>
+        </sc-if>
       </div>
       <sc-if value="{{ deepActive }}" hint-placeholder-val="{{ false }}">
         <button onClick="{{ deepExit }}" style="margin-top:18px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; background:none; border:none; color:#676c79; cursor:pointer; padding:8px 0;">Save &amp; exit — finish later</button>
@@ -946,6 +958,7 @@ class Component extends DCLogic {
     acctNudge: true,
     friends: [], frIn: [], frOut: [], frDraft: '', friendView: null, friendReviews: {},
     bio: '', avatar: null,
+    obFree: '', obFreeOpen: false,
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -2402,6 +2415,31 @@ class Component extends DCLogic {
     };
   }
 
+  answerOb(ob, o) {
+    const S = this.state;
+    if (S.deepMode) {
+      this.setState(s => {
+        const quizAnswers = { ...s.quizAnswers, [ob.id]: o };
+        const left = DEEP.filter(q => !quizAnswers[q.id]).length;
+        if (!left) this.showToast('Fully calibrated. Terrifying.');
+        return { quizAnswers, deepMode: left > 0, obFree: '', obFreeOpen: false };
+      });
+      return;
+    }
+    this.setState(s => ({ obStep: s.obStep + 1, obAnswers: [...s.obAnswers, o], obFree: '', obFreeOpen: false }));
+    if (S.obStep + 1 === OB.length) {
+      this.showToast('Calibrated. The deck now discriminates.');
+      this.loadWildcards(S.userLoc || PARIS);
+    }
+  }
+
+  // the typed fourth option: their words become the answer, verbatim
+  answerObFree(ob) {
+    const t = this.state.obFree.trim().slice(0, 80);
+    if (!t) return;
+    this.answerOb(ob, t);
+  }
+
   renderVals() {
     const S = this.state;
     const appName = this.props.appName ?? 'Whim';
@@ -2546,25 +2584,13 @@ class Component extends DCLogic {
       obQuestion: ob.q, obSub: ob.sub,
       deepActive,
       deepExit: () => this.setState({ deepMode: false }),
-      obOptions: ob.opts.map(o => ({
-        label: o,
-        go: () => {
-          if (S.deepMode) {
-            this.setState(s => {
-              const quizAnswers = { ...s.quizAnswers, [ob.id]: o };
-              const left = DEEP.filter(q => !quizAnswers[q.id]).length;
-              if (!left) this.showToast('Fully calibrated. Terrifying.');
-              return { quizAnswers, deepMode: left > 0 };
-            });
-            return;
-          }
-          this.setState(s => ({ obStep: s.obStep + 1, obAnswers: [...s.obAnswers, o] }));
-          if (S.obStep + 1 === OB.length) {
-            this.showToast('Calibrated. The deck now discriminates.');
-            this.loadWildcards(S.userLoc || PARIS);
-          }
-        },
-      })),
+      obOptions: ob.opts.map(o => ({ label: o, go: () => this.answerOb(ob, o) })),
+      obFree: S.obFree,
+      obFreeShown: S.obFreeOpen, obFreeClosed: !S.obFreeOpen,
+      obFreeOpenGo: () => this.setState({ obFreeOpen: true }),
+      onObFree: (e) => this.setState({ obFree: e.target.value.slice(0, 80) }),
+      onObFreeKey: (e) => { if (e.key === 'Enter') this.answerObFree(ob); },
+      obFreeGo: () => this.answerObFree(ob),
 
       ctxLine: `Paris · ${ctx.weekday} · ${ctx.clock} · ${ctx.weatherLabel}${ctx.tempC != null ? ` ${ctx.tempC}°` : ''}${geoBit}`,
       ctxIcon: sunny ? 'ri-sun-line' : 'ri-rainy-line',

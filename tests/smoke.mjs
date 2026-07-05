@@ -128,12 +128,36 @@ try {
   await new Promise((r) => setTimeout(r, 300));
   for (let i = 0; i < 13; i++) {
     await page.waitForFunction(() => [...document.querySelectorAll('button')].some((b) => /→|ri-arrow/.test(b.innerHTML) || b.innerText.length > 3), { timeout: 5000 });
+    if (i === 2) {
+      // answer one question through the free-text fourth option
+      await clickByText('In my own words');
+      await page.waitForFunction(() => !!document.querySelector('input'), { timeout: 3000 });
+      await page.evaluate(() => {
+        const input = document.querySelector('input');
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+        setter.call(input, 'I collect antique doorknobs');
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      await page.evaluate(() => {
+        const b = [...document.querySelectorAll('button')].find((x) => x.getAttribute('aria-label') === 'Use my answer');
+        if (b) b.click();
+      });
+      await new Promise((r) => setTimeout(r, 300));
+      continue;
+    }
     await page.evaluate(() => {
       const btns = [...document.querySelectorAll('button')].filter((b) => b.querySelector('i.ri-arrow-right-line'));
       if (btns[0]) btns[0].click();
     });
     await new Promise((r) => setTimeout(r, 120));
   }
+  await new Promise((r) => setTimeout(r, 400));
+  const typedOk = await page.evaluate(() => {
+    try { return (JSON.parse(localStorage.getItem('whim-v1')).obAnswers || []).includes('I collect antique doorknobs'); }
+    catch (e) { return false; }
+  });
+  check('typed onboarding answer lands in taste file', typedOk);
   await page.waitForFunction(() => document.body.innerText.toLowerCase().includes('discover'), { timeout: 8000 });
   check('onboarding completes into app', true);
 
