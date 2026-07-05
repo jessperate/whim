@@ -174,6 +174,16 @@ try {
   await new Promise((r) => setTimeout(r, 1200));
   const cardInfo = await page.evaluate(() => document.body.innerText);
   check('card shows walking-distance pill', /\d+ min from you/.test(cardInfo));
+
+  // range toggle: Near me should cap every visible card at a ~15 min walk
+  await clickByText('All Paris');
+  await new Promise((r) => setTimeout(r, 400));
+  const nearTxt = await page.evaluate(() => document.body.innerText);
+  const mins = [...nearTxt.matchAll(/(\d+) min from you/g)].map((m) => +m[1]);
+  check('range toggle flips to Near me', /near me/i.test(nearTxt));
+  check('Near me keeps cards walkable', mins.length > 0 && Math.max(...mins) <= 15, `mins: ${mins.join(',')}`);
+  await clickByText('Near me');
+  await new Promise((r) => setTimeout(r, 300));
   check('deck shows a distance', /\d+(m|(\.\d)?km)\b/i.test(cardInfo));
   check('live rating stub applied (4.9)', cardInfo.includes('4.9'));
   check('live Google reviews label', cardInfo.includes('1.2k Google reviews'));

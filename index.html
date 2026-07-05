@@ -128,10 +128,13 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             <button onClick="{{ nudgeDismiss }}" aria-label="Dismiss" style="background:none; border:none; cursor:pointer; padding:2px; flex:none;"><i class="ri-close-line" style="font-size:16px; color:#676c79;"></i></button>
           </div>
         </sc-if>
-        <div style="display:flex; gap:8px; padding:12px 16px 2px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
-          <sc-for list="{{ catChips }}" as="cc" hint-placeholder-count="6">
-            <button onClick="{{ cc.go }}" style="{{ cc.style }}">{{ cc.label }}</button>
-          </sc-for>
+        <div style="display:flex; align-items:center; gap:8px; padding:12px 16px 2px;">
+          <button onClick="{{ rangeToggle }}" aria-label="Switch between nearby and all of Paris" style="{{ rangeStyle }}"><i class="{{ rangeIcon }}" style="font-size:14px;"></i>{{ rangeLabel }}</button>
+          <div style="display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; flex:1; min-width:0;">
+            <sc-for list="{{ catChips }}" as="cc" hint-placeholder-count="6">
+              <button onClick="{{ cc.go }}" style="{{ cc.style }}">{{ cc.label }}</button>
+            </sc-for>
+          </div>
         </div>
         <div style="flex:1; position:relative; margin:12px 16px 10px;">
           <sc-if value="{{ deckEmpty }}" hint-placeholder-val="{{ false }}">
@@ -964,6 +967,7 @@ class Component extends DCLogic {
     bio: '', avatar: null,
     obFree: '', obFreeOpen: false,
     pendingInvite: null,
+    range: 'city',
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -2037,6 +2041,9 @@ class Component extends DCLogic {
     const nowMode = this.state.cat === 'now';
     const catActive = this.state.cat !== 'all' && !nowMode;
     const foodMode = this.state.cat === 'pink';
+    const nearMode = this.state.range === 'walk';
+    const maxKm = nearMode ? 1.2 : 8;
+    const inRange = p => !nearMode || this.distFor(p).km <= maxKm;
     const fitsNow = p => p.times.includes(ctx.timeOfDay) && (p.weather === 'any' || p.weather === ctx.weather);
     const liveFlag = p => {
       const l = this.state.live[p.id];
@@ -2050,7 +2057,7 @@ class Component extends DCLogic {
       !(T.noGluten && (p.kind === 'Boulangerie' || p.kind === 'Crêperie' || p.id === 'p20')) &&
       !(T.noMuseums && p.kind === 'Museum') &&
       !(T.earlyBed && p.kind === 'Jazz club') &&
-      openish(p) &&
+      openish(p) && inRange(p) &&
       (this.state.cat === 'all' || nowMode || (this.state.cat === 'family' ? !!p.kids : p.accent === this.state.cat))
     );
     this._seed = this._seed || Math.floor(Math.random() * 1e9);
@@ -2067,7 +2074,7 @@ class Component extends DCLogic {
         (this.state.cat === 'all' || nowMode || (this.state.cat === 'family' ? !!p.kids : p.accent === this.state.cat))
       )
       .map(p => ({ ...p, ...this.distFor(p) }))
-      .filter(p => p.km < 3.5)
+      .filter(p => p.km <= maxKm)
       .sort((a, b) => strHash(a.id + this._seed) - strHash(b.id + this._seed))
       .slice(0, 12);
 
@@ -2100,7 +2107,7 @@ class Component extends DCLogic {
           !(T.noMuseums && (p.kind === 'Museum' || p.kind === 'Gallery')) &&
           (this.state.cat === 'all' || (this.state.cat === 'family' ? !!p.kids : p.accent === this.state.cat)))
         .map(p => ({ ...p, ...this.distFor(p), score: this.scorePlace(p, T) - this.seenPenalty(p.id), notNow: true }))
-        .filter(p => p.score > -3 && openish(p) && (!p.wild || p.km < 3.5))
+        .filter(p => p.score > -3 && openish(p) && p.km <= (nearMode ? maxKm : 3.5))
         .sort((a, b) => (b.score + jit(b.id)) - (a.score + jit(a.id)))
         .slice(0, 12 - deck.length);
       deck.push(...extras);
@@ -2268,6 +2275,7 @@ class Component extends DCLogic {
           clock: ctx.clock, weekday: ctx.weekday, timeOfDay: ctx.timeOfDay,
           weatherLabel: ctx.weatherLabel, tempC: ctx.tempC, geo: S.geo,
           name: S.name || null,
+          range: S.range,
           feedback: S.chat.filter(m => m.fb).slice(-5).map(m => ({ text: String(m.text).slice(0, 90), verdict: m.fb })),
           taste, liked, deck,
           pulse: S.pulse.slice(0, 6).map(p => ({ text: p.text, spot: p.spot })),
@@ -2693,6 +2701,15 @@ class Component extends DCLogic {
         },
       })),
 
+      rangeLabel: S.range === 'walk' ? 'Near me' : 'All Paris',
+      rangeIcon: S.range === 'walk' ? 'ri-walk-line' : 'ri-map-2-line',
+      rangeToggle: () => this.setState(s => ({ range: s.range === 'walk' ? 'city' : 'walk' })),
+      rangeStyle: {
+        flex: 'none', display: 'flex', alignItems: 'center', gap: '6px',
+        font: "500 13px 'Saans Mono',monospace", letterSpacing: '.03em', textTransform: 'uppercase',
+        background: S.range === 'walk' ? '#451212' : '#ffffff', color: S.range === 'walk' ? '#fff5ee' : '#451212',
+        border: '1px solid #451212', borderRadius: '58px', padding: '11px 14px', cursor: 'pointer', whiteSpace: 'nowrap',
+      },
       catChips: [
         { key: 'all', label: 'All', bg: '#ffffff', ink: '#451212' },
         { key: 'now', label: 'Right now', bg: '#ffe0d9', ink: '#c0361c' },
