@@ -665,6 +665,20 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
           <sc-if value="{{ dNoReviews }}" hint-placeholder-val="{{ false }}">
             <div style="font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; margin-top:12px;">{{ dNoReviews }}</div>
           </sc-if>
+          <sc-if value="{{ dHasExpos }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#e5e5ff; padding:14px 14px 6px; margin:4px 0 10px;">
+              <div style="display:flex; align-items:center; gap:8px; font:500 10px 'Saans Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#1b1b8f;"><i class="ri-artboard-line" style="font-size:14px;"></i>On the walls right now</div>
+              <sc-for list="{{ dExpos }}" as="ex" hint-placeholder-count="2">
+                <div style="padding:10px 0 8px; border-bottom:1px solid #c7c7f5;">
+                  <div style="font:700 14.5px/1.3 'Saans',sans-serif; color:#0f0f57;">{{ ex.title }}</div>
+                  <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.05em; text-transform:uppercase; color:#1b1b8f; margin-top:4px;">{{ ex.when }}</div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ dExpoSite }}" hint-placeholder-val="{{ false }}">
+                <a href="{{ dExpoSite }}" target="_blank" rel="noopener" style="display:block; font:500 10px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#1b1b8f; text-decoration:none; padding:10px 0;">Full programme on their site →</a>
+              </sc-if>
+            </div>
+          </sc-if>
           <sc-for list="{{ dReviews }}" as="rv" hint-placeholder-count="2">
             <div style="border-top:1px solid #f2d3c6; padding:12px 0 2px; margin-top:10px;">
               <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.04em; color:#c0361c;">{{ rv.head }}</div>
@@ -991,6 +1005,7 @@ class Component extends DCLogic {
     range: 'city',
     city: null, tzName: null, global: false,
     planMood: 'mix', planSkips: {}, planDay: '',
+    expos: {},
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -1754,7 +1769,23 @@ class Component extends DCLogic {
     this.setState({ detail: { id } });
     this.ensureDetails(p);
     this.ensureReddit(p);
+    this.ensureExpos(p);
     this.ensureFriendReviews(id);
+  }
+
+  // museums and galleries: what's hanging right now, scraped from their site
+  ensureExpos(p) {
+    if (!['Museum', 'Gallery'].includes(p.kind) || this.state.expos[p.id]) return;
+    this._expoReq = this._expoReq || {};
+    if (this._expoReq[p.id]) return;
+    this._expoReq[p.id] = true;
+    fetch(`/api/expo?name=${encodeURIComponent(p.fsq || p.name)}&ll=${p.lat},${p.lng}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => {
+        if (!j || !j.ok) return;
+        this.setState(s => ({ expos: { ...s.expos, [p.id]: { list: j.expos || [], site: j.site } } }));
+      })
+      .catch(() => {});
   }
 
   closeDetail() {
@@ -2520,7 +2551,7 @@ class Component extends DCLogic {
     const S = this.state;
     const id = S.detail && S.detail.id;
     const p = id ? this.findPlace(id) : null;
-    if (!p) return { detailOpen: false, dPhotos: [], dReviews: [], dHasPhotos: false, dNoPhotos: false, dSwipeHint: '', dLoadingReviews: false, dNoReviews: '', dBookable: false, dResyIdle: false, dResyLoading: false, dResySlots: [], dResyNone: false, dResyUrl: null, dSimilar: [], dMyReview: false, dRevButton: false, dRevEdit: false, dFriendReviews: [], dReddit: [], dAo: null, dRedditAny: false };
+    if (!p) return { detailOpen: false, dPhotos: [], dReviews: [], dHasPhotos: false, dNoPhotos: false, dSwipeHint: '', dLoadingReviews: false, dNoReviews: '', dBookable: false, dResyIdle: false, dResyLoading: false, dResySlots: [], dResyNone: false, dResyUrl: null, dSimilar: [], dMyReview: false, dRevButton: false, dRevEdit: false, dFriendReviews: [], dReddit: [], dAo: null, dRedditAny: false, dExpos: [], dHasExpos: false, dExpoSite: null };
 
     const dd = S.details[p.id];
     const live = S.live[p.id];
@@ -2614,6 +2645,9 @@ class Component extends DCLogic {
         meta: `r/${t.sub} · ${t.ups} upvotes`,
         url: t.url,
       })),
+      dExpos: ((S.expos[p.id] || {}).list || []).map(e => ({ title: e.title, when: e.when || 'On now' })),
+      get dHasExpos() { return this.dExpos.length > 0; },
+      dExpoSite: (S.expos[p.id] || {}).site || null,
       dAo: p.aoUrl || null,
       get dRedditAny() { return this.dReddit.length > 0; },
       dShare: () => this.shareCard(p.id),

@@ -52,16 +52,28 @@ export default async function handler(req) {
     findPhoto(name, ll, process.env.GOOGLE_PLACES_API_KEY),
   ]);
 
-  const logo = h('img', { position: 'absolute', top: 36, right: 42, width: 200 }, undefined, { src: `${origin}/whim-logo.png`, width: 200 });
+  const logo = h('div', {
+    position: 'absolute', top: 34, right: 40, display: 'flex',
+    backgroundColor: '#fff7f2', borderRadius: 22, padding: '16px 24px',
+    boxShadow: '0 6px 24px rgba(38,8,5,0.38)',
+  }, [h('img', { width: 170 }, undefined, { src: `${origin}/whim-logo.png`, width: 170 })]);
 
   const body = photo
     ? h('div', { width: '100%', height: '100%', display: 'flex', position: 'relative', backgroundColor: '#fff7f2' }, [
         h('img', { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }, undefined, { src: photo, width: 1200, height: 630 }),
         h('div', { position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(38,8,5,0.82) 0%, rgba(38,8,5,0.25) 38%, rgba(38,8,5,0) 62%)' }),
         logo,
-        h('div', { position: 'absolute', left: 48, right: 48, bottom: 40, display: 'flex', flexDirection: 'column' }, [
-          ...(kind ? [h('div', { fontSize: 22, letterSpacing: 4, color: '#ffd3c4', textTransform: 'uppercase', marginBottom: 10 }, kind.toUpperCase())] : []),
-          h('div', { fontSize: 64, lineHeight: 1.05, color: '#fff7f2' }, name),
+        h('div', { position: 'absolute', left: 48, right: 48, bottom: 44, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }, [
+          ...(kind ? [h('div', {
+            fontSize: 21, letterSpacing: 4, color: '#fff5ee', backgroundColor: '#e8432c',
+            padding: '9px 18px 7px', marginBottom: 14, textTransform: 'uppercase',
+            boxShadow: '0 4px 16px rgba(38,8,5,0.3)',
+          }, kind.toUpperCase())] : []),
+          h('div', {
+            fontSize: 58, lineHeight: 1.08, color: '#451212', backgroundColor: '#fff7f2',
+            padding: '14px 24px', maxWidth: 1040,
+            boxShadow: '0 6px 24px rgba(38,8,5,0.35)',
+          }, name),
         ]),
       ])
     : h('div', { width: '100%', height: '100%', display: 'flex', position: 'relative', backgroundColor: '#fff7f2', alignItems: 'center', justifyContent: 'center' }, [

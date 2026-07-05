@@ -49,6 +49,13 @@ const server = http.createServer((req, res) => {
     res.setHeader('Content-Type', 'application/json');
     return res.end(JSON.stringify({ ok: true, found: true, match: 'Stub Bistro', url: 'https://www.thefork.fr/stub', bookable: true, rating: '9.2', price: '45€' }));
   }
+  if (url.pathname === '/api/expo') {
+    res.setHeader('Content-Type', 'application/json');
+    return res.end(JSON.stringify({ ok: true, site: 'https://example.org/musee', expos: [
+      { title: 'EXPOSTUB: Monet in the Dark', when: 'Until 12 October' },
+      { title: 'Bronze, but Moody', when: '' },
+    ]}));
+  }
   if (url.pathname === '/api/details') {
     res.setHeader('Content-Type', 'application/json');
     const px = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
@@ -327,6 +334,12 @@ try {
   check('Friends tab renders', frTxt.includes('your friends'));
   check('Friends tab invite button', frTxt.includes('invite from your contacts'));
   check('Friends tab signed-out pitch', frTxt.includes('sign in from the you tab'));
+
+  // --- museum sheet: current exhibitions scraped from the museum site ---
+  await page.goto('http://127.0.0.1:8199/?place=p22&n=Mus%C3%A9e%20Rodin&k=Museum', { waitUntil: 'networkidle2' });
+  await new Promise((r) => setTimeout(r, 900));
+  const expoTxt = await page.evaluate(() => document.body.innerText.toLowerCase());
+  check('museum sheet shows current exhibitions', expoTxt.includes('on the walls right now') && expoTxt.includes('expostub'), '');
 
   // --- detail sheet: deep-link straight to a known bookable bar (deterministic) ---
   await page.goto('http://127.0.0.1:8199/?place=p13&n=Le%20Baron%20Rouge&k=Wine%20bar', { waitUntil: 'networkidle2' });
