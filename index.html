@@ -358,6 +358,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             </sc-if>
           </div>
         </sc-if>
+        <button onClick="{{ openAdd }}" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:22px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px dashed #451212; border-radius:58px; padding:14px; cursor:pointer;"><i class="ri-map-pin-add-line" style="font-size:16px;"></i>Add your own spot</button>
         <sc-if value="{{ savedAny }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:24px;">
             <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;">
@@ -451,6 +452,40 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             </div>
           </sc-if>
         </div>
+      </div>
+    </sc-if>
+
+    <!-- add-your-own-spot sheet -->
+    <sc-if value="{{ addOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; z-index:70; background:#fff7f2; display:flex; flex-direction:column; padding:22px 20px calc(20px + env(safe-area-inset-bottom));">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#c0361c;">Your repertoire</div>
+          <button onClick="{{ closeAdd }}" aria-label="Close" style="width:36px; height:36px; border-radius:50%; border:1px solid #451212; background:#fff7f2; cursor:pointer;"><i class="ri-close-line" style="font-size:19px; color:#451212;"></i></button>
+        </div>
+        <div style="font:400 30px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:14px 0 4px;">Add your own spot</div>
+        <div style="font:italic 400 15px/1.45 'Serrif VF',Georgia,serif; color:#676c79; margin-bottom:18px;">Your secret. Whim keeps it. Mostly.</div>
+        <div style="display:flex; gap:8px;">
+          <input value="{{ addName }}" onChange="{{ onAddName }}" onKeyDown="{{ onAddKey }}" placeholder="Name of the place" style="flex:1; min-width:0; font:400 16px 'Saans',sans-serif; background:#ffffff; border:1px solid #451212; color:#451212; padding:14px; outline:none; border-radius:0; -webkit-appearance:none;">
+          <button onClick="{{ addLookupGo }}" style="flex:none; font:500 13px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:0 18px; cursor:pointer;">Find it</button>
+        </div>
+        <sc-if value="{{ addBusy }}" hint-placeholder-val="{{ false }}">
+          <div style="font:italic 400 13.5px 'Serrif VF',Georgia,serif; color:#676c79; margin-top:10px;">Consulting the map…</div>
+        </sc-if>
+        <sc-if value="{{ addFoundLine }}" hint-placeholder-val="{{ false }}">
+          <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#c0361c; margin-top:10px;">{{ addFoundLine }}</div>
+        </sc-if>
+        <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#676c79; margin:18px 0 8px;">What is it?</div>
+        <div style="display:flex; gap:7px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding-bottom:4px;">
+          <sc-for list="{{ addKinds }}" as="ak" hint-placeholder-count="6">
+            <button onClick="{{ ak.go }}" style="{{ ak.style }}">{{ ak.label }}</button>
+          </sc-for>
+        </div>
+        <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#676c79; margin:16px 0 8px;">Your one-liner (optional)</div>
+        <input value="{{ addBlurb }}" onChange="{{ onAddBlurb }}" placeholder="Say something nice. Or mean but accurate." style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:13px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+        <div style="flex:1;"></div>
+        <sc-if value="{{ addCanSave }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ addSaveGo }}" style="font:500 16px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:16px; cursor:pointer; width:100%;">Add to my repertoire</button>
+        </sc-if>
       </div>
     </sc-if>
 
@@ -857,7 +892,8 @@ class Component extends DCLogic {
     gplaces: {},
     user: null, authReady: false,
     seen: {},
-    reddit: {}, username: '',
+    reddit: {},
+    addOpen: false, addName: '', addKind: 'Café', addBlurb: '', addBusy: false, addFound: null, username: '',
     authMode: 'signup', authEmail: '', authPassword: '', authUser: '', authBusy: false,
     acctNudge: true,
     friends: [], frIn: [], frOut: [], frDraft: '', friendView: null, friendReviews: {},
@@ -876,7 +912,7 @@ class Component extends DCLogic {
         name: S.name,
         myReviews: S.myReviews,
         // keep only the dynamic places the user has acted on
-        gplaces: Object.fromEntries(Object.entries(S.gplaces).filter(([id]) => S.swiped[id] === 'like' || S.hearts[id] || S.myReviews[id])),
+        gplaces: Object.fromEntries(Object.entries(S.gplaces).filter(([id, g]) => g.custom || S.swiped[id] === 'like' || S.hearts[id] || S.myReviews[id])),
         acctNudge: S.acctNudge,
       }));
     } catch (e) {}
@@ -1609,6 +1645,61 @@ class Component extends DCLogic {
       .catch(() => {});
   }
 
+  static ADD_KINDS = [
+    { kind: 'Café', accent: 'pink', icon: 'ri-cup-line' },
+    { kind: 'Restaurant', accent: 'pink', icon: 'ri-restaurant-line' },
+    { kind: 'Boulangerie', accent: 'pink', icon: 'ri-cake-2-line' },
+    { kind: 'Bar', accent: 'yellow', icon: 'ri-goblet-line' },
+    { kind: 'Wine bar', accent: 'yellow', icon: 'ri-goblet-fill' },
+    { kind: 'Club', accent: 'yellow', icon: 'ri-disc-line' },
+    { kind: 'Museum', accent: 'indigo', icon: 'ri-gallery-line' },
+    { kind: 'Gallery', accent: 'indigo', icon: 'ri-artboard-line' },
+    { kind: 'Bookshop', accent: 'indigo', icon: 'ri-book-open-line' },
+    { kind: 'Park', accent: 'green', icon: 'ri-plant-line' },
+    { kind: 'Vintage shop', accent: 'lilac', icon: 'ri-t-shirt-line' },
+    { kind: 'Concept store', accent: 'lilac', icon: 'ri-shopping-bag-line' },
+    { kind: 'Other', accent: 'pink', icon: 'ri-map-pin-line' },
+  ];
+
+  addLookup() {
+    const name = this.state.addName.trim();
+    if (!name || this.state.addBusy) return;
+    this.setState({ addBusy: true, addFound: null });
+    const loc = this.state.userLoc || PARIS;
+    fetch(`/api/places?name=${encodeURIComponent(name)}&ll=${loc.lat.toFixed(4)},${loc.lng.toFixed(4)}&radius=15000`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => this.setState({ addBusy: false, addFound: j && j.ok && j.lat != null ? j : { miss: true } }))
+      .catch(() => this.setState({ addBusy: false, addFound: { miss: true } }));
+  }
+
+  addSave() {
+    const name = this.state.addName.trim().slice(0, 80);
+    if (!name) return;
+    const meta = Component.ADD_KINDS.find(k => k.kind === this.state.addKind) || Component.ADD_KINDS[0];
+    const found = this.state.addFound && !this.state.addFound.miss ? this.state.addFound : null;
+    const loc = this.state.userLoc || PARIS;
+    const id = 'u_' + strHash(name.toLowerCase());
+    const blurb = this.state.addBlurb.trim().slice(0, 200);
+    this.setState(s => ({
+      gplaces: {
+        ...s.gplaces,
+        [id]: {
+          id, name, kind: meta.kind === 'Other' ? 'Spot' : meta.kind, icon: meta.icon, accent: meta.accent,
+          times: ['morning', 'afternoon', 'evening', 'night'], weather: 'any', kids: false,
+          area: 'Your find', lat: found ? found.lat : loc.lat, lng: found ? found.lng : loc.lng,
+          blurb: blurb || 'Yours. No notes — you clearly know something.',
+          slot: 50 + (strHash(id) % 40), wild: true, custom: true,
+          grating: found ? found.rating : null, greviews: found ? found.ratings : null,
+        },
+      },
+      hearts: { ...s.hearts, [id]: Date.now() },
+      photos: found && found.photo && !s.photos[id] ? { ...s.photos, [id]: found.photo } : s.photos,
+      addOpen: false, addName: '', addBlurb: '', addFound: null,
+    }));
+    this.showToast('Added to the repertoire. Excellent instincts.');
+    setTimeout(() => this.openDetail(id), 250);
+  }
+
   toggleHeart(id) {
     const was = !!this.state.hearts[id];
     this.setState(s => {
@@ -1760,6 +1851,7 @@ class Component extends DCLogic {
     if (T.electro && p.kind === 'Club') s += 3;
     if (T.chanson && (p.kind === 'Dive bar' || p.kind === 'Jazz club')) s += 2;
     if (T.photoLover && (p.kind === 'Viewpoint' || p.kind === 'Landmark' || p.kind === 'Passage')) s += 2;
+    if (p.custom) s += 2; // their own finds deserve airtime
     if (T.withKids && p.kids) s += 3;
     if (T.withKids && ['Bar', 'Wine bar', 'Cocktail bar', 'Jazz club'].includes(p.kind)) s -= 2;
     if (T.couple && (p.kind === 'Viewpoint' || p.kind === 'Wine bar' || p.id === 'p36')) s += 2;
@@ -2224,7 +2316,7 @@ class Component extends DCLogic {
         isQuiz,
         name: c.name, kind: c.kind, dist: c.dist, blurb: c.blurb, icon: c.icon,
         // 2b: time-dash meta line
-        meta: isQuiz ? '' : (c.happening ? `${ctx.clock} — This week · via Instagram${c.spot ? ` · ${c.spot}` : ''}` : `${ctx.clock} — ${c.wild ? 'Wildcard · ' : ''}${c.kind} · ${c.dist}${c.notNow ? ` · A ${c.times[0]} thing` : (c.score >= 2 ? ' · Very you' : '')}${openBit}`),
+        meta: isQuiz ? '' : (c.happening ? `${ctx.clock} — This week · via Instagram${c.spot ? ` · ${c.spot}` : ''}` : `${ctx.clock} — ${c.custom ? 'Yours · ' : (c.wild ? 'Wildcard · ' : '')}${c.kind} · ${c.dist}${c.notNow ? ` · A ${c.times[0]} thing` : (c.score >= 2 ? ' · Very you' : '')}${openBit}`),
         rating: isQuiz ? '' : (c.happening ? '✶' : ((live && live.rating) || c.grating || fallback[0])),
         reviews: isQuiz ? '' : (c.happening ? 'spotted this week' : (live && live.ratings != null ? `${fmtCount(live.ratings)} Google reviews` : (c.wild ? `${fmtCount(c.greviews)} Google reviews` : `${fallback[1]} reviews`))),
         gmaps: isQuiz ? null : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' Paris')}`,
@@ -2530,6 +2622,35 @@ class Component extends DCLogic {
       toast: S.toast,
 
       ...this.getDetailVals(ctx),
+
+      addOpen: S.addOpen,
+      openAdd: () => this.setState({ addOpen: true }),
+      closeAdd: () => this.setState({ addOpen: false, addFound: null }),
+      addName: S.addName,
+      onAddName: (e) => this.setState({ addName: e.target.value, addFound: null }),
+      onAddKey: (e) => { if (e.key === 'Enter') this.addLookup(); },
+      addLookupGo: () => this.addLookup(),
+      addBusy: S.addBusy,
+      addFoundLine: S.addFound
+        ? (S.addFound.miss
+          ? 'Not on Google. I’ll pin it near you — close enough.'
+          : `Found: ${S.addFound.match}${S.addFound.rating ? ` · ${S.addFound.rating}★` : ''}`)
+        : '',
+      addKinds: Component.ADD_KINDS.map(k => ({
+        label: k.kind,
+        go: () => this.setState({ addKind: k.kind }),
+        style: {
+          font: "500 12.5px 'Saans', sans-serif", padding: '9px 14px', cursor: 'pointer',
+          flex: 'none', borderRadius: 58, whiteSpace: 'nowrap',
+          background: S.addKind === k.kind ? '#451212' : '#ffffff',
+          color: S.addKind === k.kind ? '#fff7f2' : '#451212',
+          border: '1px solid ' + (S.addKind === k.kind ? '#451212' : '#f2d3c6'),
+        },
+      })),
+      addBlurb: S.addBlurb,
+      onAddBlurb: (e) => this.setState({ addBlurb: e.target.value }),
+      addSaveGo: () => this.addSave(),
+      addCanSave: !!S.addName.trim(),
 
       savedAny: PLACES.concat(Object.values(S.gplaces)).some(p => S.hearts[p.id]),
       savedCity: 'Paris',

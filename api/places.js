@@ -13,6 +13,8 @@ export default async function handler(req, res) {
   }
 
   const [lat, lng] = ll.split(',').map(Number);
+  // wider bias for user-added spot lookups; default stays tight for card enrichment
+  const radius = Math.min(30000, Math.max(100, parseInt(req.query.radius, 10) || 500));
 
   try {
     const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
@@ -20,12 +22,12 @@ export default async function handler(req, res) {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': key,
-        'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.currentOpeningHours.openNow,places.photos',
+        'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.currentOpeningHours.openNow,places.photos,places.location',
       },
       body: JSON.stringify({
         textQuery: name,
         pageSize: 1,
-        locationBias: { circle: { center: { latitude: lat, longitude: lng }, radius: 500 } },
+        locationBias: { circle: { center: { latitude: lat, longitude: lng }, radius } },
       }),
     });
     if (!r.ok) {
@@ -56,6 +58,8 @@ export default async function handler(req, res) {
       ratings: place.userRatingCount ?? null,
       openNow: place.currentOpeningHours?.openNow ?? null,
       photo,
+      lat: place.location?.latitude ?? null,
+      lng: place.location?.longitude ?? null,
       match: place.displayName?.text ?? null,
     });
   } catch (e) {
