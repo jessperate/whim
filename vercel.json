@@ -25,6 +25,10 @@
     {
       "source": "/terms",
       "destination": "/terms.html"
+    },
+    {
+      "source": "/u/:handle",
+      "destination": "/api/u?handle=:handle"
     }
   ]
 }

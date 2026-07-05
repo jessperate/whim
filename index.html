@@ -349,7 +349,13 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             </div>
           </div>
           <button onClick="{{ saveProfile }}" style="width:100%; margin-top:12px; font:500 14px 'Saans',sans-serif; background:#451212; color:#fff5ee; border:none; border-radius:58px; padding:12px; cursor:pointer;">Save profile</button>
-          <div style="font:400 12px/1.5 'Saans',sans-serif; color:#676c79; margin-top:8px;">Friends see your photo, name and bio — plus your likes, saves and reviews. Strangers see nothing.</div>
+          <div style="font:400 12px/1.5 'Saans',sans-serif; color:#676c79; margin-top:8px;">Friends see your photo, name and bio — plus your likes, saves and reviews. Strangers see nothing, unless you go public below.</div>
+          <sc-if value="{{ profSignedIn }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ profPublicToggle }}" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:12px; font:500 12px 'Saans Mono',monospace; letter-spacing:.05em; text-transform:uppercase; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:12px; cursor:pointer;"><i class="{{ profPublicIcon }}" style="font-size:15px;"></i>{{ profPublicLabel }}</button>
+            <sc-if value="{{ profShowUrl }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ profCopyUrl }}" style="display:block; width:100%; margin-top:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.03em; background:#fdece4; color:#c0361c; border:none; padding:11px; cursor:pointer; text-align:center;">{{ profPublicUrl }} — share it</button>
+            </sc-if>
+          </sc-if>
         </div>
         <div style="border:1px solid #f2d3c6; margin-top:14px; padding:16px 14px;">
           <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Spread the whim</div>
@@ -1033,6 +1039,7 @@ class Component extends DCLogic {
     planMood: 'mix', planSkips: {}, planDay: '',
     expos: {},
     lists: {}, listOf: {}, listDraft: '', listAdding: false,
+    isPublic: false,
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -1239,6 +1246,15 @@ class Component extends DCLogic {
     this.showToast('Noted. Your taste file just got sharper.');
   }
 
+  togglePublic() {
+    if (!this.state.user) return this.showToast('Sign in first \u2014 a public profile needs an account.');
+    if (!this._profileV3) return this.showToast('Public profiles need a one-line database upgrade \u2014 ask your developer. (It\u2019s me. I\u2019m the developer.)');
+    const next = !this.state.isPublic;
+    this.setState({ isPublic: next });
+    setTimeout(() => this.pushProfile(true), 50);
+    this.showToast(next ? 'You\u2019re public. The world can browse your taste.' : 'Private again. Friends only.');
+  }
+
   saveProfile() {
     this.persist();
     this.pushProfile(true);
@@ -1327,6 +1343,7 @@ class Component extends DCLogic {
       plan_status: S.planStatus, swipe_count: S.swipeCount, display_name: S.name || '',
     };
     if (this._profileV2) { row.bio = S.bio || ''; row.avatar = S.avatar || null; }
+    if (this._profileV3) row.is_public = !!S.isPublic;
     const sig = JSON.stringify(row);
     if (!force && sig === this._profSig) return;
     this._profSig = sig;
@@ -1352,6 +1369,8 @@ class Component extends DCLogic {
     const localHasData = S.obStep >= 0 || Object.keys(S.swiped).length > 0 || Object.keys(S.hearts).length > 0 || Object.keys(S.myReviews).length > 0;
     const next = { username: p.username || '' };
     this._profileV2 = 'avatar' in p;
+    this._profileV3 = 'is_public' in p;
+    if (typeof p.is_public === 'boolean') next.isPublic = p.is_public;
     if (p.bio && !S.bio) next.bio = p.bio;
     if (p.avatar && !S.avatar) next.avatar = p.avatar;
 
@@ -3110,6 +3129,18 @@ class Component extends DCLogic {
       profInitial: (S.name || '?').trim().charAt(0).toUpperCase() || '?',
       onAvatarPick: (e) => this.setAvatar(e),
       saveProfile: () => this.saveProfile(),
+      profPublic: !!S.isPublic,
+      profPublicLabel: S.isPublic ? 'Public profile: ON' : 'Public profile: OFF',
+      profPublicToggle: () => this.togglePublic(),
+      profPublicIcon: S.isPublic ? 'ri-earth-line' : 'ri-lock-2-line',
+      profShowUrl: !!(S.isPublic && S.username),
+      profPublicUrl: S.username ? `${location.origin}/u/${S.username}` : '',
+      profCopyUrl: () => {
+        const u = `${location.origin}/u/${S.username}`;
+        if (navigator.share) { navigator.share({ url: u }).catch(() => {}); return; }
+        navigator.clipboard && navigator.clipboard.writeText(u).then(() => this.showToast('Profile link copied.')).catch(() => {});
+      },
+      profSignedIn: !!S.user,
       doInvite: () => this.inviteContacts(),
       goYou: () => this.setState({ tab: 'you' }),
       fvOpen: !!S.friendView,

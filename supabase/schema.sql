@@ -252,3 +252,18 @@ grant execute on function public.claim_invite(text) to authenticated;
 
 -- 2026-07-06: named lists — a heart can live in a user-named folder.
 alter table public.hearts add column if not exists list text;
+
+-- 2026-07-06: public profiles — an explicit opt-in makes a profile (and its
+-- saves) readable by anyone, powering the /u/<handle> pages. Default stays
+-- private (friends-only). anon gets SELECT grants; RLS still gates rows.
+alter table public.profiles add column if not exists is_public boolean not null default false;
+grant select on public.profiles to anon;
+grant select on public.hearts to anon;
+drop policy if exists "profiles public read" on public.profiles;
+create policy "profiles public read" on public.profiles
+  for select using (is_public);
+drop policy if exists "hearts public read" on public.hearts;
+create policy "hearts public read" on public.hearts
+  for select using (exists (
+    select 1 from public.profiles pr where pr.user_id = hearts.user_id and pr.is_public
+  ));
