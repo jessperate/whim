@@ -24,7 +24,8 @@ export default async function handler(req, res) {
   const blurb = deesc(curated ? curated.blurb : '');
   const host = req.headers.host || 'whim-eta.vercel.app';
 
-  const photo = `https://${host}/whim-og.jpg`;
+  const ll = curated ? `${curated.lat},${curated.lng}` : '';
+  const photo = `https://${host}/api/og?n=${encodeURIComponent(name)}&k=${encodeURIComponent(kind)}${ll ? `&ll=${ll}` : ''}`;
   const desc = blurb || `${kind} in Paris, found on Whim — the pocket concierge that knows your taste.`;
   const app = `/?place=${encodeURIComponent(id)}&n=${encodeURIComponent(name)}&k=${encodeURIComponent(kind)}`;
 
