@@ -219,3 +219,8 @@ grant select, insert, update, delete
 revoke all on public.profiles, public.swipes, public.hearts, public.reviews, public.friendships from anon;
 grant execute on function public.is_friend(uuid, uuid), public.has_link(uuid, uuid), public.find_profile(text) to authenticated;
 revoke execute on function public.find_profile(text) from anon, public;
+
+-- 2026-07-05: profile v2 — photo (256px JPEG data URL) + bio.
+-- Existing projects: run these two lines in the SQL editor.
+alter table public.profiles add column if not exists bio text;
+alter table public.profiles add column if not exists avatar text;

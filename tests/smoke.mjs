@@ -222,6 +222,16 @@ try {
   const youTxt = await page.evaluate(() => document.body.innerText);
   check('You tab shows LIVE location', youTxt.includes('LIVE'));
   check('context override controls present', youTxt.toLowerCase().includes('auto (live)'));
+  check('You tab has profile editor', youTxt.toLowerCase().includes('your profile') && youTxt.toLowerCase().includes('save profile'));
+  check('You tab has contacts invite', youTxt.toLowerCase().includes('share whim with your contacts'));
+
+  // Friends tab
+  await clickByText('Friends');
+  await new Promise((r) => setTimeout(r, 300));
+  const frTxt = await page.evaluate(() => document.body.innerText.toLowerCase());
+  check('Friends tab renders', frTxt.includes('your friends'));
+  check('Friends tab invite button', frTxt.includes('invite from your contacts'));
+  check('Friends tab signed-out pitch', frTxt.includes('sign in from the you tab'));
 
   // --- detail sheet: deep-link straight to a known bookable bar (deterministic) ---
   await page.goto('http://127.0.0.1:8199/?place=p13&n=Le%20Baron%20Rouge&k=Wine%20bar', { waitUntil: 'networkidle2' });

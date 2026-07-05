@@ -298,6 +298,28 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             </div>
           </sc-for>
         </div>
+        <div style="border:1px solid #f2d3c6; margin-top:22px; padding:16px 14px;">
+          <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Your profile</div>
+          <div style="display:flex; gap:14px; align-items:flex-start; margin-top:12px;">
+            <label style="flex:none; cursor:pointer; position:relative; display:block;" aria-label="Upload a profile photo">
+              <input type="file" accept="image/*" onChange="{{ onAvatarPick }}" style="display:none;">
+              <sc-if value="{{ profHasAvatar }}" hint-placeholder-val="{{ false }}"><div role="img" aria-label="Your profile photo" style="{{ profAvatarStyle }}"></div></sc-if>
+              <sc-if value="{{ profNoAvatar }}" hint-placeholder-val="{{ true }}"><div style="width:64px; height:64px; border-radius:50%; background:#ffe0d9; color:#c0361c; display:flex; align-items:center; justify-content:center; font:700 24px 'Saans',sans-serif;">{{ profInitial }}</div></sc-if>
+              <div style="position:absolute; right:-2px; bottom:-2px; width:22px; height:22px; border-radius:50%; background:#451212; display:flex; align-items:center; justify-content:center;"><i class="ri-camera-line" style="font-size:12px; color:#fff5ee;"></i></div>
+            </label>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:8px;">
+              <input value="{{ profName }}" onChange="{{ onProfName }}" placeholder="Your name" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+              <textarea value="{{ profBio }}" onChange="{{ onProfBio }}" placeholder="A one-liner about you. Flatter yourself." rows="2" style="font:400 14px/1.4 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box; resize:none;"></textarea>
+            </div>
+          </div>
+          <button onClick="{{ saveProfile }}" style="width:100%; margin-top:12px; font:500 14px 'Saans',sans-serif; background:#451212; color:#fff5ee; border:none; border-radius:58px; padding:12px; cursor:pointer;">Save profile</button>
+          <div style="font:400 12px/1.5 'Saans',sans-serif; color:#676c79; margin-top:8px;">Friends see your photo, name and bio — plus your likes, saves and reviews. Strangers see nothing.</div>
+        </div>
+        <div style="border:1px solid #f2d3c6; margin-top:14px; padding:16px 14px;">
+          <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Spread the whim</div>
+          <div style="font:400 12.5px/1.5 'Saans',sans-serif; color:#676c79; margin:6px 0 12px;">Paris is better with witnesses. Invite your people straight from your address book.</div>
+          <button onClick="{{ doInvite }}" style="display:flex; align-items:center; justify-content:center; gap:9px; width:100%; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:13px; cursor:pointer;"><i class="ri-contacts-book-2-line" style="font-size:16px;"></i>Share Whim with your contacts</button>
+        </div>
         <sc-if value="{{ signedOut }}" hint-placeholder-val="{{ false }}">
           <div style="border:1px solid #451212; margin-top:22px; padding:16px 14px;">
             <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Your account</div>
@@ -326,36 +348,6 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
               <div style="font:400 12px 'Saans',sans-serif; color:#676c79;">{{ userSub }}</div>
             </div>
             <button onClick="{{ doSignOut }}" style="font:500 9px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; border:none; color:#852952; cursor:pointer; padding:6px;">Sign out</button>
-          </div>
-        </sc-if>
-        <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
-          <div style="margin-top:24px;">
-            <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;">
-              <i class="ri-group-line" style="font-size:14px;"></i>Friends
-            </div>
-            <div style="display:flex; gap:8px;">
-              <input value="{{ frDraft }}" onChange="{{ onFrDraft }}" onKeyDown="{{ onFrKey }}" placeholder="Add a friend by handle" autocapitalize="none" style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none;">
-              <button onClick="{{ doAddFriend }}" aria-label="Send friend request" style="width:44px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-user-add-line" style="font-size:18px; color:#fff5ee;"></i></button>
-            </div>
-            <sc-if value="{{ frAny }}" hint-placeholder-val="{{ false }}">
-              <div style="border:1px solid #f2d3c6; margin-top:10px;">
-                <sc-for list="{{ frRows }}" as="fr" hint-placeholder-count="2">
-                  <div style="display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid #f2d3c6;">
-                    <div onClick="{{ fr.open }}" style="flex:1; min-width:0; cursor:pointer;">
-                      <div style="font:700 14px 'Saans',sans-serif; color:#451212;">{{ fr.label }}</div>
-                      <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ fr.sub }}</div>
-                    </div>
-                    <sc-if value="{{ fr.canAccept }}" hint-placeholder-val="{{ false }}">
-                      <button onClick="{{ fr.accept }}" style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:8px 12px; cursor:pointer; flex:none;">Accept</button>
-                    </sc-if>
-                    <button onClick="{{ fr.remove }}" aria-label="Remove" style="border:none; background:none; cursor:pointer; padding:6px; flex:none;"><i class="ri-close-line" style="font-size:16px; color:#676c79;"></i></button>
-                  </div>
-                </sc-for>
-              </div>
-            </sc-if>
-            <sc-if value="{{ frEmpty }}" hint-placeholder-val="{{ false }}">
-              <div style="font:400 12px/1.5 'Saans',sans-serif; color:#676c79; margin-top:8px;">No friends yet. Your handle is @{{ myHandle }} — hand it out at parties.</div>
-            </sc-if>
           </div>
         </sc-if>
         <button onClick="{{ openAdd }}" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:22px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px dashed #451212; border-radius:58px; padding:14px; cursor:pointer;"><i class="ri-map-pin-add-line" style="font-size:16px;"></i>Add your own spot</button>
@@ -400,14 +392,64 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
       </div>
     </sc-if>
 
+    <!-- FRIENDS -->
+    <sc-if value="{{ tabFriends }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1; overflow:auto; padding:22px 20px; background:#ffffff;">
+        <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">The social club</div>
+        <div style="font:400 32px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:9px 0 5px;">Your friends</div>
+        <div style="font:400 13px/1.55 'Saans',sans-serif; color:#676c79;">Their photos, their saves, their questionable favorites. Friendship is seeing someone’s museum opinions and staying.</div>
+        <button onClick="{{ doInvite }}" style="display:flex; align-items:center; justify-content:center; gap:9px; width:100%; margin-top:18px; font:500 14px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:14px; cursor:pointer;" style-hover="background:#c22f1a;"><i class="ri-contacts-book-2-line" style="font-size:16px;"></i>Invite from your contacts</button>
+        <sc-if value="{{ frPitch }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid #f2d3c6; margin-top:18px; padding:16px 14px;">
+            <div style="font:400 13px/1.55 'Saans',sans-serif; color:#676c79;">Friends need a face. Sign in, claim a handle, and your people can find you — and see your saves.</div>
+            <button onClick="{{ goYou }}" style="width:100%; margin-top:12px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:12px; cursor:pointer;">Sign in from the You tab</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:24px;">
+            <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;">
+              <i class="ri-group-line" style="font-size:14px;"></i>Friends
+            </div>
+            <div style="display:flex; gap:8px;">
+              <input value="{{ frDraft }}" onChange="{{ onFrDraft }}" onKeyDown="{{ onFrKey }}" placeholder="Add a friend by handle" autocapitalize="none" style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none;">
+              <button onClick="{{ doAddFriend }}" aria-label="Send friend request" style="width:44px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-user-add-line" style="font-size:18px; color:#fff5ee;"></i></button>
+            </div>
+            <sc-if value="{{ frAny }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px solid #f2d3c6; margin-top:10px;">
+                <sc-for list="{{ frRows }}" as="fr" hint-placeholder-count="2">
+                  <div style="display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid #f2d3c6;">
+                    <sc-if value="{{ fr.hasAvatar }}" hint-placeholder-val="{{ false }}"><div onClick="{{ fr.open }}" style="{{ fr.avatarStyle }}"></div></sc-if>
+                    <sc-if value="{{ fr.noAvatar }}" hint-placeholder-val="{{ true }}"><div onClick="{{ fr.open }}" style="width:38px; height:38px; border-radius:50%; background:#ffe0d9; color:#c0361c; display:flex; align-items:center; justify-content:center; font:700 15px 'Saans',sans-serif; flex:none; cursor:pointer;">{{ fr.initial }}</div></sc-if>
+                    <div onClick="{{ fr.open }}" style="flex:1; min-width:0; cursor:pointer;">
+                      <div style="font:700 14px 'Saans',sans-serif; color:#451212;">{{ fr.label }}</div>
+                      <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ fr.sub }}</div>
+                    </div>
+                    <sc-if value="{{ fr.canAccept }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ fr.accept }}" style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:8px 12px; cursor:pointer; flex:none;">Accept</button>
+                    </sc-if>
+                    <button onClick="{{ fr.remove }}" aria-label="Remove" style="border:none; background:none; cursor:pointer; padding:6px; flex:none;"><i class="ri-close-line" style="font-size:16px; color:#676c79;"></i></button>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ frEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="font:400 12px/1.5 'Saans',sans-serif; color:#676c79; margin-top:8px;">No friends yet. Your handle is @{{ myHandle }} — hand it out at parties.</div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
     <!-- friend sheet (z below the detail sheet so tapped places open above it) -->
     <sc-if value="{{ fvOpen }}" hint-placeholder-val="{{ false }}">
       <div style="position:absolute; inset:0; z-index:55; background:#fff7f2; display:flex; flex-direction:column;">
         <div style="padding:18px 20px 0; flex:none;">
           <div style="display:flex; align-items:flex-start; gap:10px;">
+            <sc-if value="{{ fvHasAvatar }}" hint-placeholder-val="{{ false }}"><div style="{{ fvAvatarStyle }}"></div></sc-if>
             <div style="flex:1; min-width:0;">
               <div style="font:500 9.5px 'Saans Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#c0361c;">@{{ fvHandle }}</div>
               <div style="font:400 28px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin-top:6px;">{{ fvName }}</div>
+              <sc-if value="{{ fvHasBio }}" hint-placeholder-val="{{ false }}"><div style="font:italic 400 13.5px/1.45 'Serrif VF',Georgia,serif; color:#38100c; margin-top:6px;">{{ fvBio }}</div></sc-if>
             </div>
             <button onClick="{{ fvClose }}" aria-label="Close friend view" style="width:38px; height:38px; flex:none; border-radius:50%; border:1px solid #451212; background:#fff7f2; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-close-line" style="font-size:20px; color:#451212;"></i></button>
           </div>
@@ -864,6 +906,8 @@ function restoreState() {
       hearts: s.hearts || {},
       seen: s.seen || {},
       name: typeof s.name === 'string' ? s.name.slice(0, 40) : '',
+      bio: typeof s.bio === 'string' ? s.bio.slice(0, 160) : '',
+      avatar: typeof s.avatar === 'string' && s.avatar.startsWith('data:image/') ? s.avatar : null,
       myReviews: s.myReviews || {},
       gplaces: s.gplaces || {},
       acctNudge: s.acctNudge !== false,
@@ -897,6 +941,7 @@ class Component extends DCLogic {
     authMode: 'signup', authEmail: '', authPassword: '', authUser: '', authBusy: false,
     acctNudge: true,
     friends: [], frIn: [], frOut: [], frDraft: '', friendView: null, friendReviews: {},
+    bio: '', avatar: null,
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -910,6 +955,7 @@ class Component extends DCLogic {
         hearts: S.hearts,
         seen: Object.fromEntries(Object.entries(S.seen).slice(-200)),
         name: S.name,
+        bio: S.bio, avatar: S.avatar,
         myReviews: S.myReviews,
         // keep only the dynamic places the user has acted on
         gplaces: Object.fromEntries(Object.entries(S.gplaces).filter(([id, g]) => g.custom || S.swiped[id] === 'like' || S.hearts[id] || S.myReviews[id])),
@@ -1045,6 +1091,53 @@ class Component extends DCLogic {
     this._sb.auth.signOut().then(() => this.showToast('Signed out. The concierge misses you already.'));
   }
 
+  // profile photo: downscale to a 256px cover-cropped JPEG data URL so it fits
+  // in the profiles row (no storage bucket needed)
+  setAvatar(e) {
+    const f = e.target && e.target.files && e.target.files[0];
+    if (!f || !f.type.startsWith('image/')) return;
+    const url = URL.createObjectURL(f);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const D = 256, c = document.createElement('canvas');
+      c.width = D; c.height = D;
+      const x = c.getContext('2d');
+      const r = Math.max(D / img.width, D / img.height);
+      x.drawImage(img, (D - img.width * r) / 2, (D - img.height * r) / 2, img.width * r, img.height * r);
+      this.setState({ avatar: c.toDataURL('image/jpeg', 0.82) });
+      this.pushProfile(true);
+      this.showToast('Look at you. Photo saved.');
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); this.showToast('That image refused to cooperate. Try another.'); };
+    img.src = url;
+    e.target.value = '';
+  }
+
+  saveProfile() {
+    this.persist();
+    this.pushProfile(true);
+    this.showToast(this.state.user ? 'Profile saved. Friends can see it now.' : 'Saved on this phone \u2014 sign in to share it.');
+  }
+
+  // invite via the phone's address book where supported (Contact Picker API,
+  // Android Chrome); everywhere else the native share sheet or clipboard
+  async inviteContacts() {
+    const handle = this.state.username ? ` I\u2019m @${this.state.username} on there.` : '';
+    const msg = `Come fl\u00e2ner with me on Whim \u2014 a pocket concierge for Paris.${handle} ${location.origin}`;
+    if (navigator.contacts && navigator.contacts.select) {
+      try {
+        const picked = await navigator.contacts.select(['tel'], { multiple: true });
+        const tels = picked.map(c => (c.tel || [])[0]).filter(Boolean);
+        if (tels.length) location.href = `sms:${tels.join(',')}?body=${encodeURIComponent(msg)}`;
+      } catch (err) { /* picker dismissed */ }
+      return;
+    }
+    if (navigator.share) { navigator.share({ text: msg }).catch(() => {}); return; }
+    try { await navigator.clipboard.writeText(msg); this.showToast('Invite copied \u2014 paste it anywhere.'); }
+    catch (err) { this.showToast(`Copy this: ${location.host}`); }
+  }
+
   signUpEmail() {
     if (!this._sb || this.state.authBusy) return;
     const email = this.state.authEmail.trim();
@@ -1107,6 +1200,7 @@ class Component extends DCLogic {
       ob_step: S.obStep, ob_answers: S.obAnswers, quiz_answers: S.quizAnswers,
       plan_status: S.planStatus, swipe_count: S.swipeCount, display_name: S.name || '',
     };
+    if (this._profileV2) { row.bio = S.bio || ''; row.avatar = S.avatar || null; }
     const sig = JSON.stringify(row);
     if (!force && sig === this._profSig) return;
     this._profSig = sig;
@@ -1131,6 +1225,9 @@ class Component extends DCLogic {
     const serverFresh = p.ob_step < 0 && !rows.sw.length && !rows.ht.length && !rows.rv.length;
     const localHasData = S.obStep >= 0 || Object.keys(S.swiped).length > 0 || Object.keys(S.hearts).length > 0 || Object.keys(S.myReviews).length > 0;
     const next = { username: p.username || '' };
+    this._profileV2 = 'avatar' in p;
+    if (p.bio && !S.bio) next.bio = p.bio;
+    if (p.avatar && !S.avatar) next.avatar = p.avatar;
 
     if (serverFresh && localHasData) {
       // first sign-in from a device with history: the local file becomes the account
@@ -1179,10 +1276,11 @@ class Component extends DCLogic {
     const others = [...new Set(data.map(f => (f.requester === uid ? f.addressee : f.requester)))];
     const profiles = {};
     if (others.length) {
-      const res = await this._sb.from('profiles').select('user_id,username,display_name').in('user_id', others);
+      let res = await this._sb.from('profiles').select('user_id,username,display_name,bio,avatar').in('user_id', others);
+      if (res.error) res = await this._sb.from('profiles').select('user_id,username,display_name').in('user_id', others);
       (res.data || []).forEach(pr => { profiles[pr.user_id] = pr; });
     }
-    const info = (id) => ({ id, username: (profiles[id] || {}).username || 'unknown', displayName: (profiles[id] || {}).display_name || '' });
+    const info = (id) => ({ id, username: (profiles[id] || {}).username || 'unknown', displayName: (profiles[id] || {}).display_name || '', bio: (profiles[id] || {}).bio || '', avatar: (profiles[id] || {}).avatar || null });
     this.setState({
       friends: data.filter(f => f.status === 'accepted').map(f => info(f.requester === uid ? f.addressee : f.requester)),
       frIn: data.filter(f => f.status === 'pending' && f.addressee === uid).map(f => info(f.requester)),
@@ -2395,10 +2493,13 @@ class Component extends DCLogic {
     const likedN = Object.values(S.swiped).filter(v => v === 'like').length;
     const nopedN = Object.values(S.swiped).filter(v => v === 'nope').length;
 
+    const avStyle = (url, px) => ({ width: `${px}px`, height: `${px}px`, borderRadius: '50%', backgroundImage: `url(${url})`, backgroundSize: 'cover', backgroundPosition: 'center', flex: 'none', cursor: 'pointer' });
+    const frLook = (f) => ({ label: `@${f.username}`, hasAvatar: !!f.avatar, noAvatar: !f.avatar, avatarStyle: f.avatar ? avStyle(f.avatar, 38) : null, initial: (f.displayName || f.username || '?').charAt(0).toUpperCase() });
     const tabsDef = [
       { key: 'discover', label: 'Discover', icon: 'ri-compass-3-line' },
       { key: 'plan', label: 'Plan', icon: 'ri-route-line', badge: plan.length || false },
       { key: 'chat', label: 'Concierge', icon: 'ri-chat-smile-2-line' },
+      { key: 'friends', label: 'Friends', icon: 'ri-group-line', badge: S.frIn.length || false },
       { key: 'you', label: 'You', icon: 'ri-user-smile-line' },
     ];
 
@@ -2468,7 +2569,7 @@ class Component extends DCLogic {
         : (sunny ? CTX[ctx.timeOfDay].greetSunny : CTX[ctx.timeOfDay].greetRainy),
 
       tabDiscover: S.tab === 'discover', tabPlan: S.tab === 'plan',
-      tabChat: S.tab === 'chat', tabYou: S.tab === 'you',
+      tabChat: S.tab === 'chat', tabYou: S.tab === 'you', tabFriends: S.tab === 'friends',
       tabs: tabsDef.map(t => ({
         ...t,
         go: () => this.setState({ tab: t.key }),
@@ -2579,6 +2680,7 @@ class Component extends DCLogic {
       youTitle: S.name ? `${S.name}’s taste file` : 'Your taste file',
       authReady: S.authReady,
       signedOut: S.authReady && !S.user,
+      frPitch: !S.user,
       signedIn: !!S.user,
       userLine: S.user ? `${S.user.name || S.user.email}` : '',
       userSub: S.user ? (S.username ? `@${S.username} · ${S.user.email}` : S.user.email) : '',
@@ -2605,13 +2707,26 @@ class Component extends DCLogic {
       frAny: (S.frIn.length + S.friends.length + S.frOut.length) > 0,
       frEmpty: !!S.user && (S.frIn.length + S.friends.length + S.frOut.length) === 0,
       frRows: [
-        ...S.frIn.map(f => ({ label: `@${f.username}`, sub: f.displayName ? `${f.displayName} · wants in` : 'wants in', canAccept: true, accept: () => this.acceptFriend(f.id), open: () => {}, remove: () => this.removeFriend(f.id) })),
-        ...S.friends.map(f => ({ label: `@${f.username}`, sub: f.displayName || 'friend', canAccept: false, accept: null, open: () => this.openFriend(f), remove: () => this.removeFriend(f.id) })),
-        ...S.frOut.map(f => ({ label: `@${f.username}`, sub: 'request pending', canAccept: false, accept: null, open: () => {}, remove: () => this.removeFriend(f.id) })),
+        ...S.frIn.map(f => ({ ...frLook(f), sub: f.displayName ? `${f.displayName} · wants in` : 'wants in', canAccept: true, accept: () => this.acceptFriend(f.id), open: () => {}, remove: () => this.removeFriend(f.id) })),
+        ...S.friends.map(f => ({ ...frLook(f), sub: f.displayName || 'friend', canAccept: false, accept: null, open: () => this.openFriend(f), remove: () => this.removeFriend(f.id) })),
+        ...S.frOut.map(f => ({ ...frLook(f), sub: 'request pending', canAccept: false, accept: null, open: () => {}, remove: () => this.removeFriend(f.id) })),
       ],
+      profName: S.name, onProfName: (e) => this.setState({ name: e.target.value.slice(0, 40) }),
+      profBio: S.bio, onProfBio: (e) => this.setState({ bio: e.target.value.slice(0, 160) }),
+      profHasAvatar: !!S.avatar, profNoAvatar: !S.avatar,
+      profAvatarStyle: S.avatar ? avStyle(S.avatar, 64) : null,
+      profInitial: (S.name || '?').trim().charAt(0).toUpperCase() || '?',
+      onAvatarPick: (e) => this.setAvatar(e),
+      saveProfile: () => this.saveProfile(),
+      doInvite: () => this.inviteContacts(),
+      goYou: () => this.setState({ tab: 'you' }),
       fvOpen: !!S.friendView,
       fvHandle: S.friendView ? S.friendView.username : '',
       fvName: S.friendView ? (S.friendView.displayName || `@${S.friendView.username}`) : '',
+      fvHasAvatar: !!(S.friendView && S.friendView.avatar),
+      fvAvatarStyle: S.friendView && S.friendView.avatar ? { ...avStyle(S.friendView.avatar, 54), marginTop: '2px' } : null,
+      fvBio: S.friendView ? (S.friendView.bio || '') : '',
+      fvHasBio: !!(S.friendView && S.friendView.bio),
       fvLoading: !!(S.friendView && S.friendView.loading),
       fvClose: () => this.closeFriend(),
       fvHearts, fvLikes,
