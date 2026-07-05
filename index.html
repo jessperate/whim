@@ -923,6 +923,7 @@ function restoreState() {
       seen: s.seen || {},
       name: typeof s.name === 'string' ? s.name.slice(0, 40) : '',
       bio: typeof s.bio === 'string' ? s.bio.slice(0, 160) : '',
+      pendingInvite: typeof s.pendingInvite === 'string' ? s.pendingInvite : undefined,
       avatar: typeof s.avatar === 'string' && s.avatar.startsWith('data:image/') ? s.avatar : null,
       myReviews: s.myReviews || {},
       gplaces: s.gplaces || {},
@@ -959,6 +960,7 @@ class Component extends DCLogic {
     friends: [], frIn: [], frOut: [], frDraft: '', friendView: null, friendReviews: {},
     bio: '', avatar: null,
     obFree: '', obFreeOpen: false,
+    pendingInvite: null,
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -973,6 +975,7 @@ class Component extends DCLogic {
         seen: Object.fromEntries(Object.entries(S.seen).slice(-200)),
         name: S.name,
         bio: S.bio, avatar: S.avatar,
+        pendingInvite: S.pendingInvite,
         myReviews: S.myReviews,
         // keep only the dynamic places the user has acted on
         gplaces: Object.fromEntries(Object.entries(S.gplaces).filter(([id, g]) => g.custom || S.swiped[id] === 'like' || S.hearts[id] || S.myReviews[id])),
@@ -1004,6 +1007,19 @@ class Component extends DCLogic {
         history.replaceState(null, '', location.pathname);
       }
     } catch (e) { /* malformed share params */ }
+
+    // invite landing: ?add=<handle> — remembered until they're signed in,
+    // then the friendship claims itself
+    try {
+      const qs = new URLSearchParams(location.search);
+      const add = (qs.get('add') || '').toLowerCase().replace(/^@/, '').slice(0, 20);
+      if (/^[a-z0-9_]{3,20}$/.test(add)) {
+        this.setState({ pendingInvite: add });
+        setTimeout(() => this.claimInvite(), 400);
+        this.showToast(`@${add} invited you. Sign in and you\u2019re friends \u2014 no paperwork.`);
+        history.replaceState(null, '', location.pathname);
+      }
+    } catch (e) { /* malformed invite param */ }
 
     const WIKI = {
       p4: ['en', 'Canal Saint-Martin'],
@@ -1090,6 +1106,7 @@ class Component extends DCLogic {
               name: s.name || fullName.split(' ')[0] || '',
             }));
             this.syncDown(u.id);
+            this.claimInvite();
           };
           this._sb.auth.getSession().then(({ data }) => applySession(data.session));
           this._sb.auth.onAuthStateChange((_e, session) => applySession(session));
@@ -1141,7 +1158,8 @@ class Component extends DCLogic {
   // Android Chrome); everywhere else the native share sheet or clipboard
   async inviteContacts() {
     const handle = this.state.username ? ` I\u2019m @${this.state.username} on there.` : '';
-    const msg = `Come fl\u00e2ner with me on Whim \u2014 a pocket concierge for Paris.${handle} ${location.origin}`;
+    const link = this.state.username ? `${location.origin}/?add=${this.state.username}` : location.origin;
+    const msg = `Come fl\u00e2ner with me on Whim \u2014 a pocket concierge for Paris.${handle} ${link}`;
     if (navigator.contacts && navigator.contacts.select) {
       try {
         const picked = await navigator.contacts.select(['tel'], { multiple: true });
@@ -1302,6 +1320,36 @@ class Component extends DCLogic {
       friends: data.filter(f => f.status === 'accepted').map(f => info(f.requester === uid ? f.addressee : f.requester)),
       frIn: data.filter(f => f.status === 'pending' && f.addressee === uid).map(f => info(f.requester)),
       frOut: data.filter(f => f.status === 'pending' && f.requester === uid).map(f => info(f.addressee)),
+    });
+  }
+
+  // invite links (?add=<handle>): once signed in, become friends instantly via
+  // the claim_invite SQL function; if it isn't installed yet, degrade to a
+  // normal pending request
+  claimInvite() {
+    const uid = this.uid();
+    const inviter = this.state.pendingInvite;
+    if (!this._sb || !uid || !inviter || this._claiming) return;
+    if (inviter === this.state.username) return this.setState({ pendingInvite: null });
+    this._claiming = true;
+    this._sb.rpc('claim_invite', { inviter }).then(({ data, error }) => {
+      this._claiming = false;
+      if (!error) {
+        this.setState({ pendingInvite: null });
+        if (data === 'ok') {
+          this.showToast(`Friends with @${inviter}. That was easy.`);
+          this.loadFriends();
+        }
+        return;
+      }
+      this._sb.rpc('find_profile', { q: inviter }).then(({ data: hits, error: e1 }) => {
+        this.setState({ pendingInvite: null });
+        const hit = hits && hits[0];
+        if (e1 || !hit || hit.user_id === uid) return;
+        this._sb.from('friendships').insert({ requester: uid, addressee: hit.user_id }).then(({ error: e2 }) => {
+          if (!e2) { this.showToast(`Request sent to @${inviter}.`); this.loadFriends(); }
+        });
+      });
     });
   }
 

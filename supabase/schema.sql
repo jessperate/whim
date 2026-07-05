@@ -224,3 +224,28 @@ revoke execute on function public.find_profile(text) from anon, public;
 -- Existing projects: run these two lines in the SQL editor.
 alter table public.profiles add column if not exists bio text;
 alter table public.profiles add column if not exists avatar text;
+
+-- 2026-07-05: invite links (?add=<handle>) become instant friendships.
+-- The invitee calls this after signing in; security definer lets it write the
+-- accepted row that RLS would otherwise reserve for the addressee.
+create or replace function public.claim_invite(inviter text)
+returns text
+language plpgsql security definer set search_path = public
+as $$
+declare
+  v uuid;
+  me uuid := auth.uid();
+begin
+  if me is null then return 'not_signed_in'; end if;
+  select user_id into v from public.profiles where username = lower(trim(inviter));
+  if v is null then return 'no_such_user'; end if;
+  if v = me then return 'self'; end if;
+  update public.friendships set status = 'accepted'
+    where (requester = v and addressee = me) or (requester = me and addressee = v);
+  if not found then
+    insert into public.friendships (requester, addressee, status) values (v, me, 'accepted');
+  end if;
+  return 'ok';
+end $$;
+revoke execute on function public.claim_invite(text) from anon, public;
+grant execute on function public.claim_invite(text) to authenticated;
