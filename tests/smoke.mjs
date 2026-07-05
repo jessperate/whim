@@ -24,10 +24,13 @@ const server = http.createServer((req, res) => {
   }
   if (url.pathname === '/api/discover') {
     res.setHeader('Content-Type', 'application/json');
+    // echo places around whatever coordinates were asked for, so the stub
+    // works for any city the test geolocates to
+    const [qlat, qlng] = (url.searchParams.get('ll') || '48.8605,2.3592').split(',').map(Number);
     return res.end(JSON.stringify({ ok: true, places: [
-      { id: 'w1', name: 'Chez Stub', type: 'restaurant', lat: 48.8612, lng: 2.3588, rating: '4.6', ratings: 2100, blurb: 'A neighborhood favorite.' },
-      { id: 'w2', name: 'Café Wildcard', type: 'cafe', lat: 48.8598, lng: 2.3611, rating: '4.5', ratings: 800, blurb: null },
-      { id: 'w3', name: 'Bar Stub', type: 'wine_bar', lat: 48.8605, lng: 2.3577, rating: '4.7', ratings: 1500, blurb: 'Natural wine, no attitude.' },
+      { id: 'w1', name: 'Chez Stub', type: 'restaurant', lat: qlat + 0.0007, lng: qlng - 0.0004, rating: '4.6', ratings: 2100, blurb: 'A neighborhood favorite.', openNow: true },
+      { id: 'w2', name: 'Café Wildcard', type: 'cafe', lat: qlat - 0.0007, lng: qlng + 0.0019, rating: '4.5', ratings: 800, blurb: null, openNow: true },
+      { id: 'w3', name: 'Bar Stub', type: 'wine_bar', lat: qlat - 0.0002, lng: qlng - 0.0015, rating: '4.7', ratings: 1500, blurb: 'Natural wine, no attitude.', openNow: true },
     ]}));
   }
   if (url.pathname === '/api/reddit') {
@@ -243,6 +246,43 @@ try {
   }
   const tabBar = await page.evaluate(() => [...document.querySelectorAll('button')].map(b => b.innerText.trim()).filter(Boolean).slice(-6).join('|'));
   results.push('DEBUG tab bar after likes: ' + tabBar);
+
+  // ---- global mode: same app, geolocated to Manhattan ----
+  {
+    const g = await browser.newPage();
+    await browser.defaultBrowserContext().overridePermissions('http://127.0.0.1:8199', ['geolocation']);
+    await g.setGeolocation({ latitude: 40.7328, longitude: -73.9987 }); // Greenwich Village
+    await g.setViewport({ width: 390, height: 844 });
+    await g.evaluateOnNewDocument(() => {
+      const real = window.fetch;
+      window.fetch = (input, init) => {
+        const u = String(input);
+        if (u.includes('bigdatacloud')) {
+          return Promise.resolve(new Response(JSON.stringify({ city: 'New York', countryName: 'United States' }), { headers: { 'Content-Type': 'application/json' } }));
+        }
+        if (u.includes('open-meteo')) {
+          return Promise.resolve(new Response(JSON.stringify({ timezone: 'America/New_York', current: { temperature_2m: 24, weather_code: 1 } }), { headers: { 'Content-Type': 'application/json' } }));
+        }
+        return real(input, init);
+      };
+    });
+    await g.goto('http://127.0.0.1:8199/', { waitUntil: 'domcontentloaded' });
+    await g.evaluate(() => localStorage.setItem('whim-v1', JSON.stringify({ obStep: 99, obAnswers: [], name: 'Jess' })));
+    await g.goto('http://127.0.0.1:8199/', { waitUntil: 'networkidle2' });
+    await g.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => /allons/i.test(x.innerText)); if (b) b.click(); });
+    await g.waitForFunction(() => document.body.innerText.toLowerCase().includes('discover'), { timeout: 10000 });
+    await new Promise((r) => setTimeout(r, 2500));
+    const gTxt = await g.evaluate(() => document.body.innerText);
+    check('global: masthead shows detected city', /new york ·/i.test(gTxt), gTxt.match(/[\w ]+ · \w+ · \d{1,2}:\d{2}/i)?.[0] || 'no masthead');
+    // headless-shell lacks full tz data (Intl silently falls back to host tz),
+    // so compare against what this browser's own Intl produces for NY
+    const expectedNy = await g.evaluate(() => new Intl.DateTimeFormat('en-GB', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date()));
+    const shown = gTxt.match(/new york · \w+ · (\d{1,2}:\d{2})/i)?.[1];
+    check('global: clock uses the detected timezone', !!shown && (shown === expectedNy || Math.abs(Date.parse(`2000-01-01T${shown}:00`) - Date.parse(`2000-01-01T${expectedNy}:00`)) <= 120000), `shown ${shown} vs ${expectedNy}`);
+    check('global: deck builds from dynamic discovery', /Chez Stub|Café Wildcard|Bar Stub/.test(gTxt), '');
+    check('global: no Paris curated cards', !/Du Pain et des Idées|Sainte-Chapelle|Marché d'Aligre/.test(gTxt));
+    await g.close();
+  }
   await clickByText('Plan');
   await new Promise((r) => setTimeout(r, 600));
   const afterTab = await page.evaluate(() => document.body.innerText.toLowerCase());

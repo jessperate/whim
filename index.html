@@ -839,7 +839,7 @@ const WILD_KIND = {
   bar: { kind: 'Bar', icon: 'ri-goblet-line', accent: 'yellow', times: ['evening', 'night'] },
   wine_bar: { kind: 'Wine bar', icon: 'ri-goblet-fill', accent: 'yellow', times: ['evening', 'night'] },
   ice_cream_shop: { kind: 'Ice cream', icon: 'ri-cake-line', accent: 'pink', times: ['afternoon'], kids: true },
-  museum: { kind: 'Museum', icon: 'ri-gallery-line', accent: 'indigo', times: ['morning', 'afternoon'] },
+  museum: { kind: 'Museum', icon: 'ri-gallery-line', accent: 'indigo', times: ['morning', 'afternoon'], kids: true },
   art_gallery: { kind: 'Gallery', icon: 'ri-artboard-line', accent: 'indigo', times: ['morning', 'afternoon'] },
   book_store: { kind: 'Bookshop', icon: 'ri-book-open-line', accent: 'indigo', times: ['afternoon'] },
   park: { kind: 'Park', icon: 'ri-plant-line', accent: 'green', times: ['morning', 'afternoon'], kids: true },
@@ -968,6 +968,7 @@ class Component extends DCLogic {
     obFree: '', obFreeOpen: false,
     pendingInvite: null,
     range: 'city',
+    city: null, tzName: null, global: false,
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -1465,35 +1466,43 @@ class Component extends DCLogic {
 
   initLocation() {
     const apply = (loc, geo) => {
-      this.setState({ userLoc: loc, geo });
+      const global = geo === 'ok' && haversineKm(loc, PARIS) > 30;
+      this.setState({ userLoc: loc, geo, global });
       this.refreshWeather(loc);
       this.loadWildcards(loc);
+      if (global) this.detectCity(loc);
     };
     if (!navigator.geolocation) return apply(PARIS, 'unavailable');
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        if (haversineKm(loc, PARIS) > 30) {
-          apply(PARIS, 'far');
-          this.showToast('Not in Paris? Pretending you\u2019re in the Marais.');
-        } else {
-          apply(loc, 'ok');
-        }
-      },
+      (pos) => apply({ lat: pos.coords.latitude, lng: pos.coords.longitude }, 'ok'),
       () => apply(PARIS, 'denied'),
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
     );
   }
 
+  // outside Paris, ask the (keyless, browser-only) reverse geocoder whose
+  // city we woke up in — the whole app re-anchors around it
+  detectCity(loc) {
+    fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${loc.lat.toFixed(4)}&longitude=${loc.lng.toFixed(4)}&localityLanguage=en`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => {
+        if (!j) return;
+        const name = (j.city || j.locality || j.principalSubdivision || '').slice(0, 40) || 'your city';
+        this.setState({ city: { name, country: j.countryName || '' } });
+        this.showToast(`Whim, now serving ${name}.`);
+      })
+      .catch(() => {});
+  }
+
   refreshWeather(loc) {
-    const q = `latitude=${loc.lat.toFixed(3)}&longitude=${loc.lng.toFixed(3)}&current=temperature_2m,weather_code&timezone=Europe%2FParis`;
+    const q = `latitude=${loc.lat.toFixed(3)}&longitude=${loc.lng.toFixed(3)}&current=temperature_2m,weather_code&timezone=auto`;
     fetch(`https://api.open-meteo.com/v1/forecast?${q}`)
       .then(r => (r.ok ? r.json() : null))
       .then(j => {
         if (!j || !j.current) return;
         const code = j.current.weather_code;
         const rainy = (code >= 51 && code <= 99);
-        this.setState({ tempC: Math.round(j.current.temperature_2m), weatherCode: code, weatherLive: rainy ? 'rainy' : 'sunny' });
+        this.setState({ tempC: Math.round(j.current.temperature_2m), weatherCode: code, weatherLive: rainy ? 'rainy' : 'sunny', tzName: j.timezone || null });
       })
       .catch(() => {});
   }
@@ -1501,7 +1510,9 @@ class Component extends DCLogic {
   // Resolves the app's working context: real Paris time + live weather, unless overridden.
   getCtx() {
     const S = this.state;
-    const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', weekday: 'long', hour: '2-digit', minute: '2-digit', hour12: false });
+    let tz = 'Europe/Paris';
+    if (S.global && S.tzName) { try { new Intl.DateTimeFormat('en', { timeZone: S.tzName }); tz = S.tzName; } catch (e) { /* bad tz id */ } }
+    const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: tz, weekday: 'long', hour: '2-digit', minute: '2-digit', hour12: false });
     const parts = Object.fromEntries(fmt.formatToParts(new Date()).map(x => [x.type, x.value]));
     const h = Number(parts.hour);
     const realTod = h >= 5 && h < 11 ? 'morning' : h >= 11 && h < 17 ? 'afternoon' : h >= 17 && h < 22 ? 'evening' : 'night';
@@ -1598,6 +1609,7 @@ class Component extends DCLogic {
 
   loadWildcards(loc) {
     const T = this.getTaste();
+    const global = haversineKm(loc, PARIS) > 30;
     const ll = `${loc.lat.toFixed(3)},${loc.lng.toFixed(3)}`;
     this._seed = this._seed || Math.floor(Math.random() * 1e9);
     // day bucket rotates the edge cache so the pool refreshes daily
@@ -1607,7 +1619,11 @@ class Component extends DCLogic {
     // base sweep — popularity-capped for hidden-gem people so it's not the same icons
     calls.push({ url: `/api/discover?ll=${ll}&d=${day}${T.offPath ? '&cap=15000' : ''}`, meta: null });
     // everyone gets one rotating-neighborhood sweep; explorers get a capped one
-    const a = Component.OFFBEAT[(this._seed + (T.offPath ? 1 : 0)) % Component.OFFBEAT.length];
+    const spokes = [[0.018, 0], [0, 0.026], [-0.018, 0.013], [0.011, -0.022], [-0.014, -0.016]];
+    const sp = spokes[(this._seed + (T.offPath ? 1 : 0)) % spokes.length];
+    const a = global
+      ? { lat: loc.lat + sp[0], lng: loc.lng + sp[1] } // a nearby quartier, any city
+      : Component.OFFBEAT[(this._seed + (T.offPath ? 1 : 0)) % Component.OFFBEAT.length];
     calls.push({ url: `/api/discover?ll=${a.lat},${a.lng}&d=${day}${T.offPath ? '&cap=15000' : ''}`, meta: null });
     // every active taste hunt (bounded), rotated so the day's cache still varies per session
     const active = Component.TASTE_QUERIES.filter(t => T[t.flag]);
@@ -1619,7 +1635,7 @@ class Component extends DCLogic {
     calls.forEach(({ url, meta }) => this.fetchWildcards(url, meta));
 
     // TheFork top-rated bookable inventory joins the wildcard pool
-    if (!this._forkLoaded) {
+    if (!this._forkLoaded && !global) { // TheFork snapshot is Paris inventory
       this._forkLoaded = true;
       fetch(`/api/book?feed=1&d=${day}`)
         .then(r => (r.ok ? r.json() : null))
@@ -1651,7 +1667,7 @@ class Component extends DCLogic {
     }
 
     // Atlas Obscura layer for the hidden-gem and macabre crowd
-    if ((T.offPath || T.macabre) && !this._aoLoaded) {
+    if ((T.offPath || T.macabre) && !this._aoLoaded && !global) { // Atlas Obscura run is Paris-scoped
       this._aoLoaded = true;
       fetch('/api/oddities')
         .then(r => (r.ok ? r.json() : null))
@@ -1800,6 +1816,7 @@ class Component extends DCLogic {
   }
 
   ensureReddit(p) {
+    if (this.state.global) return; // subreddit chatter is Paris-scoped
     this._redditReq = this._redditReq || {};
     if (p.noLive || this._redditReq[p.id] || (this.state.reddit && this.state.reddit[p.id])) return;
     this._redditReq[p.id] = true;
@@ -1901,6 +1918,7 @@ class Component extends DCLogic {
   }
 
   checkResy(p) {
+    if (this.state.global) return; // TheFork snapshot is Paris inventory
     if (this.state.resy[p.id] && !this.state.resy[p.id].error) return;
     this.setState(s => ({ resy: { ...s.resy, [p.id]: { loading: true } } }));
     const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());
@@ -2068,7 +2086,7 @@ class Component extends DCLogic {
       return typeof p.openNow === 'boolean' ? p.openNow : null;
     };
     const openish = p => (!nowMode && !foodMode) || liveFlag(p) !== false;
-    const places = PLACES.filter(p =>
+    const places = (this.state.global ? [] : PLACES).filter(p =>
       (catActive || fitsNow(p)) &&
       !swiped[p.id] &&
       !(T.noGluten && (p.kind === 'Boulangerie' || p.kind === 'Crêperie' || p.id === 'p20')) &&
@@ -2118,7 +2136,7 @@ class Component extends DCLogic {
     // the same few
     if (!nowMode && deck.length < 12) {
       const have = new Set(deck.map(p => p.id));
-      const extras = PLACES.concat(Object.values(this.state.gplaces))
+      const extras = (this.state.global ? [] : PLACES).concat(Object.values(this.state.gplaces))
         .filter(p => !have.has(p.id) && !p.q && !swiped[p.id] && !fitsNow(p) &&
           !(T.noGluten && (p.kind === 'Boulangerie' || p.kind === 'Crêperie' || p.id === 'p20')) &&
           !(T.noMuseums && (p.kind === 'Museum' || p.kind === 'Gallery')) &&
@@ -2142,7 +2160,7 @@ class Component extends DCLogic {
     }
 
     // 'Right now' opens with this week's happenings scraped from Instagram
-    if (nowMode && this.state.pulse.length) {
+    if (nowMode && !this.state.global && this.state.pulse.length) {
       const happenings = this.state.pulse.slice(0, 4)
         .map((h, i) => {
           const id = 'hp_' + strHash(h.text);
@@ -2293,6 +2311,7 @@ class Component extends DCLogic {
           weatherLabel: ctx.weatherLabel, tempC: ctx.tempC, geo: S.geo,
           name: S.name || null,
           range: S.range,
+          city: (S.city && S.city.name) || 'Paris',
           feedback: S.chat.filter(m => m.fb).slice(-5).map(m => ({ text: String(m.text).slice(0, 90), verdict: m.fb })),
           taste, liked, deck,
           pulse: S.pulse.slice(0, 6).map(p => ({ text: p.text, spot: p.spot })),
@@ -2673,7 +2692,7 @@ class Component extends DCLogic {
       border: active ? '1px solid #451212' : '1px solid #f2d3c6',
     });
 
-    const geoBit = S.geo === 'ok' ? ' · Near you' : S.geo === 'far' ? ' · From afar' : '';
+    const geoBit = S.geo === 'ok' ? ' · Near you' : '';
 
     const fvHearts = ((S.friendView && S.friendView.hearts) || []).map(id => this.friendRow(id)).filter(Boolean);
     const fvLikes = ((S.friendView && S.friendView.likes) || []).map(id => this.friendRow(id)).filter(Boolean);
@@ -2703,7 +2722,7 @@ class Component extends DCLogic {
       onObFreeKey: (e) => { if (e.key === 'Enter') this.answerObFree(ob); },
       obFreeGo: () => this.answerObFree(ob),
 
-      ctxLine: `Paris · ${ctx.weekday} · ${ctx.clock} · ${ctx.weatherLabel}${ctx.tempC != null ? ` ${ctx.tempC}°` : ''}${geoBit}`,
+      ctxLine: `${(S.city && S.city.name) || 'Paris'} · ${ctx.weekday} · ${ctx.clock} · ${ctx.weatherLabel}${ctx.tempC != null ? ` ${ctx.tempC}°` : ''}${geoBit}`,
       ctxIcon: sunny ? 'ri-sun-line' : 'ri-rainy-line',
       greeting: sass === 'polite'
         ? `Good ${ctx.timeOfDay}. Here\u2019s what\u2019s nearby.`
@@ -2892,7 +2911,7 @@ class Component extends DCLogic {
         { label: 'Passed on', val: `${nopedN}` },
         { label: 'Croissant loyalty', val: S.quizAnswers.q1 === 'Croissant' ? '100%' : (S.quizAnswers.q1 ? 'BETRAYED' : 'TBD') },
         { label: 'Tourist-trap tolerance', val: S.quizAnswers.q2 === 'Ironically, yes' ? 'HIGH' : (S.quizAnswers.q2 ? 'ZERO' : 'TBD') },
-        { label: 'Location', val: S.geo === 'ok' ? 'LIVE' : S.geo === 'far' ? 'NOT IN PARIS' : S.geo === 'pending' ? 'LOCATING\u2026' : 'MARAIS (DEFAULT)' },
+        { label: 'Location', val: S.geo === 'ok' ? (S.global ? `LIVE · ${((S.city && S.city.name) || 'ELSEWHERE').toUpperCase()}` : 'LIVE') : S.geo === 'pending' ? 'LOCATING\u2026' : 'MARAIS (DEFAULT)' },
       ],
       resetTaste: () => {
         try { localStorage.removeItem(STORE_KEY); } catch (e) {}
@@ -2936,7 +2955,7 @@ class Component extends DCLogic {
       addCanSave: !!S.addName.trim(),
 
       savedAny: PLACES.concat(Object.values(S.gplaces)).some(p => S.hearts[p.id]),
-      savedCity: 'Paris',
+      savedCity: (S.city && S.city.name) || 'Paris',
       savedCount: String(PLACES.concat(Object.values(S.gplaces)).filter(p => S.hearts[p.id]).length),
       saved: PLACES.concat(Object.values(S.gplaces)).filter(p => S.hearts[p.id])
         .sort((a, b) => S.hearts[a.id] - S.hearts[b.id])
