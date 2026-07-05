@@ -149,6 +149,9 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
                   <sc-if value="{{ card.showIcon }}" hint-placeholder-val="{{ true }}">
                     <div style="{{ card.artIconWrap }}"><i class="{{ card.icon }}" style="{{ card.artIcon }}"></i></div>
                   </sc-if>
+                  <sc-if value="{{ card.hasDist }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute; left:10px; bottom:10px; display:flex; align-items:center; gap:5px; background:#fff7f2; border:1px solid #451212; border-radius:58px; padding:5px 11px 5px 9px; font:500 11px 'Saans Mono',monospace; letter-spacing:.04em; color:#451212;"><i class="ri-walk-line" style="font-size:13px; color:#d1401f;"></i>{{ card.distPill }}</div>
+                  </sc-if>
                 </div>
                 <div style="{{ card.bodyStyle }}">
                   <div style="{{ card.kickerStyle }}">{{ card.meta }}</div>
@@ -2546,6 +2549,13 @@ class Component extends DCLogic {
         isPlace: !isQuiz,
         isQuiz,
         name: c.name, kind: c.kind, dist: c.dist, blurb: c.blurb, icon: c.icon,
+        hasDist: !isQuiz && !c.happening && c.km != null,
+        distPill: (() => {
+          if (isQuiz || c.happening || c.km == null) return '';
+          const mins = Math.max(1, Math.round(c.km * 12)); // brisk Paris pace
+          if (mins > 25) return `${c.dist} away`;
+          return S.geo === 'ok' ? `${mins} min from you` : `${mins} min walk`;
+        })(),
         // 2b: time-dash meta line
         meta: isQuiz ? '' : (c.happening ? `${ctx.clock} — This week · via Instagram${c.spot ? ` · ${c.spot}` : ''}` : `${ctx.clock} — ${c.custom ? 'Yours · ' : (c.wild ? 'Wildcard · ' : '')}${c.kind} · ${c.dist}${c.notNow ? ` · A ${c.times[0]} thing` : (c.score >= 2 ? ' · Very you' : '')}${openBit}`),
         rating: isQuiz ? '' : (c.happening ? '✶' : ((live && live.rating) || c.grating || fallback[0])),

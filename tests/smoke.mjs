@@ -173,6 +173,7 @@ try {
   // deck cards with live stub data
   await new Promise((r) => setTimeout(r, 1200));
   const cardInfo = await page.evaluate(() => document.body.innerText);
+  check('card shows walking-distance pill', /\d+ min from you/.test(cardInfo));
   check('deck shows a distance', /\d+(m|(\.\d)?km)\b/i.test(cardInfo));
   check('live rating stub applied (4.9)', cardInfo.includes('4.9'));
   check('live Google reviews label', cardInfo.includes('1.2k Google reviews'));
