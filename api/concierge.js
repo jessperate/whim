@@ -1,12 +1,10 @@
-import Anthropic from '@anthropic-ai/sdk';
-
-const client = new Anthropic();
+// Concierge replies come from the OpenAI API (raw REST — no SDK needed).
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'POST only' });
   }
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.OPENAI_API_KEY) {
     return res.status(200).json({ reply: null, reason: 'no_key' });
   }
 
@@ -68,22 +66,30 @@ ${pulse.map((p) => `- ${String(p.text).slice(0, 200)}${p.spot ? ` [${String(p.sp
   if (!turns.length) return res.status(400).json({ error: 'no user message' });
 
   try {
-    const response = await client.messages.create({
-      model: 'claude-opus-4-8',
-      max_tokens: 600,
-      thinking: { type: 'adaptive' },
-      output_config: { effort: 'low' },
-      system,
-      messages: turns.slice(-20),
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-5.1',
+        max_completion_tokens: 600,
+        reasoning_effort: 'low',
+        messages: [{ role: 'system', content: system }, ...turns.slice(-20)],
+      }),
     });
-    const reply = response.content
-      .filter((b) => b.type === 'text')
-      .map((b) => b.text)
-      .join('')
-      .trim();
+    if (!r.ok) {
+      const err = await r.text().catch(() => '');
+      console.error('concierge error', r.status, err.slice(0, 300));
+      return res.status(502).json({ error: 'concierge_unavailable' });
+    }
+    const data = await r.json();
+    const reply = (data.choices?.[0]?.message?.content || '').trim();
+    if (!reply) return res.status(502).json({ error: 'concierge_unavailable' });
     return res.status(200).json({ reply });
   } catch (e) {
-    console.error('concierge error', e?.status, e?.message);
+    console.error('concierge error', e?.message);
     return res.status(502).json({ error: 'concierge_unavailable' });
   }
 }
