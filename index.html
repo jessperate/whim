@@ -1040,6 +1040,7 @@ class Component extends DCLogic {
     expos: {},
     lists: {}, listOf: {}, listDraft: '', listAdding: false,
     isPublic: false,
+    toPulse: [],
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
   };
 
@@ -1567,6 +1568,7 @@ class Component extends DCLogic {
       this.refreshWeather(loc);
       this.loadWildcards(loc);
       if (global) this.detectCity(loc);
+      if (!global) this.loadTimeout('Paris');
     };
     if (!navigator.geolocation) return apply(PARIS, 'unavailable');
     navigator.geolocation.getCurrentPosition(
@@ -1574,6 +1576,19 @@ class Component extends DCLogic {
       () => apply(PARIS, 'denied'),
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
     );
+  }
+
+  // the local Time Out magazine: fresh happenings for whatever city we're in
+  loadTimeout(cityName) {
+    if (this._toLoaded === cityName) return;
+    this._toLoaded = cityName;
+    fetch(`/api/timeout?city=${encodeURIComponent(cityName)}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => {
+        if (!j || !j.ok || !Array.isArray(j.items)) return;
+        this.setState({ toPulse: j.items.map(it => ({ text: it.text, url: it.url, src: 'Time Out' })) });
+      })
+      .catch(() => {});
   }
 
   // outside Paris, ask the (keyless, browser-only) reverse geocoder whose
@@ -1585,6 +1600,7 @@ class Component extends DCLogic {
         if (!j) return;
         const name = (j.city || j.locality || j.principalSubdivision || '').slice(0, 40) || 'your city';
         this.setState({ city: { name, country: j.countryName || '' } });
+        this.loadTimeout(name);
         this.showToast(`Whim, now serving ${name}.`);
       })
       .catch(() => {});
@@ -2308,16 +2324,24 @@ class Component extends DCLogic {
       if (wix > 1) deck.splice(1, 0, deck.splice(wix, 1)[0]);
     }
 
-    // 'Right now' opens with this week's happenings scraped from Instagram
-    if (nowMode && !this.state.global && this.state.pulse.length) {
-      const happenings = this.state.pulse.slice(0, 4)
+    // 'Right now' opens with this week's happenings — Instagram pulse (Paris)
+    // plus the local Time Out magazine (any city)
+    const igP = this.state.global ? [] : this.state.pulse;
+    const toP = this.state.toPulse;
+    const pulsePool = []; // interleave sources so neither hogs the deck
+    for (let i = 0; i < Math.max(igP.length, toP.length); i++) {
+      if (igP[i]) pulsePool.push(igP[i]);
+      if (toP[i]) pulsePool.push(toP[i]);
+    }
+    if (nowMode && pulsePool.length) {
+      const happenings = pulsePool.slice(0, 6)
         .map((h, i) => {
           const id = 'hp_' + strHash(h.text);
-          const headline = h.text.split(/[.!\n•]|—/)[0].trim().slice(0, 52) || 'Happening in Paris';
+          const headline = h.text.split(/[.!\n•]|—/)[0].trim().slice(0, 52) || `Happening in ${(this.state.city && this.state.city.name) || 'Paris'}`;
           return {
             id, happening: true, name: headline, kind: 'Happening', icon: 'ri-calendar-event-line',
             accent: 'yellow', blurb: h.text.slice(0, 170), km: 0, dist: '', slot: 45 + i,
-            igUrl: h.url, spot: h.spot, score: 0, noLive: true, times: [ctx.timeOfDay], weather: 'any',
+            igUrl: h.url, spot: h.spot, src: h.src, score: 0, noLive: true, times: [ctx.timeOfDay], weather: 'any',
           };
         })
         .filter(h => !swiped[h.id])
@@ -2470,7 +2494,7 @@ class Component extends DCLogic {
           city: (S.city && S.city.name) || 'Paris',
           feedback: S.chat.filter(m => m.fb).slice(-5).map(m => ({ text: String(m.text).slice(0, 90), verdict: m.fb })),
           taste, liked, deck,
-          pulse: S.pulse.slice(0, 6).map(p => ({ text: p.text, spot: p.spot })),
+          pulse: [...(S.global ? [] : S.pulse), ...S.toPulse].slice(0, 8).map(p => ({ text: p.text, spot: p.spot })),
           places: (() => {
             const spotFor = (p) => {
               const lv = S.live[p.id] || {};
@@ -2848,7 +2872,7 @@ class Component extends DCLogic {
           return S.geo === 'ok' ? `${mins} min from you` : `${mins} min walk`;
         })(),
         // 2b: time-dash meta line
-        meta: isQuiz ? '' : (c.happening ? `${ctx.clock} — This week · via Instagram${c.spot ? ` · ${c.spot}` : ''}` : `${ctx.clock} — ${c.custom ? 'Yours · ' : (c.wild ? 'Wildcard · ' : '')}${c.kind} · ${c.dist}${c.notNow ? ` · A ${c.times[0]} thing` : (c.score >= 2 ? ' · Very you' : '')}${openBit}`),
+        meta: isQuiz ? '' : (c.happening ? `${ctx.clock} — This week · via ${c.src || 'Instagram'}${c.spot ? ` · ${c.spot}` : ''}` : `${ctx.clock} — ${c.custom ? 'Yours · ' : (c.wild ? 'Wildcard · ' : '')}${c.kind} · ${c.dist}${c.notNow ? ` · A ${c.times[0]} thing` : (c.score >= 2 ? ' · Very you' : '')}${openBit}`),
         rating: isQuiz ? '' : (c.happening ? '✶' : ((live && live.rating) || c.grating || fallback[0])),
         reviews: isQuiz ? '' : (c.happening ? 'spotted this week' : (live && live.ratings != null ? `${fmtCount(live.ratings)} Google reviews` : (c.wild ? `${fmtCount(c.greviews)} Google reviews` : `${fallback[1]} reviews`))),
         gmaps: isQuiz ? null : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' Paris')}`,

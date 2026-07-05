@@ -49,6 +49,12 @@ const server = http.createServer((req, res) => {
     res.setHeader('Content-Type', 'application/json');
     return res.end(JSON.stringify({ ok: true, found: true, match: 'Stub Bistro', url: 'https://www.thefork.fr/stub', bookable: true, rating: '9.2', price: '45€' }));
   }
+  if (url.pathname === '/api/timeout') {
+    res.setHeader('Content-Type', 'application/json');
+    return res.end(JSON.stringify({ ok: true, city: 'Paris', items: [
+      { text: 'TIMEOUTSTUB: night market on the canal this weekend', url: 'https://www.timeout.fr/stub' },
+    ]}));
+  }
   if (url.pathname === '/api/expo') {
     res.setHeader('Content-Type', 'application/json');
     return res.end(JSON.stringify({ ok: true, site: 'https://example.org/musee', expos: [
@@ -249,6 +255,7 @@ try {
   await new Promise((r) => setTimeout(r, 500));
   const nowTxt = await page.evaluate(() => document.body.innerText.toLowerCase());
   check('right-now happening card renders', nowTxt.includes('this week · via instagram') && nowTxt.includes('ground control'));
+  check('Time Out happening joins Right now', /timeoutstub|via time out/i.test(await page.evaluate(() => document.body.innerText)));
   await page.evaluate(() => {
     const b = [...document.querySelectorAll('button')].find((x) => x.innerText.trim().toLowerCase() === 'all');
     b && b.click();
