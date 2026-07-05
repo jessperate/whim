@@ -290,6 +290,14 @@ try {
   const planTxt = await page.evaluate(() => document.body.innerText);
   check('plan drafts after likes', planTxt.toLowerCase().includes('concierge proposes'), planTxt.toLowerCase().includes('concierge proposes') ? '' : planTxt.slice(0, 200));
 
+  // every draft row is individually deletable
+  const beforeRows = await page.evaluate(() => document.querySelectorAll('button[aria-label="Remove stop"]').length);
+  check('draft rows have delete buttons', beforeRows >= 2, `rows: ${beforeRows}`);
+  await page.evaluate(() => document.querySelector('button[aria-label="Remove stop"]').click());
+  await new Promise((r) => setTimeout(r, 400));
+  const afterRows = await page.evaluate(() => document.querySelectorAll('button[aria-label="Remove stop"]').length);
+  check('deleting a row removes the stop', afterRows === beforeRows - 1, `now: ${afterRows}`);
+
   // chat -> stubbed concierge API
   await clickByText('Concierge');
   await new Promise((r) => setTimeout(r, 200));
@@ -474,7 +482,7 @@ try {
     const tab = [...document.querySelectorAll('button')].find((x) => /plan\s*\(/i.test(x.innerText));
     return tab ? tab.innerText.trim() : '';
   });
-  check('chat card adds to plan', /plan\s*\(\s*3\s*\)/i.test(planBadge), planBadge);
+  check('chat card adds to plan', /plan\s*\(\s*2\s*\)/i.test(planBadge), planBadge); // 2 likes - 1 deleted row + 1 chat like
 
   // tap the chat card to open the sheet
   await page.evaluate(() => {

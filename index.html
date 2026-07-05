@@ -196,8 +196,8 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
     <!-- PLAN (2c: color-blocked) -->
     <sc-if value="{{ tabPlan }}" hint-placeholder-val="{{ false }}">
       <div style="flex:1; overflow:auto; padding:22px 20px; background:#ffffff;">
-        <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Today · Paris</div>
-        <div style="font:400 32px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:9px 0 5px;">Your day plan</div>
+        <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">{{ planKicker }}</div>
+        <div style="font:400 32px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:9px 0 5px;">{{ planTitle }}</div>
         <div style="font:italic 400 16px/1.5 'Serrif VF',Georgia,serif; color:#676c79; margin-bottom:20px;">{{ planSub }}</div>
         <sc-if value="{{ planEmpty }}" hint-placeholder-val="{{ false }}">
           <div style="border:1px dashed #f2d3c6; padding:30px 22px; text-align:center; background:#fff7f2;">
@@ -210,11 +210,17 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c;">Concierge proposes · Draft {{ draftNo }}</div>
             <div style="font:italic 400 17px/1.5 'Serrif VF',Georgia,serif; color:#451212;">{{ proposalMsg }}</div>
             <div style="display:flex; flex-direction:column; gap:8px;">
-              <sc-for list="{{ proposalStops }}" as="ps" hint-placeholder-count="3">
-                <div onClick="{{ ps.open }}" style="{{ ps.rowStyle }}">
-                  <span style="{{ ps.atStyle }}">{{ ps.at }}</span>
-                  <span style="font:700 16px 'Saans',sans-serif; color:#451212;">{{ ps.name }}</span>
-                </div>
+              <sc-for list="{{ planDays }}" as="pd" hint-placeholder-count="1">
+                <sc-if value="{{ pd.showLabel }}" hint-placeholder-val="{{ false }}">
+                  <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#c0361c; margin-top:6px;">{{ pd.label }}</div>
+                </sc-if>
+                <sc-for list="{{ pd.stops }}" as="ps" hint-placeholder-count="3">
+                  <div style="{{ ps.rowStyle }}">
+                    <span style="{{ ps.atStyle }}">{{ ps.at }}</span>
+                    <span onClick="{{ ps.open }}" style="font:700 16px 'Saans',sans-serif; color:#451212; flex:1; min-width:0; cursor:pointer;">{{ ps.name }}</span>
+                    <button onClick="{{ ps.remove }}" aria-label="Remove stop" style="border:none; background:none; cursor:pointer; padding:6px; margin:-6px; flex:none;"><i class="ri-close-line" style="{{ ps.xStyle }}"></i></button>
+                  </div>
+                </sc-for>
               </sc-for>
             </div>
             <div style="display:flex; gap:10px; margin-top:2px;">
@@ -229,18 +235,25 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             <button onClick="{{ redraftPlan }}" style="font:500 11px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; background:none; border:none; color:#d1401f; cursor:pointer; padding:8px 0 8px 12px;" style-hover="color:#c22f1a;">Re-draft</button>
           </div>
         </sc-if>
-        <div style="display:flex; flex-direction:column; gap:9px;">
-          <sc-for list="{{ plan }}" as="stop" hint-placeholder-count="3">
-            <div style="{{ stop.blockStyle }}">
-              <span style="{{ stop.atStyle }}">{{ stop.at }}</span>
-              <div onClick="{{ stop.open }}" style="flex:1; cursor:pointer;">
-                <div style="font:700 16px/1.25 'Saans',sans-serif; color:#451212;">{{ stop.name }}</div>
-                <div style="{{ stop.metaStyle }}">{{ stop.meta }}</div>
-              </div>
-              <button onClick="{{ stop.remove }}" aria-label="Remove stop" style="border:none; background:none; cursor:pointer; padding:6px; margin:-6px;"><i class="ri-close-line" style="{{ stop.xStyle }}"></i></button>
-            </div>
-          </sc-for>
-        </div>
+        <sc-if value="{{ planApproved }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:9px;">
+            <sc-for list="{{ planDays }}" as="pd" hint-placeholder-count="1">
+              <sc-if value="{{ pd.showLabel }}" hint-placeholder-val="{{ false }}">
+                <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#c0361c; margin-top:8px;">{{ pd.label }}</div>
+              </sc-if>
+              <sc-for list="{{ pd.stops }}" as="stop" hint-placeholder-count="3">
+                <div style="{{ stop.blockStyle }}">
+                  <span style="{{ stop.atStyle }}">{{ stop.at }}</span>
+                  <div onClick="{{ stop.open }}" style="flex:1; cursor:pointer;">
+                    <div style="font:700 16px/1.25 'Saans',sans-serif; color:#451212;">{{ stop.name }}</div>
+                    <div style="{{ stop.metaStyle }}">{{ stop.meta }}</div>
+                  </div>
+                  <button onClick="{{ stop.remove }}" aria-label="Remove stop" style="border:none; background:none; cursor:pointer; padding:6px; margin:-6px;"><i class="ri-close-line" style="{{ stop.xStyle }}"></i></button>
+                </div>
+              </sc-for>
+            </sc-for>
+          </div>
+        </sc-if>
         <sc-if value="{{ planHasStops }}" hint-placeholder-val="{{ false }}">
           <div style="border-top:1px solid #451212; margin-top:14px; padding-top:14px; font:500 11.5px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#c0361c;">{{ planStats }}</div>
           <a href="{{ routeUrl }}" target="_blank" rel="noopener" style="display:block; text-align:center; margin-top:12px; font:500 15px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:14px; text-decoration:none;">Open walking route in Maps</a>
@@ -2349,13 +2362,46 @@ class Component extends DCLogic {
     const ordered = [...plan].sort((a, b) =>
       ix === 0 ? a.slot - b.slot : ((a.slot * 7 + ix * 13) % 17) - ((b.slot * 7 + ix * 13) % 17)
     );
-    // sequential times from "now", rounded up to the next half hour, 90 min per stop
+    // 4 stops a day: today runs from "now" (next half hour, 90 min per stop),
+    // later days start at a civilized 10:00
+    const PER_DAY = 4;
     const [h0, m0] = ctx.clock.split(':').map(Number);
-    let mins = h0 * 60 + (m0 > 30 ? 60 : 30);
-    const timed = ordered.map(p => {
-      const at = `${Math.floor(mins / 60) % 24}:${String(mins % 60).padStart(2, '0')}`;
-      mins += 90;
-      return { p, at };
+    const removeStop = (p) => {
+      this.setState(s => {
+        const sw = { ...s.swiped }; delete sw[p.id];
+        return { swiped: sw };
+      });
+      this.dbDrop('swipes', p.id);
+      this.showToast(`${p.name} is off the list.`);
+    };
+    const mkRow = (p, at) => {
+      const a = ACCENTS[p.accent];
+      return {
+        at, name: p.name,
+        open: () => this.openDetail(p.id),
+        remove: () => removeStop(p),
+        meta: `${p.kind} · ${p.dist}`,
+        rowStyle: { display: 'flex', gap: 10, alignItems: 'baseline', background: a.body, padding: '12px 14px' },
+        blockStyle: { display: 'flex', gap: 12, alignItems: 'flex-start', background: a.body, padding: '12px 14px' },
+        atStyle: { font: "500 10px 'Saans Mono', monospace", color: a.ink, width: 42, flex: 'none', paddingTop: 3 },
+        metaStyle: { font: "500 9px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, marginTop: 4 },
+        xStyle: { fontSize: 16, color: a.ink, opacity: 0.6 },
+      };
+    };
+    const chunks = [];
+    for (let i = 0; i < ordered.length; i += PER_DAY) chunks.push(ordered.slice(i, i + PER_DAY));
+    const planDays = chunks.map((chunk, d) => {
+      let mins = d === 0 ? h0 * 60 + (m0 > 30 ? 60 : 30) : 10 * 60;
+      const wd = new Date(Date.now() + d * 86400000).toLocaleDateString('en-GB', { weekday: 'long' });
+      return {
+        showLabel: chunks.length > 1,
+        label: d === 0 ? `Today · ${wd}` : d === 1 ? `Tomorrow · ${wd}` : `Day ${d + 1} · ${wd}`,
+        stops: chunk.map(p => {
+          const at = `${Math.floor(mins / 60) % 24}:${String(mins % 60).padStart(2, '0')}`;
+          mins += 90;
+          return mkRow(p, at);
+        }),
+      };
     });
 
     const msgs = [
@@ -2374,41 +2420,19 @@ class Component extends DCLogic {
       planApproved: approved,
       draftNo: String(ix + 1).padStart(2, '0'),
       proposalMsg: msgs[Math.min(ix, msgs.length - 1)],
-      // 2c: proposal stops tinted by category
-      proposalStops: timed.map(({ p, at }) => {
-        const a = ACCENTS[p.accent];
-        return {
-          at, name: p.name,
-          open: () => this.openDetail(p.id),
-          rowStyle: { display: 'flex', gap: 10, alignItems: 'baseline', background: a.body, padding: '12px 14px', cursor: 'pointer' },
-          atStyle: { font: "500 10px 'Saans Mono', monospace", color: a.ink, width: 42, flex: 'none' },
-        };
-      }),
+      planDays,
+      planKicker: `${chunks.length > 1 ? `${chunks.length} days` : 'Today'} · ${(this.state.city && this.state.city.name) || 'Paris'}`,
+      planTitle: chunks.length > 1 ? `Your ${chunks.length}-day plan` : 'Your day plan',
       approvePlan: () => { this.setState({ planStatus: 'approved' }); this.showToast('Plan approved. Go forth.'); },
       shufflePlan: () => this.setState(s => ({ shuffleIx: (s.shuffleIx || 0) + 1 })),
       redraftPlan: () => this.setState({ planStatus: 'draft' }),
-      plan: approved ? timed.map(({ p, at }) => {
-        const a = ACCENTS[p.accent];
-        return {
-          at, name: p.name,
-          open: () => this.openDetail(p.id),
-          meta: `${p.kind} · ${p.dist}`,
-          blockStyle: { display: 'flex', gap: 12, alignItems: 'flex-start', background: a.body, padding: '12px 14px' },
-          atStyle: { font: "500 10px 'Saans Mono', monospace", color: a.ink, width: 40, flex: 'none', paddingTop: 3 },
-          metaStyle: { font: "500 9px 'Saans Mono', monospace", letterSpacing: '.08em', textTransform: 'uppercase', color: a.ink, marginTop: 4 },
-          xStyle: { fontSize: 16, color: a.ink, opacity: 0.6 },
-          remove: () => {
-            this.setState(s => {
-              const sw = { ...s.swiped }; delete sw[p.id];
-              return { swiped: sw };
-            });
-            this.dbDrop('swipes', p.id);
-          },
-        };
-      }) : [],
       planHasStops: approved,
-      routeUrl: approved && timed.length
-        ? `https://www.google.com/maps/dir/?api=1&travelmode=walking&destination=${encodeURIComponent(timed[timed.length - 1].p.name + ' Paris')}${timed.length > 1 ? `&waypoints=${encodeURIComponent(timed.slice(0, -1).map(({ p }) => p.name + ' Paris').join('|'))}` : ''}`
+      routeUrl: approved && ordered.length
+        ? (() => {
+            const cityName = (this.state.city && this.state.city.name) || 'Paris';
+            const names = ordered.map(p => `${p.name} ${cityName}`);
+            return `https://www.google.com/maps/dir/?api=1&travelmode=walking&destination=${encodeURIComponent(names[names.length - 1])}${names.length > 1 ? `&waypoints=${encodeURIComponent(names.slice(0, -1).join('|'))}` : ''}`;
+          })()
         : null,
       planSub: plan.length === 0
         ? 'Swipe right and the concierge drafts your day.'
