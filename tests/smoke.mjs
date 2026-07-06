@@ -366,6 +366,21 @@ try {
   const youTxt = await page.evaluate(() => document.body.innerText);
   check('You tab shows LIVE location', youTxt.includes('LIVE'));
   check('context override controls present', youTxt.toLowerCase().includes('auto (live)'));
+
+  // a11y regression guards
+  const a11y = await page.evaluate(() => {
+    const unlabeled = [...document.querySelectorAll('button')].filter((b) => {
+      const t = b.innerText.trim();
+      return !t && !b.getAttribute('aria-label');
+    }).length;
+    const liveRegion = !!document.querySelector('[role="status"][aria-live]');
+    const nav = !!document.querySelector('[role="navigation"][aria-label]');
+    const nakedInputs = [...document.querySelectorAll('input:not([type="file"]), textarea')].filter((i) => !i.getAttribute('aria-label') && !i.id).length;
+    return { unlabeled, liveRegion, nav, nakedInputs };
+  });
+  check('a11y: no unlabeled icon-only buttons', a11y.unlabeled === 0, `found ${a11y.unlabeled}`);
+  check('a11y: toast live region + labeled nav', a11y.liveRegion && a11y.nav);
+  check('a11y: all inputs labeled', a11y.nakedInputs === 0, `naked: ${a11y.nakedInputs}`);
   check('You tab has profile editor', youTxt.toLowerCase().includes('your profile') && youTxt.toLowerCase().includes('save profile'));
   check('You tab has contacts invite', youTxt.toLowerCase().includes('share whim with your contacts'));
 

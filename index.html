@@ -30,6 +30,19 @@
 <helmet>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet">
 <style>
+/* a11y: keyboard focus stays visible even where inline styles reset outlines */
+button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid #e8432c !important;
+  outline-offset: 2px !important;
+}
+/* a11y: respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
 @font-face { font-family:'Serrif VF'; src:url('fonts/SerrifVF.ttf') format('truetype'); font-display:swap; font-weight:100 900; }
 @font-face { font-family:'Saans'; src:url('fonts/Saans-Regular.ttf') format('truetype'); font-display:swap; font-weight:400; }
 @font-face { font-family:'Saans'; src:url('fonts/Saans-Medium.ttf') format('truetype'); font-display:swap; font-weight:500; }
@@ -65,7 +78,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
       <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; color:#c0361c; text-transform:uppercase;">Taste calibration · Introductions</div>
       <div style="font:400 34px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:26px 0 6px;">What should I call you?</div>
       <div style="font:400 14px/1.5 'Saans',sans-serif; color:#676c79; margin-bottom:26px;">For the greetings. And the gossip.</div>
-      <input value="{{ nameDraft }}" onChange="{{ onNameDraft }}" onKeyDown="{{ onNameKey }}" placeholder="Your name" autocomplete="given-name" style="font:400 18px 'Saans',sans-serif; background:#ffffff; border:1px solid #451212; color:#451212; padding:16px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+      <input aria-label="Your name" value="{{ nameDraft }}" onChange="{{ onNameDraft }}" onKeyDown="{{ onNameKey }}" placeholder="Your name" autocomplete="given-name" style="font:400 18px 'Saans',sans-serif; background:#ffffff; border:1px solid #451212; color:#451212; padding:16px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
       <button onClick="{{ commitName }}" style="font:500 15px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:16px 36px; cursor:pointer; margin-top:16px;">Enchanté</button>
       <div style="font:400 11px 'Saans',sans-serif; color:#676c79; margin-top:12px;">Leave it blank to stay mysterious. I’ll manage.</div>
     </div>
@@ -95,7 +108,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
         </sc-if>
         <sc-if value="{{ obFreeShown }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex; gap:8px;">
-            <input value="{{ obFree }}" onChange="{{ onObFree }}" onKeyDown="{{ onObFreeKey }}" placeholder="Say it your way" autofocus style="flex:1; min-width:0; font:400 16px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:17px 18px; outline:none; border-radius:0; -webkit-appearance:none;">
+            <input aria-label="Say it your way" value="{{ obFree }}" onChange="{{ onObFree }}" onKeyDown="{{ onObFreeKey }}" placeholder="Say it your way" autofocus style="flex:1; min-width:0; font:400 16px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:17px 18px; outline:none; border-radius:0; -webkit-appearance:none;">
             <button onClick="{{ obFreeGo }}" aria-label="Use my answer" style="width:56px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-arrow-right-line" style="font-size:20px; color:#fff5ee;"></i></button>
           </div>
           <div style="font:400 12.5px 'Saans',sans-serif; color:#676c79; margin-top:8px;">The concierge reads every word of this. Choose them well.</div>
@@ -307,7 +320,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
           </sc-for>
         </div>
         <div style="display:flex; gap:10px; padding:0 20px 16px;">
-          <input value="{{ chatDraft }}" onChange="{{ onDraft }}" onKeyDown="{{ onChatKey }}" placeholder="Tell me what you're craving…" style="flex:1; min-width:0; font:400 16px 'Saans',sans-serif; background:#ffffff; border:1px solid #451212; color:#451212; padding:14px 16px; outline:none; border-radius:0; -webkit-appearance:none;">
+          <input aria-label="Tell me what you're craving" value="{{ chatDraft }}" onChange="{{ onDraft }}" onKeyDown="{{ onChatKey }}" placeholder="Tell me what you're craving…" style="flex:1; min-width:0; font:400 16px 'Saans',sans-serif; background:#ffffff; border:1px solid #451212; color:#451212; padding:14px 16px; outline:none; border-radius:0; -webkit-appearance:none;">
           <button onClick="{{ sendChat }}" aria-label="Send message" style="width:52px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#c22f1a;"><i class="ri-arrow-up-line" style="font-size:24px; color:#fff5ee;"></i></button>
         </div>
       </div>
@@ -344,8 +357,8 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
               <div style="position:absolute; right:-2px; bottom:-2px; width:22px; height:22px; border-radius:50%; background:#451212; display:flex; align-items:center; justify-content:center;"><i class="ri-camera-line" style="font-size:12px; color:#fff5ee;"></i></div>
             </label>
             <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:8px;">
-              <input value="{{ profName }}" onChange="{{ onProfName }}" placeholder="Your name" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
-              <textarea value="{{ profBio }}" onChange="{{ onProfBio }}" placeholder="A one-liner about you. Flatter yourself." rows="2" style="font:400 14px/1.4 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box; resize:none;"></textarea>
+              <input aria-label="Your name" value="{{ profName }}" onChange="{{ onProfName }}" placeholder="Your name" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+              <textarea aria-label="A one-liner about you. Flatter yourself." value="{{ profBio }}" onChange="{{ onProfBio }}" placeholder="A one-liner about you. Flatter yourself." rows="2" style="font:400 14px/1.4 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box; resize:none;"></textarea>
             </div>
           </div>
           <button onClick="{{ saveProfile }}" style="width:100%; margin-top:12px; font:500 14px 'Saans',sans-serif; background:#451212; color:#fff5ee; border:none; border-radius:58px; padding:12px; cursor:pointer;">Save profile</button>
@@ -374,10 +387,10 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             </div>
             <div style="display:flex; flex-direction:column; gap:8px;">
               <sc-if value="{{ authSignup }}" hint-placeholder-val="{{ true }}">
-                <input value="{{ authUser }}" onChange="{{ onAuthUser }}" placeholder="Pick a handle (a–z, 0–9, _)" autocomplete="username" autocapitalize="none" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+                <input aria-label="Pick a handle (a–z, 0–9, _)" value="{{ authUser }}" onChange="{{ onAuthUser }}" placeholder="Pick a handle (a–z, 0–9, _)" autocomplete="username" autocapitalize="none" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
               </sc-if>
-              <input value="{{ authEmail }}" onChange="{{ onAuthEmail }}" placeholder="Email" autocomplete="email" autocapitalize="none" inputmode="email" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
-              <input value="{{ authPassword }}" onChange="{{ onAuthPassword }}" onKeyDown="{{ onAuthKey }}" type="password" placeholder="Password (8+ characters)" autocomplete="current-password" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+              <input aria-label="Email" value="{{ authEmail }}" onChange="{{ onAuthEmail }}" placeholder="Email" autocomplete="email" autocapitalize="none" inputmode="email" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+              <input aria-label="Password (8+ characters)" value="{{ authPassword }}" onChange="{{ onAuthPassword }}" onKeyDown="{{ onAuthKey }}" type="password" placeholder="Password (8+ characters)" autocomplete="current-password" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
             </div>
             <button onClick="{{ authSubmit }}" style="width:100%; margin-top:10px; font:500 15px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:14px; cursor:pointer;" style-hover="background:#c22f1a;">{{ authSubmitLabel }}</button>
             <button onClick="{{ doSignIn }}" style="display:flex; align-items:center; justify-content:center; gap:9px; width:100%; margin-top:8px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:13px; cursor:pointer;"><i class="ri-google-fill" style="font-size:16px;"></i>Continue with Google</button>
@@ -424,7 +437,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
         </sc-if>
         <sc-if value="{{ listAddShown }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex; gap:8px; margin-top:14px;">
-            <input value="{{ listDraft }}" onChange="{{ onListDraft }}" onKeyDown="{{ onListKey }}" placeholder="Name it something unique" autofocus style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none;">
+            <input aria-label="Name it something unique" value="{{ listDraft }}" onChange="{{ onListDraft }}" onKeyDown="{{ onListKey }}" placeholder="Name it something unique" autofocus style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none;">
             <button onClick="{{ doCreateList }}" aria-label="Create list" style="width:44px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-check-line" style="font-size:18px; color:#fff5ee;"></i></button>
           </div>
         </sc-if>
@@ -474,7 +487,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
               <i class="ri-group-line" style="font-size:14px;"></i>Friends
             </div>
             <div style="display:flex; gap:8px;">
-              <input value="{{ frDraft }}" onChange="{{ onFrDraft }}" onKeyDown="{{ onFrKey }}" placeholder="Add a friend by handle" autocapitalize="none" style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none;">
+              <input aria-label="Add a friend by handle" value="{{ frDraft }}" onChange="{{ onFrDraft }}" onKeyDown="{{ onFrKey }}" placeholder="Add a friend by handle" autocapitalize="none" style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:11px 12px; outline:none; border-radius:0; -webkit-appearance:none;">
               <button onClick="{{ doAddFriend }}" aria-label="Send friend request" style="width:44px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-user-add-line" style="font-size:18px; color:#fff5ee;"></i></button>
             </div>
             <sc-if value="{{ frAny }}" hint-placeholder-val="{{ false }}">
@@ -505,7 +518,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
 
     <!-- own profile view -->
     <sc-if value="{{ meOpen }}" hint-placeholder-val="{{ false }}">
-      <div style="position:absolute; inset:0; z-index:55; background:#fff7f2; display:flex; flex-direction:column;">
+      <div role="dialog" aria-modal="true" aria-label="Your profile" style="position:absolute; inset:0; z-index:55; background:#fff7f2; display:flex; flex-direction:column;">
         <div style="padding:18px 20px 0; flex:none;">
           <div style="display:flex; align-items:flex-start; gap:12px;">
             <sc-if value="{{ meHasAvatar }}" hint-placeholder-val="{{ false }}"><div style="{{ meAvatarStyle }}"></div></sc-if>
@@ -552,7 +565,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
 
     <!-- friend sheet (z below the detail sheet so tapped places open above it) -->
     <sc-if value="{{ fvOpen }}" hint-placeholder-val="{{ false }}">
-      <div style="position:absolute; inset:0; z-index:55; background:#fff7f2; display:flex; flex-direction:column;">
+      <div role="dialog" aria-modal="true" aria-label="Friend's profile" style="position:absolute; inset:0; z-index:55; background:#fff7f2; display:flex; flex-direction:column;">
         <div style="padding:18px 20px 0; flex:none;">
           <div style="display:flex; align-items:flex-start; gap:10px;">
             <sc-if value="{{ fvHasAvatar }}" hint-placeholder-val="{{ false }}"><div style="{{ fvAvatarStyle }}"></div></sc-if>
@@ -612,7 +625,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
 
     <!-- add-your-own-spot sheet -->
     <sc-if value="{{ addOpen }}" hint-placeholder-val="{{ false }}">
-      <div style="position:absolute; inset:0; z-index:70; background:#fff7f2; display:flex; flex-direction:column; padding:22px 20px calc(20px + env(safe-area-inset-bottom));">
+      <div role="dialog" aria-modal="true" aria-label="Add your own spot" style="position:absolute; inset:0; z-index:70; background:#fff7f2; display:flex; flex-direction:column; padding:22px 20px calc(20px + env(safe-area-inset-bottom));">
         <div style="display:flex; align-items:center; justify-content:space-between;">
           <div style="font:500 11px 'Saans Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#c0361c;">Your repertoire</div>
           <button onClick="{{ closeAdd }}" aria-label="Close" style="width:36px; height:36px; border-radius:50%; border:1px solid #451212; background:#fff7f2; cursor:pointer;"><i class="ri-close-line" style="font-size:19px; color:#451212;"></i></button>
@@ -620,7 +633,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
         <div style="font:400 30px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin:14px 0 4px;">Add your own spot</div>
         <div style="font:italic 400 15px/1.45 'Serrif VF',Georgia,serif; color:#676c79; margin-bottom:18px;">Your secret. Whim keeps it. Mostly.</div>
         <div style="display:flex; gap:8px;">
-          <input value="{{ addName }}" onChange="{{ onAddName }}" onKeyDown="{{ onAddKey }}" placeholder="Name of the place" style="flex:1; min-width:0; font:400 16px 'Saans',sans-serif; background:#ffffff; border:1px solid #451212; color:#451212; padding:14px; outline:none; border-radius:0; -webkit-appearance:none;">
+          <input aria-label="Name of the place" value="{{ addName }}" onChange="{{ onAddName }}" onKeyDown="{{ onAddKey }}" placeholder="Name of the place" style="flex:1; min-width:0; font:400 16px 'Saans',sans-serif; background:#ffffff; border:1px solid #451212; color:#451212; padding:14px; outline:none; border-radius:0; -webkit-appearance:none;">
           <button onClick="{{ addLookupGo }}" style="flex:none; font:500 13px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:0 18px; cursor:pointer;">Find it</button>
         </div>
         <sc-if value="{{ addBusy }}" hint-placeholder-val="{{ false }}">
@@ -636,7 +649,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
           </sc-for>
         </div>
         <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#676c79; margin:16px 0 8px;">Your one-liner (optional)</div>
-        <input value="{{ addBlurb }}" onChange="{{ onAddBlurb }}" placeholder="Say something nice. Or mean but accurate." style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:13px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+        <input aria-label="Say something nice. Or mean but accurate." value="{{ addBlurb }}" onChange="{{ onAddBlurb }}" placeholder="Say something nice. Or mean but accurate." style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:13px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
         <div style="flex:1;"></div>
         <sc-if value="{{ addCanSave }}" hint-placeholder-val="{{ false }}">
           <button onClick="{{ addSaveGo }}" style="font:500 16px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:16px; cursor:pointer; width:100%;">Add to my repertoire</button>
@@ -646,7 +659,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
 
     <!-- detail sheet -->
     <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
-      <div style="position:absolute; inset:0; z-index:60; background:#fff7f2; display:flex; flex-direction:column;">
+      <div role="dialog" aria-modal="true" aria-label="Place details" style="position:absolute; inset:0; z-index:60; background:#fff7f2; display:flex; flex-direction:column;">
         <div style="height:42%; flex:none; position:relative; border-bottom:1px solid #451212; background:#fdece4; overflow:hidden;">
           <sc-if value="{{ dHasPhotos }}" hint-placeholder-val="{{ true }}">
             <div style="display:flex; height:100%; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
@@ -696,7 +709,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
               </sc-if>
               <sc-if value="{{ dListAddShown }}" hint-placeholder-val="{{ false }}">
                 <div style="display:flex; gap:8px; padding:10px 12px;">
-                  <input value="{{ listDraft }}" onChange="{{ onListDraft }}" onKeyDown="{{ dNewListKey }}" placeholder="Name it something unique" autofocus style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:10px 12px; outline:none; border-radius:0; -webkit-appearance:none;">
+                  <input aria-label="Name it something unique" value="{{ listDraft }}" onChange="{{ onListDraft }}" onKeyDown="{{ dNewListKey }}" placeholder="Name it something unique" autofocus style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:10px 12px; outline:none; border-radius:0; -webkit-appearance:none;">
                   <button onClick="{{ dNewListGo }}" aria-label="Create list and file here" style="width:42px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-check-line" style="font-size:17px; color:#fff5ee;"></i></button>
                 </div>
               </sc-if>
@@ -725,7 +738,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
                   <button onClick="{{ st.go }}" aria-label="Set rating" style="background:none; border:none; cursor:pointer; padding:2px;"><i class="{{ st.icon }}" style="font-size:19px; color:#c0361c;"></i></button>
                 </sc-for>
               </div>
-              <input value="{{ dRevText }}" onChange="{{ dRevOnText }}" placeholder="Your verdict, in a sentence or three…" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
+              <input aria-label="Your verdict, in a sentence or three" value="{{ dRevText }}" onChange="{{ dRevOnText }}" placeholder="Your verdict, in a sentence or three…" style="font:400 15px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:12px; outline:none; border-radius:0; -webkit-appearance:none; width:100%; box-sizing:border-box;">
               <div style="display:flex; gap:8px; margin-top:9px;">
                 <button onClick="{{ dRevSave }}" style="flex:1; font:500 13px 'Saans',sans-serif; background:#e8432c; color:#fff5ee; border:none; border-radius:58px; padding:11px; cursor:pointer;">Publish</button>
                 <button onClick="{{ dRevCancel }}" style="font:500 13px 'Saans',sans-serif; background:#ffffff; color:#676c79; border:1px solid #f2d3c6; border-radius:58px; padding:11px 16px; cursor:pointer;">Cancel</button>
@@ -817,12 +830,14 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
     </sc-if>
 
     <!-- toast -->
-    <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
-      <div style="position:absolute; bottom:calc(96px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); background:#451212; color:#fff7f2; font:500 12px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; padding:11px 16px; white-space:nowrap; animation:whim-toast .25s ease-out; z-index:40;">{{ toast }}</div>
-    </sc-if>
+    <div role="status" aria-live="polite">
+      <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; bottom:calc(96px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); background:#451212; color:#fff7f2; font:500 12px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; padding:11px 16px; white-space:nowrap; animation:whim-toast .25s ease-out; z-index:40;">{{ toast }}</div>
+      </sc-if>
+    </div>
 
     <!-- tab bar -->
-    <div style="display:flex; border-top:1px solid #451212; background:#ffffff; padding-bottom:env(safe-area-inset-bottom);">
+    <div role="navigation" aria-label="Main" style="display:flex; border-top:1px solid #451212; background:#ffffff; padding-bottom:env(safe-area-inset-bottom);">
       <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
         <button onClick="{{ t.go }}" style="{{ t.style }}"><i class="{{ t.icon }}" style="font-size:22px; display:block; margin:0 auto 3px;"></i>{{ t.label }}<sc-if value="{{ t.badge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:4px; color:#d1401f;">({{ t.badge }})</span></sc-if></button>
       </sc-for>
