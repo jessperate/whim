@@ -762,6 +762,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
           <sc-if value="{{ dNoReviews }}" hint-placeholder-val="{{ false }}">
             <div style="font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; margin-top:12px;">{{ dNoReviews }}</div>
           </sc-if>
+          <button onClick="{{ dBeenGo }}" style="{{ dBeenStyle }}"><i class="{{ dBeenIcon }}" style="font-size:15px;"></i>{{ dBeenLabel }}</button>
           <sc-if value="{{ dHasExpos }}" hint-placeholder-val="{{ false }}">
             <div style="background:#e5e5ff; padding:14px 14px 6px; margin:4px 0 10px;">
               <div style="display:flex; align-items:center; gap:8px; font:500 10px 'Saans Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#1b1b8f;"><i class="ri-artboard-line" style="font-size:14px;"></i>On the walls right now</div>
@@ -1059,6 +1060,7 @@ function restoreState() {
       name: typeof s.name === 'string' ? s.name.slice(0, 40) : '',
       bio: typeof s.bio === 'string' ? s.bio.slice(0, 160) : '',
       pendingInvite: typeof s.pendingInvite === 'string' ? s.pendingInvite : undefined,
+      visited: s.visited || {},
       lists: s.lists || {},
       listOf: s.listOf || {},
       planMood: typeof s.planMood === 'string' ? s.planMood : 'mix',
@@ -1108,6 +1110,7 @@ class Component extends DCLogic {
     lists: {}, listOf: {}, listDraft: '', listAdding: false,
     openFolders: {}, listPickerOpen: false,
     meView: false,
+    visited: {},
     isPublic: false,
     toPulse: [],
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
@@ -1127,6 +1130,7 @@ class Component extends DCLogic {
         pendingInvite: S.pendingInvite,
         planMood: S.planMood, planSkips: S.planSkips, planDay: S.planDay,
         lists: S.lists, listOf: S.listOf,
+        visited: S.visited,
         myReviews: S.myReviews,
         // keep only the dynamic places the user has acted on
         gplaces: Object.fromEntries(Object.entries(S.gplaces).filter(([id, g]) => g.custom || S.swiped[id] === 'like' || S.hearts[id] || S.myReviews[id])),
@@ -1414,6 +1418,7 @@ class Component extends DCLogic {
     };
     if (this._profileV2) { row.bio = S.bio || ''; row.avatar = S.avatar || null; }
     if (this._profileV3) row.is_public = !!S.isPublic;
+    if (this._profileV4) row.visited = S.visited;
     const sig = JSON.stringify(row);
     if (!force && sig === this._profSig) return;
     this._profSig = sig;
@@ -1440,6 +1445,10 @@ class Component extends DCLogic {
     const next = { username: p.username || '' };
     this._profileV2 = 'avatar' in p;
     this._profileV3 = 'is_public' in p;
+    this._profileV4 = 'visited' in p;
+    if (p.visited && typeof p.visited === 'object' && !Array.isArray(p.visited)) {
+      next.visited = { ...p.visited, ...S.visited };
+    }
     if (typeof p.is_public === 'boolean') next.isPublic = p.is_public;
     if (p.bio && !S.bio) next.bio = p.bio;
     if (p.avatar && !S.avatar) next.avatar = p.avatar;
@@ -1589,9 +1598,10 @@ class Component extends DCLogic {
   async openFriend(f) {
     if (!this._sb) return;
     this.setState({ friendView: { ...f, loading: true, hearts: [], likes: [] } });
-    const [ht0, sw] = await Promise.all([
+    const [ht0, sw, pv] = await Promise.all([
       this._sb.from('hearts').select('place_id,place,created_at,list').eq('user_id', f.id),
       this._sb.from('swipes').select('place_id,place').eq('user_id', f.id).eq('direction', 'like'),
+      this._sb.from('profiles').select('visited').eq('user_id', f.id).maybeSingle().then(r => (r.error ? { data: null } : r)),
     ]);
     const ht = ht0.error ? await this._sb.from('hearts').select('place_id,place,created_at').eq('user_id', f.id) : ht0;
     const gplaces = { ...this.state.gplaces };
@@ -1603,6 +1613,7 @@ class Component extends DCLogic {
         hearts: (ht.data || []).sort((x, y) => Date.parse(x.created_at) - Date.parse(y.created_at)).map(r => r.place_id),
         heartRows: (ht.data || []).sort((x, y) => Date.parse(x.created_at) - Date.parse(y.created_at)).map(r => ({ id: r.place_id, list: r.list || '' })),
         likes: (sw.data || []).map(r => r.place_id),
+        visited: pv.data && pv.data.visited && typeof pv.data.visited === 'object' && !Array.isArray(pv.data.visited) ? pv.data.visited : {},
       },
     });
   }
@@ -2103,6 +2114,20 @@ class Component extends DCLogic {
     setTimeout(() => this.openDetail(id), 250);
   }
 
+  toggleVisited(id) {
+    const p = this.findPlace(id);
+    if (!p) return;
+    const was = !!this.state.visited[id];
+    this.setState(s => {
+      const visited = { ...s.visited };
+      if (was) delete visited[id];
+      else visited[id] = { at: Date.now(), name: p.name, kind: p.kind };
+      return { visited };
+    });
+    setTimeout(() => this.pushProfile(true), 60);
+    this.showToast(was ? 'Un-been. It happens.' : 'Been there. Noted for the record.');
+  }
+
   listNameOf(id) {
     const lid = this.state.listOf[id];
     return (lid && this.state.lists[lid] && this.state.lists[lid].name) || null;
@@ -2299,6 +2324,7 @@ class Component extends DCLogic {
     if (T.chanson && (p.kind === 'Dive bar' || p.kind === 'Jazz club')) s += 2;
     if (T.photoLover && (p.kind === 'Viewpoint' || p.kind === 'Landmark' || p.kind === 'Passage')) s += 2;
     if (p.custom) s += 2; // their own finds deserve airtime
+    if (this.state.visited[p.id]) s -= 1.5; // been there; new ground first
     if (T.withKids && p.kids) s += 3;
     if (T.withKids && ['Bar', 'Wine bar', 'Cocktail bar', 'Jazz club'].includes(p.kind)) s -= 2;
     if (T.couple && (p.kind === 'Viewpoint' || p.kind === 'Wine bar' || p.id === 'p36')) s += 2;
@@ -2570,6 +2596,7 @@ class Component extends DCLogic {
           city: (S.city && S.city.name) || 'Paris',
           feedback: S.chat.filter(m => m.fb).slice(-5).map(m => ({ text: String(m.text).slice(0, 90), verdict: m.fb })),
           taste, liked, deck,
+          visited: Object.values(S.visited).map(v => v.name).filter(Boolean).slice(0, 30),
           pulse: [...(S.global ? [] : S.pulse), ...S.toPulse].slice(0, 8).map(p => ({ text: p.text, spot: p.spot })),
           places: (() => {
             const spotFor = (p) => {
@@ -2852,6 +2879,15 @@ class Component extends DCLogic {
       get dRedditAny() { return this.dReddit.length > 0; },
       dShare: () => this.shareCard(p.id),
       dHeart: () => this.toggleHeart(p.id),
+      dBeenGo: () => this.toggleVisited(p.id),
+      dBeenIcon: S.visited[p.id] ? 'ri-map-pin-user-fill' : 'ri-map-pin-user-line',
+      dBeenLabel: S.visited[p.id] ? 'Been here' : 'Been here?',
+      dBeenStyle: {
+        display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '12px',
+        font: "500 11px 'Saans Mono',monospace", letterSpacing: '.05em', textTransform: 'uppercase',
+        background: S.visited[p.id] ? '#451212' : '#ffffff', color: S.visited[p.id] ? '#fff5ee' : '#451212',
+        border: '1px solid #451212', borderRadius: '58px', padding: '9px 14px', cursor: 'pointer',
+      },
       dListOpen: !!S.listPickerOpen,
       dListPick: () => this.setState(s => ({ listPickerOpen: !s.listPickerOpen, listAdding: false })),
       dBookIcon: S.hearts[p.id] ? 'ri-bookmark-fill' : 'ri-bookmark-line',
@@ -3256,7 +3292,7 @@ class Component extends DCLogic {
       fvLoading: !!(S.friendView && S.friendView.loading),
       fvClose: () => this.closeFriend(),
       fvHearts, fvLikes,
-      fvStats: S.friendView && !S.friendView.loading ? `${((S.friendView.heartRows) || S.friendView.hearts || []).length} saves · ${(S.friendView.likes || []).length} liked` : '',
+      fvStats: S.friendView && !S.friendView.loading ? `${((S.friendView.heartRows) || S.friendView.hearts || []).length} saves · ${Object.keys((S.friendView.visited) || {}).length} been · ${(S.friendView.likes || []).length} liked` : '',
       fvSections: (() => {
         const rows = (S.friendView && S.friendView.heartRows) || ((S.friendView && S.friendView.hearts) || []).map(id => ({ id, list: '' }));
         const by = new Map();
@@ -3266,7 +3302,13 @@ class Component extends DCLogic {
           icon: k ? 'ri-folder-3-line' : 'ri-folder-heart-line',
           rows: ids.map(id => this.friendRow(id)).filter(Boolean),
         })).filter(s => s.rows.length);
-      })(),
+      })().concat((() => {
+        const v = (S.friendView && S.friendView.visited) || {};
+        const rows = Object.entries(v)
+          .sort((x, y) => (y[1].at || 0) - (x[1].at || 0))
+          .map(([id, e]) => ({ name: e.name || id, meta: `${e.kind || 'Spot'} · visited`, open: () => this.openDetail(id) }));
+        return rows.length ? [{ title: `Been there (${rows.length})`, icon: 'ri-map-pin-user-line', rows }] : [];
+      })()),
       get fvHasSections() { return this.fvSections.length > 0; },
       meOpen: !!S.meView,
       meGo: () => this.setState({ meView: true }),
@@ -3278,7 +3320,7 @@ class Component extends DCLogic {
       meHasAvatar: !!S.avatar,
       meAvatarStyle: S.avatar ? avStyle(S.avatar, 74) : null,
       meInitial: (S.name || '?').trim().charAt(0).toUpperCase() || '?',
-      meStats: `${Object.keys(S.hearts).length} saves · ${Object.values(S.swiped).filter(v => v === 'like').length} liked · ${Object.keys(S.myReviews).length} reviews · ${S.swipeCount} swipes`,
+      meStats: `${Object.keys(S.hearts).length} saves · ${Object.keys(S.visited).length} been · ${Object.keys(S.myReviews).length} reviews · ${S.swipeCount} swipes`,
       mePublicRow: !!(S.isPublic && S.username),
       fvHasHearts: fvHearts.length > 0,
       fvHasLikes: fvLikes.length > 0,
@@ -3352,7 +3394,19 @@ class Component extends DCLogic {
             const items = savedAll.filter(x => S.listOf[x.id] === lid);
             return { fid: lid, icon: 'ri-folder-3-line', title: `${l.name} (${items.length})`, items };
           }),
-        ].map(f => {
+          {
+            fid: 'been', icon: 'ri-map-pin-user-line',
+            title: `Been there (${Object.keys(S.visited).length})`,
+            items: Object.entries(S.visited)
+              .sort((x, y) => (y[1].at || 0) - (x[1].at || 0))
+              .map(([id, v]) => ({
+                name: v.name || id, id,
+                meta: `${v.kind || 'Spot'} · visited`,
+                open: () => this.openDetail(id),
+                remove: () => this.toggleVisited(id),
+              })),
+          },
+        ].filter(f => f.fid !== 'been' || f.items.length > 0).map(f => {
           const open = !!S.openFolders[f.fid];
           return {
             ...f, any: f.items.length > 0,
@@ -3363,7 +3417,7 @@ class Component extends DCLogic {
           };
         });
       })(),
-      foldersAny: PLACES.concat(Object.values(S.gplaces)).filter(p => S.hearts[p.id]).length > 0 || Object.keys(S.lists).length > 0,
+      foldersAny: PLACES.concat(Object.values(S.gplaces)).filter(p => S.hearts[p.id]).length > 0 || Object.keys(S.lists).length > 0 || Object.keys(S.visited).length > 0,
       listAddShown: S.listAdding, listAddClosed: !S.listAdding,
       listAddOpen: () => this.setState({ listAdding: true }),
       listDraft: S.listDraft,

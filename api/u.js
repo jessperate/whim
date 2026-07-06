@@ -47,7 +47,8 @@ export default async function handler(req, res) {
 
   try {
     const sb = (path) => fetch(`${url}/rest/v1/${path}`, { headers: { apikey: key, Authorization: `Bearer ${key}` } }).then((r) => (r.ok ? r.json() : null));
-    const profs = await sb(`profiles?select=user_id,username,display_name,bio,avatar,swipe_count&username=eq.${encodeURIComponent(handle)}&is_public=eq.true&limit=1`);
+    let profs = await sb(`profiles?select=user_id,username,display_name,bio,avatar,swipe_count,visited&username=eq.${encodeURIComponent(handle)}&is_public=eq.true&limit=1`);
+    if (!Array.isArray(profs)) profs = await sb(`profiles?select=user_id,username,display_name,bio,avatar,swipe_count&username=eq.${encodeURIComponent(handle)}&is_public=eq.true&limit=1`);
     const prof = Array.isArray(profs) && profs[0];
     if (!prof) {
       res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=3600');
@@ -70,6 +71,11 @@ export default async function handler(req, res) {
       const area = p.area || '';
       return `<a class="row" href="/p/${encodeURIComponent(h.place_id)}?n=${encodeURIComponent(nm)}&k=${encodeURIComponent(kind)}"><b>${esc(nm)}</b><span>${esc([kind, area].filter(Boolean).join(' · '))}</span></a>`;
     };
+    const visited = prof.visited && typeof prof.visited === 'object' && !Array.isArray(prof.visited) ? prof.visited : {};
+    const visitedRows = Object.entries(visited)
+      .sort((a, b) => (b[1].at || 0) - (a[1].at || 0))
+      .map(([id, v]) => `<a class="row" href="/p/${encodeURIComponent(id)}?n=${encodeURIComponent(v.name || id)}&k=${encodeURIComponent(v.kind || '')}"><b>${esc(v.name || id)}</b><span>${esc([v.kind, 'visited'].filter(Boolean).join(' · '))}</span></a>`)
+      .join('');
     const sections = [...folders.entries()]
       .filter(([, items]) => items.length)
       .map(([k, items]) => `<h2>${k ? esc(k) : 'Saved for later'} (${items.length})</h2><div class="list">${items.map(rowFor).join('')}</div>`)
@@ -87,7 +93,8 @@ export default async function handler(req, res) {
         <div class="kicker">@${esc(prof.username)}</div>
       </div></div>
       ${prof.bio ? `<div class="bio">${esc(prof.bio)}</div>` : ''}
-      <div class="stats">${hearts.length} saves · ${prof.swipe_count || 0} swipes judged</div>
+      <div class="stats">${hearts.length} saves · ${Object.keys(visited).length} been · ${prof.swipe_count || 0} swipes judged</div>
+      ${visitedRows ? `<h2>Been there (${Object.keys(visited).length})</h2><div class="list">${visitedRows}</div>` : ''}
       ${sections || '<p style="font:400 15px -apple-system,sans-serif; color:#676c79;">Nothing saved yet. The taste is still forming.</p>'}
       <a class="cta" href="/?add=${encodeURIComponent(prof.username)}">Add ${esc(name.split(' ')[0])} on Whim →</a>`,
       `<meta property="og:title" content="${esc(name)} on Whim">

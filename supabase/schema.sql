@@ -267,3 +267,7 @@ create policy "hearts public read" on public.hearts
   for select using (exists (
     select 1 from public.profiles pr where pr.user_id = hearts.user_id and pr.is_public
   ));
+
+-- 2026-07-06: been-there — visited places live on the profile as a jsonb map
+-- of place_id -> { at, name, kind } (snapshotted so public pages can render).
+alter table public.profiles add column if not exists visited jsonb not null default '{}'::jsonb;

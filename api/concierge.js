@@ -31,6 +31,7 @@ export default async function handler(req, res) {
   } = context;
   const taste = cap(context.taste, 24).map(String);
   const liked = cap(context.liked, 40).map(String);
+  const visited = cap(context.visited, 30).map(String);
   const deck = cap(context.deck, 8).map(String);
   const places = cap(context.places, 80);
   const pulse = cap(context.pulse, 8);
@@ -50,7 +51,7 @@ The user is ${geo === 'ok' ? `in ${city} — recommendations are sorted by real 
 ${userName ? `The user's name is ${userName} — greet them by name and use it naturally now and then, without overdoing it.` : ''}
 Their taste file (from the calibration quiz and swipes): ${taste.length ? taste.join('; ') : 'still a blank slate — feel free to interrogate them, politely'}.${feedback.length ? `
 Their reactions to your recent suggestions (learn from these): ${feedback.map((f) => `[${f.verdict === 'up' ? 'liked' : 'disliked'}] "${String(f.text).slice(0, 90)}"`).join(' · ')}.` : ''}
-Places they've liked so far: ${liked.length ? liked.join(', ') : 'none yet'}.
+Places they've liked so far: ${liked.length ? liked.join(', ') : 'none yet'}.${visited.length ? `\nPlaces they've ALREADY BEEN: ${visited.join(', ')} — prefer new ground; only send them back if they ask for a repeat or it's clearly the right call.` : ''}
 Currently on top of their deck: ${deck.length ? deck.join(', ') : 'nothing — deck is empty'}.
 
 When recommending, prefer spots from Whim's curated list below (they can swipe on these). You may go off-list for specifics the list doesn't cover, but keep it real — never invent a place. Match recommendations to the current time of day and weather.

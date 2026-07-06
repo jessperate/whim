@@ -444,6 +444,19 @@ try {
   const youL2 = await page.evaluate(() => document.body.innerText.toLowerCase());
   check('spot filed into the named list', /honeymoon\s*\(\s*1\s*\)/.test(youL2), (youL2.match(/honeymoon[^\n]*/) || [''])[0]);
 
+  // been-here: mark the same bar as visited, profile records it
+  await page.goto('http://127.0.0.1:8199/?place=p13&n=Le%20Baron%20Rouge&k=Wine%20bar', { waitUntil: 'networkidle2' });
+  await new Promise((r) => setTimeout(r, 800));
+  await clickByText('Been here?');
+  await new Promise((r) => setTimeout(r, 400));
+  await clickByText('You');
+  await new Promise((r) => setTimeout(r, 300));
+  await clickByText('View my profile');
+  await new Promise((r) => setTimeout(r, 400));
+  const meBeen = await page.evaluate(() => document.body.innerText.toLowerCase());
+  check('been-here lands on profile', /been there\s*\(\s*1\s*\)/.test(meBeen) && /1 been/.test(meBeen), (meBeen.match(/\d+ saves[^\n]*/) || [''])[0]);
+  await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => x.getAttribute('aria-label') === 'Close profile'); b && b.click(); });
+
 
   // heart from the sheet, then close
   await clickByText('Save for later');
