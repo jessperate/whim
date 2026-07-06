@@ -2,13 +2,47 @@
 // exposes profiles that opted into is_public, so a private profile renders
 // the same page as a missing one (no existence leak).
 
+// keep in sync with TASTE_TITLES / BADGES in index.html
+const TITLES = [
+  ['Morbidly delighted', 'Connoisseur of Beautiful Darkness'],
+  ['Natural or nothing', 'Natural-Wine Truffle Pig'],
+  ['Vintage and friperies', 'Vintage Bloodhound'],
+  ['Electro until sunrise', 'Sunrise Negotiator'],
+  ['Michelin or bust', 'Michelin Mercenary'],
+  ['Street food goblin', 'Street-Food Strategist'],
+  ['Find coffee immediately', 'Espresso-Powered Cartographer'],
+  ['Espresso, standing', 'Espresso-Powered Cartographer'],
+  ['Take me where locals whisper', 'Professional Side-Street Turner'],
+  ['Icons first, no shame', 'Unapologetic Monument Hunter'],
+  ['Museum, obviously', 'Museum Marathoner'],
+  ['Hours in every wing', 'Museum Marathoner'],
+  ['Bookshops and paper goods', 'Paper-Goods Romantic'],
+  ['Jazz cellar until late', 'Cellar Jazz Regular'],
+];
+const titleFor = (answers) => {
+  const hit = TITLES.find(([label]) => answers.includes(label));
+  return hit ? hit[1] : 'Taste Profile in Progress';
+};
+const badgesFor = (d) => [
+  ['ri-footprint-fill', 'First Steps', d.been >= 1],
+  ['ri-walk-fill', 'Regular', d.been >= 5],
+  ['ri-vip-crown-fill', 'Local Legend', d.been >= 15],
+  ['ri-folder-3-fill', 'Curator', d.lists >= 1],
+  ['ri-archive-fill', 'Archivist', d.lists >= 3],
+  ['ri-cake-2-fill', 'Croissant Economy', d.kind('Boulangerie', 'Bakery', 'Café', 'Pâtisserie') >= 3],
+  ['ri-moon-fill', 'Night Shift', d.kind('Bar', 'Wine bar', 'Cocktail bar', 'Club', 'Jazz club', 'Dive bar') >= 3],
+  ['ri-gallery-fill', 'Culture Vulture', d.kind('Museum', 'Gallery') >= 3],
+  ['ri-goblet-fill', 'Cork Whisperer', d.kind('Wine bar') >= 3],
+  ['ri-compass-discover-fill', 'Off the Map', d.kind('Oddity') >= 1],
+].filter(([, , earned]) => earned);
+
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const page = (title, body, extraHead = '') => `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>${extraHead}
-<link rel="icon" href="/apple-touch-icon.png">
+<link rel="icon" href="/apple-touch-icon.png">\n<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <style>
   body { margin:0; background:#fff7f2; color:#451212; font:400 16px/1.6 Georgia,serif; }
   main { max-width:640px; margin:0 auto; padding:40px 22px 70px; }
@@ -47,7 +81,7 @@ export default async function handler(req, res) {
 
   try {
     const sb = (path) => fetch(`${url}/rest/v1/${path}`, { headers: { apikey: key, Authorization: `Bearer ${key}` } }).then((r) => (r.ok ? r.json() : null));
-    let profs = await sb(`profiles?select=user_id,username,display_name,bio,avatar,swipe_count,visited&username=eq.${encodeURIComponent(handle)}&is_public=eq.true&limit=1`);
+    let profs = await sb(`profiles?select=user_id,username,display_name,bio,avatar,swipe_count,visited,ob_answers,quiz_answers,created_at&username=eq.${encodeURIComponent(handle)}&is_public=eq.true&limit=1`);
     if (!Array.isArray(profs)) profs = await sb(`profiles?select=user_id,username,display_name,bio,avatar,swipe_count&username=eq.${encodeURIComponent(handle)}&is_public=eq.true&limit=1`);
     const prof = Array.isArray(profs) && profs[0];
     if (!prof) {
@@ -81,6 +115,30 @@ export default async function handler(req, res) {
       .map(([k, items]) => `<h2>${k ? esc(k) : 'Saved for later'} (${items.length})</h2><div class="list">${items.map(rowFor).join('')}</div>`)
       .join('');
 
+    const answers = [
+      ...(Array.isArray(prof.ob_answers) ? prof.ob_answers : []),
+      ...Object.values(prof.quiz_answers || {}),
+    ].map(String);
+    const title = titleFor(answers);
+    const listNames = new Set(hearts.map((h) => h.list).filter(Boolean));
+    const kinds = hearts.map((h) => (h.place || {}).kind).filter(Boolean);
+    const badges = badgesFor({
+      been: Object.keys(visited).length,
+      lists: listNames.size,
+      kind: (...ks) => kinds.filter((k) => ks.includes(k)).length,
+    });
+    const badgeHtml = badges.length
+      ? `<h2>Badges (${badges.length})</h2><div style="display:flex; flex-wrap:wrap; gap:8px;">${badges.map(([icon, name]) => `<span style="display:inline-flex; align-items:center; gap:7px; background:#EEFF8C; border:1px solid #5c6a0a; padding:9px 12px; font:500 11px ui-monospace,monospace; letter-spacing:.04em; text-transform:uppercase; color:#3d470a;"><i class="${icon}"></i>${esc(name)}</span>`).join('')}</div>`
+      : '';
+    const quotes = answers.filter((a) => a && a !== 'skipped' && a.length > 11 && a.length < 60).slice(0, 3);
+    const quoteHtml = quotes.length
+      ? `<h2>In their own words</h2>${quotes.map((q) => `<div class="bio" style="margin:6px 0;">“${esc(q)}”</div>`).join('')}`
+      : '';
+    const statBlocks = [
+      [Object.keys(visited).length, 'Been'], [hearts.length, 'Saved'], [listNames.size, 'Lists'], [prof.swipe_count || 0, 'Swipes judged'],
+    ].map(([v, l]) => `<div style="border:1px solid #f2d3c6; background:#fff; padding:12px 10px; text-align:center;"><div style="font:400 26px/1 Georgia,serif; color:#451212;">${v}</div><div style="font:500 10px ui-monospace,monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79; margin-top:6px;">${l}</div></div>`).join('');
+    const since = prof.created_at ? `On Whim since ${new Date(prof.created_at).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}` : '';
+
     const avatar = prof.avatar && String(prof.avatar).startsWith('data:image/')
       ? `<img class="avatar" src="${prof.avatar}" alt="">`
       : `<div class="initial">${esc(name.trim().charAt(0).toUpperCase())}</div>`;
@@ -92,8 +150,12 @@ export default async function handler(req, res) {
         <h1>${esc(name)}</h1>
         <div class="kicker">@${esc(prof.username)}</div>
       </div></div>
+      <div class="bio" style="color:#c0361c; margin-top:6px;">${esc(title)}</div>
       ${prof.bio ? `<div class="bio">${esc(prof.bio)}</div>` : ''}
-      <div class="stats">${hearts.length} saves · ${Object.keys(visited).length} been · ${prof.swipe_count || 0} swipes judged</div>
+      ${since ? `<div class="stats">${esc(since)}</div>` : ''}
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; margin-top:18px;">${statBlocks}</div>
+      ${badgeHtml}
+      ${quoteHtml}
       ${visitedRows ? `<h2>Been there (${Object.keys(visited).length})</h2><div class="list">${visitedRows}</div>` : ''}
       ${sections || '<p style="font:400 15px -apple-system,sans-serif; color:#676c79;">Nothing saved yet. The taste is still forming.</p>'}
       <a class="cta" href="/?add=${encodeURIComponent(prof.username)}">Add ${esc(name.split(' ')[0])} on Whim →</a>`,

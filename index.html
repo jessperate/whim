@@ -534,14 +534,34 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             <div style="flex:1; min-width:0;">
               <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#c0361c;">{{ meHandle }}</div>
               <div style="font:400 28px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin-top:6px;">{{ meName }}</div>
+              <div style="font:italic 400 14px/1.3 'Serrif VF',Georgia,serif; color:#c0361c; margin-top:5px;">{{ meTitle }}</div>
               <sc-if value="{{ meHasBio }}" hint-placeholder-val="{{ false }}"><div style="font:italic 400 13.5px/1.45 'Serrif VF',Georgia,serif; color:#38100c; margin-top:6px;">{{ meBio }}</div></sc-if>
-              <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79; margin-top:8px;">{{ meStats }}</div>
+              <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79; margin-top:8px;">{{ meSince }}</div>
             </div>
             <button onClick="{{ meClose }}" aria-label="Close profile" style="width:38px; height:38px; flex:none; border-radius:50%; border:1px solid #451212; background:#fff7f2; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-close-line" style="font-size:20px; color:#451212;"></i></button>
           </div>
           <div style="border-bottom:1px solid #451212; margin-top:14px;"></div>
         </div>
         <div style="flex:1; overflow:auto; padding:16px 20px 24px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:16px;">
+            <sc-for list="{{ meStatBlocks }}" as="mb" hint-placeholder-count="6">
+              <div style="border:1px solid #f2d3c6; background:#ffffff; padding:12px 10px; text-align:center;">
+                <div style="font:400 26px/1 'Serrif VF',Georgia,serif; color:#451212;">{{ mb.val }}</div>
+                <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79; margin-top:6px;">{{ mb.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; font:500 10px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:6px;"><span>The Paris canon</span><span>{{ meMeterPct }}%</span></div>
+            <div style="height:5px; background:#fdece4;"><div style="{{ meMeterStyle }}"></div></div>
+            <div style="font:400 12px 'Saans',sans-serif; color:#676c79; margin-top:6px;">{{ meMeterLine }}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;"><i class="ri-medal-line" style="font-size:14px;"></i>Badges</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;">
+            <sc-for list="{{ meBadges }}" as="bd" hint-placeholder-count="4">
+              <div style="{{ bd.chipStyle }}" title="{{ bd.need }}"><i class="{{ bd.icon }}" style="{{ bd.iconStyle }}"></i>{{ bd.name }}<sc-if value="{{ bd.sub }}" hint-placeholder-val="{{ false }}"><span style="text-transform:none; letter-spacing:0; opacity:.75;">— {{ bd.sub }}</span></sc-if></div>
+            </sc-for>
+          </div>
           <sc-if value="{{ mePublicRow }}" hint-placeholder-val="{{ false }}">
             <button onClick="{{ profCopyUrl }}" style="display:block; width:100%; margin-bottom:16px; font:500 11px 'Saans Mono',monospace; letter-spacing:.03em; background:#fdece4; color:#c0361c; border:none; padding:11px; cursor:pointer; text-align:center;">{{ profPublicUrl }} — share it</button>
           </sc-if>
@@ -581,6 +601,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
               <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#c0361c;">@{{ fvHandle }}</div>
               <div style="font:400 28px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin-top:6px;">{{ fvName }}</div>
               <sc-if value="{{ fvHasBio }}" hint-placeholder-val="{{ false }}"><div style="font:italic 400 13.5px/1.45 'Serrif VF',Georgia,serif; color:#38100c; margin-top:6px;">{{ fvBio }}</div></sc-if>
+              <sc-if value="{{ fvTitle }}" hint-placeholder-val="{{ false }}"><div style="font:italic 400 14px/1.3 'Serrif VF',Georgia,serif; color:#c0361c; margin-top:5px;">{{ fvTitle }}</div></sc-if>
               <sc-if value="{{ fvStats }}" hint-placeholder-val="{{ false }}"><div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79; margin-top:8px;">{{ fvStats }}</div></sc-if>
             </div>
             <button onClick="{{ fvClose }}" aria-label="Close friend view" style="width:38px; height:38px; flex:none; border-radius:50%; border:1px solid #451212; background:#fff7f2; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-close-line" style="font-size:20px; color:#451212;"></i></button>
@@ -588,6 +609,13 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
           <div style="border-bottom:1px solid #451212; margin-top:14px;"></div>
         </div>
         <div style="flex:1; overflow:auto; padding:16px 20px 24px;">
+          <sc-if value="{{ fvHasBadges }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+              <sc-for list="{{ fvBadges }}" as="fb" hint-placeholder-count="2">
+                <div style="display:flex; align-items:center; gap:7px; background:#EEFF8C; border:1px solid #5c6a0a; padding:9px 12px; font:500 11px 'Saans Mono',monospace; letter-spacing:.04em; text-transform:uppercase; color:#3d470a;"><i class="{{ fb.icon }}" style="font-size:14px; color:#5c6a0a;"></i>{{ fb.name }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
           <sc-if value="{{ fvLoading }}" hint-placeholder-val="{{ false }}">
             <div style="text-align:center; font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; padding:12px; border:1px dashed #f2d3c6;">Rifling through their folder…</div>
           </sc-if>
@@ -951,6 +979,42 @@ const CTX = {
   night: { t:'23:05', greetSunny:'Paris after dark. Make questionable plans.', greetRainy:'Wet midnight. Jazz cellars are dry, just saying.' },
 };
 
+// profile gamification: badges are computed, never stored — they can't drift
+const BADGES = [
+  { id: 'first', icon: 'ri-footprint-fill', name: 'First Steps', need: 'visit one place', test: d => d.been >= 1 },
+  { id: 'regular', icon: 'ri-walk-fill', name: 'Regular', need: 'visit 5 places', test: d => d.been >= 5 },
+  { id: 'legend', icon: 'ri-vip-crown-fill', name: 'Local Legend', need: 'visit 15 places', test: d => d.been >= 15 },
+  { id: 'curator', icon: 'ri-folder-3-fill', name: 'Curator', need: 'create a named list', test: d => d.lists >= 1 },
+  { id: 'archivist', icon: 'ri-archive-fill', name: 'Archivist', need: 'keep 3 lists', test: d => d.lists >= 3 },
+  { id: 'croissant', icon: 'ri-cake-2-fill', name: 'Croissant Economy', need: 'save 3 bakeries or cafés', test: d => d.kind('Boulangerie', 'Bakery', 'Café', 'Pâtisserie') >= 3 },
+  { id: 'nightshift', icon: 'ri-moon-fill', name: 'Night Shift', need: 'save 3 bars or clubs', test: d => d.kind('Bar', 'Wine bar', 'Cocktail bar', 'Club', 'Jazz club', 'Dive bar') >= 3 },
+  { id: 'culture', icon: 'ri-gallery-fill', name: 'Culture Vulture', need: 'save 3 museums or galleries', test: d => d.kind('Museum', 'Gallery') >= 3 },
+  { id: 'cork', icon: 'ri-goblet-fill', name: 'Cork Whisperer', need: 'save 3 wine bars', test: d => d.kind('Wine bar') >= 3 },
+  { id: 'offmap', icon: 'ri-compass-discover-fill', name: 'Off the Map', need: 'save an oddity or add your own spot', test: d => d.kind('Oddity') >= 1 || d.custom >= 1 },
+  { id: 'critic', icon: 'ri-quill-pen-fill', name: 'House Critic', need: 'write 3 reviews', test: d => d.reviews >= 3 },
+  { id: 'calibrated', icon: 'ri-equalizer-fill', name: 'Fully Calibrated', need: 'answer every deep cut', test: d => d.deepDone },
+];
+const computeBadges = (d) => BADGES.map(b => ({ ...b, earned: !!b.test(d) }));
+
+const TASTE_TITLES = [
+  ['macabre', 'Connoisseur of Beautiful Darkness'],
+  ['naturalWine', 'Natural-Wine Truffle Pig'],
+  ['vintage', 'Vintage Bloodhound'],
+  ['electro', 'Sunrise Negotiator'],
+  ['fancy', 'Michelin Mercenary'],
+  ['streetFood', 'Street-Food Strategist'],
+  ['coffeeFirst', 'Espresso-Powered Cartographer'],
+  ['offPath', 'Professional Side-Street Turner'],
+  ['iconsFirst', 'Unapologetic Monument Hunter'],
+  ['museumLover', 'Museum Marathoner'],
+  ['bookish', 'Paper-Goods Romantic'],
+  ['jazz', 'Cellar Jazz Regular'],
+];
+const tasteTitleFor = (T) => {
+  const hit = TASTE_TITLES.find(([flag]) => T[flag]);
+  return hit ? hit[1] : 'Taste Profile in Progress';
+};
+
 const ACCENTS = {
   pink:   { bg:'#ffd3fd', dot:'#c54b9b', ink:'#852952', chip:'#fff7ff', body:'#fee7fd' },
   indigo: { bg:'#e5e5ff', dot:'#1b1b8f', ink:'#1b1b8f', chip:'#f4f4ff', body:'#e5e5ff' },
@@ -1089,6 +1153,7 @@ function restoreState() {
       planMood: typeof s.planMood === 'string' ? s.planMood : 'mix',
       planSkips: s.planSkips || {},
       planDay: typeof s.planDay === 'string' ? s.planDay : '',
+      firstSeen: typeof s.firstSeen === 'number' ? s.firstSeen : 0,
       avatar: typeof s.avatar === 'string' && s.avatar.startsWith('data:image/') ? s.avatar : null,
       myReviews: s.myReviews || {},
       gplaces: Object.fromEntries(Object.entries(s.gplaces || {}).filter(([id, g]) =>
@@ -1136,6 +1201,7 @@ class Component extends DCLogic {
     meView: false,
     visited: {},
     splashHold: false,
+    firstSeen: 0,
     isPublic: false,
     toPulse: [],
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
@@ -1154,6 +1220,7 @@ class Component extends DCLogic {
         bio: S.bio, avatar: S.avatar,
         pendingInvite: S.pendingInvite,
         planMood: S.planMood, planSkips: S.planSkips, planDay: S.planDay,
+        firstSeen: S.firstSeen,
         lists: S.lists, listOf: S.listOf,
         visited: S.visited,
         myReviews: S.myReviews,
@@ -1165,6 +1232,7 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
+    if (!this.state.firstSeen) this.setState({ firstSeen: Date.now() });
     // returning visitors get the opening screen for a beat before the app
     try {
       const qs0 = new URLSearchParams(location.search);
@@ -1645,7 +1713,7 @@ class Component extends DCLogic {
     const [ht0, sw, pv] = await Promise.all([
       this._sb.from('hearts').select('place_id,place,created_at,list').eq('user_id', f.id),
       this._sb.from('swipes').select('place_id,place').eq('user_id', f.id).eq('direction', 'like'),
-      this._sb.from('profiles').select('visited').eq('user_id', f.id).maybeSingle().then(r => (r.error ? { data: null } : r)),
+      this._sb.from('profiles').select('visited,ob_answers,quiz_answers').eq('user_id', f.id).maybeSingle().then(r => (r.error ? this._sb.from('profiles').select('ob_answers,quiz_answers').eq('user_id', f.id).maybeSingle().then(r2 => (r2.error ? { data: null } : r2)) : r)),
     ]);
     const ht = ht0.error ? await this._sb.from('hearts').select('place_id,place,created_at').eq('user_id', f.id) : ht0;
     const gplaces = { ...this.state.gplaces };
@@ -1658,6 +1726,8 @@ class Component extends DCLogic {
         heartRows: (ht.data || []).sort((x, y) => Date.parse(x.created_at) - Date.parse(y.created_at)).map(r => ({ id: r.place_id, list: r.list || '' })),
         likes: (sw.data || []).map(r => r.place_id),
         visited: pv.data && pv.data.visited && typeof pv.data.visited === 'object' && !Array.isArray(pv.data.visited) ? pv.data.visited : {},
+        obAnswers: (pv.data && Array.isArray(pv.data.ob_answers)) ? pv.data.ob_answers : [],
+        quizAnswers: (pv.data && pv.data.quiz_answers) || {},
       },
     });
   }
@@ -2326,7 +2396,10 @@ class Component extends DCLogic {
   }
 
   getTaste() {
-    const A = [...this.state.obAnswers, ...Object.values(this.state.quizAnswers)];
+    return this.getTasteFrom([...this.state.obAnswers, ...Object.values(this.state.quizAnswers)]);
+  }
+
+  getTasteFrom(A) {
     const has = (l) => A.includes(l);
     return {
       noGluten: has('Gluten and I broke up'),
@@ -3377,6 +3450,27 @@ class Component extends DCLogic {
       fvLoading: !!(S.friendView && S.friendView.loading),
       fvClose: () => this.closeFriend(),
       fvHearts, fvLikes,
+      fvTitle: S.friendView && Array.isArray(S.friendView.obAnswers)
+        ? tasteTitleFor(this.getTasteFrom([...S.friendView.obAnswers, ...Object.values(S.friendView.quizAnswers || {})]))
+        : '',
+      fvBadges: (() => {
+        const fv = S.friendView;
+        if (!fv || fv.loading) return [];
+        const rows = fv.heartRows || [];
+        const kinds = rows.map(r => {
+          const p = this.findPlace(r.id);
+          return p && p.kind;
+        }).filter(Boolean);
+        const d = {
+          been: Object.keys(fv.visited || {}).length,
+          lists: new Set(rows.map(r => r.list).filter(Boolean)).size,
+          reviews: 0, custom: 0,
+          deepDone: false,
+          kind: (...ks) => kinds.filter(k => ks.includes(k)).length,
+        };
+        return computeBadges(d).filter(b => b.earned);
+      })(),
+      get fvHasBadges() { return this.fvBadges.length > 0; },
       fvStats: S.friendView && !S.friendView.loading ? `${((S.friendView.heartRows) || S.friendView.hearts || []).length} saves · ${Object.keys((S.friendView.visited) || {}).length} been · ${(S.friendView.likes || []).length} liked` : '',
       fvSections: (() => {
         const rows = (S.friendView && S.friendView.heartRows) || ((S.friendView && S.friendView.hearts) || []).map(id => ({ id, list: '' }));
@@ -3406,6 +3500,46 @@ class Component extends DCLogic {
       meAvatarStyle: S.avatar ? avStyle(S.avatar, 74) : null,
       meInitial: (S.name || '?').trim().charAt(0).toUpperCase() || '?',
       meStats: `${Object.keys(S.hearts).length} saves · ${Object.keys(S.visited).length} been · ${Object.keys(S.myReviews).length} reviews · ${S.swipeCount} swipes`,
+      meTitle: tasteTitleFor(this.getTaste()),
+      meSince: (() => {
+        const ts = [S.firstSeen, ...Object.values(S.hearts)].filter(Boolean);
+        if (!ts.length) return '';
+        return `On Whim since ${new Date(Math.min(...ts)).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}`;
+      })(),
+      meStatBlocks: [
+        { val: `${Object.keys(S.visited).length}`, label: 'Been' },
+        { val: `${Object.keys(S.hearts).length}`, label: 'Saved' },
+        { val: `${Object.keys(S.lists).length}`, label: 'Lists' },
+        { val: `${Object.keys(S.myReviews).length}`, label: 'Reviews' },
+        { val: `${S.swipeCount}`, label: 'Swipes judged' },
+        { val: `${new Set(Object.keys(S.visited).concat(Object.keys(S.hearts)).map(id => { const p = this.findPlace(id); return p && p.area; }).filter(Boolean)).size}`, label: 'Quartiers touched' },
+      ],
+      meMeterPct: Math.min(100, Math.round((PLACES.filter(p => S.visited[p.id]).length / PLACES.length) * 100)),
+      meMeterLine: (() => {
+        const done = PLACES.filter(p => S.visited[p.id]).length;
+        return `${done} of the ${PLACES.length} canonical spots conquered`;
+      })(),
+      meMeterStyle: { height: '100%', background: '#cc3418', width: `${Math.min(100, Math.round((PLACES.filter(p => S.visited[p.id]).length / PLACES.length) * 100))}%`, transition: 'width .4s ease-out' },
+      meBadges: (() => {
+        const savedPlaces = Object.keys(S.hearts).map(id => this.findPlace(id)).filter(Boolean);
+        const kindCount = (...ks) => savedPlaces.filter(p => ks.includes(p.kind)).length;
+        const d = {
+          been: Object.keys(S.visited).length,
+          lists: Object.keys(S.lists).length,
+          reviews: Object.keys(S.myReviews).length,
+          custom: savedPlaces.filter(p => p.custom).length,
+          deepDone: DEEP.every(q => S.quizAnswers[q.id]),
+          kind: kindCount,
+        };
+        return computeBadges(d).map(b => ({
+          ...b,
+          chipStyle: b.earned
+            ? { display: 'flex', alignItems: 'center', gap: '7px', background: '#EEFF8C', border: '1px solid #5c6a0a', padding: '9px 12px', font: "500 11px 'Saans Mono',monospace", letterSpacing: '.04em', textTransform: 'uppercase', color: '#3d470a' }
+            : { display: 'flex', alignItems: 'center', gap: '7px', background: '#ffffff', border: '1px dashed #d8b6a6', padding: '9px 12px', font: "500 11px 'Saans Mono',monospace", letterSpacing: '.04em', textTransform: 'uppercase', color: '#9aa0ac' },
+          iconStyle: { fontSize: '14px', color: b.earned ? '#5c6a0a' : '#c7ccd6' },
+          sub: b.earned ? '' : b.need,
+        }));
+      })(),
       mePublicRow: !!(S.isPublic && S.username),
       fvHasHearts: fvHearts.length > 0,
       fvHasLikes: fvLikes.length > 0,

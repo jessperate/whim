@@ -508,7 +508,10 @@ try {
   await clickByText('View my profile');
   await new Promise((r) => setTimeout(r, 400));
   const meBeen = await page.evaluate(() => document.body.innerText.toLowerCase());
-  check('been-here lands on profile', /been there\s*\(\s*1\s*\)/.test(meBeen) && /1 been/.test(meBeen), (meBeen.match(/\d+ saves[^\n]*/) || [''])[0]);
+  check('been-here lands on profile', /been there\s*\(\s*1\s*\)/.test(meBeen), (meBeen.match(/been there[^\n]*/) || [''])[0]);
+  check('profile shows taste title', /truffle pig|bloodhound|side-street|marathoner|cartographer|in progress|monument hunter|mercenary|strategist|negotiator|darkness|romantic|jazz regular/.test(meBeen));
+  check('profile shows earned badges', /first steps/.test(meBeen) && /curator/.test(meBeen), '');
+  check('profile shows the canon meter', /the paris canon/.test(meBeen) && /canonical spots conquered/.test(meBeen));
   await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => x.getAttribute('aria-label') === 'Close profile'); b && b.click(); });
 
 
