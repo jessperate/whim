@@ -346,6 +346,14 @@ try {
   check('You tab has profile editor', youTxt.toLowerCase().includes('your profile') && youTxt.toLowerCase().includes('save profile'));
   check('You tab has contacts invite', youTxt.toLowerCase().includes('share whim with your contacts'));
 
+  // own profile view opens from the You tab
+  await clickByText('View my profile');
+  await new Promise((r) => setTimeout(r, 400));
+  const meTxt = await page.evaluate(() => document.body.innerText.toLowerCase());
+  check('own profile view opens', /no handle yet|@\w+/.test(meTxt) && meTxt.includes('swipes'), (meTxt.match(/\d+ saves[^\n]*/) || [''])[0]);
+  await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => x.getAttribute('aria-label') === 'Close profile'); b && b.click(); });
+  await new Promise((r) => setTimeout(r, 300));
+
   // Friends tab
   await clickByText('Friends');
   await new Promise((r) => setTimeout(r, 300));

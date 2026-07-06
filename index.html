@@ -349,6 +349,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
             </div>
           </div>
           <button onClick="{{ saveProfile }}" style="width:100%; margin-top:12px; font:500 14px 'Saans',sans-serif; background:#451212; color:#fff5ee; border:none; border-radius:58px; padding:12px; cursor:pointer;">Save profile</button>
+          <button onClick="{{ meGo }}" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:8px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:12px; cursor:pointer;"><i class="ri-user-smile-line" style="font-size:15px;"></i>View my profile</button>
           <div style="font:400 12px/1.5 'Saans',sans-serif; color:#676c79; margin-top:8px;">Friends see your photo, name and bio — plus your likes, saves and reviews. Strangers see nothing, unless you go public below.</div>
           <sc-if value="{{ profSignedIn }}" hint-placeholder-val="{{ false }}">
             <button onClick="{{ profPublicToggle }}" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:12px; font:500 12px 'Saans Mono',monospace; letter-spacing:.05em; text-transform:uppercase; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; padding:12px; cursor:pointer;"><i class="{{ profPublicIcon }}" style="font-size:15px;"></i>{{ profPublicLabel }}</button>
@@ -502,6 +503,53 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
       </div>
     </sc-if>
 
+    <!-- own profile view -->
+    <sc-if value="{{ meOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; z-index:55; background:#fff7f2; display:flex; flex-direction:column;">
+        <div style="padding:18px 20px 0; flex:none;">
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <sc-if value="{{ meHasAvatar }}" hint-placeholder-val="{{ false }}"><div style="{{ meAvatarStyle }}"></div></sc-if>
+            <sc-if value="{{ profNoAvatar }}" hint-placeholder-val="{{ true }}"><div style="width:74px; height:74px; border-radius:50%; background:#ffe0d9; color:#c0361c; display:flex; align-items:center; justify-content:center; font:700 28px 'Saans',sans-serif; flex:none;">{{ meInitial }}</div></sc-if>
+            <div style="flex:1; min-width:0;">
+              <div style="font:500 9.5px 'Saans Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#c0361c;">{{ meHandle }}</div>
+              <div style="font:400 28px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin-top:6px;">{{ meName }}</div>
+              <sc-if value="{{ meHasBio }}" hint-placeholder-val="{{ false }}"><div style="font:italic 400 13.5px/1.45 'Serrif VF',Georgia,serif; color:#38100c; margin-top:6px;">{{ meBio }}</div></sc-if>
+              <div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79; margin-top:8px;">{{ meStats }}</div>
+            </div>
+            <button onClick="{{ meClose }}" aria-label="Close profile" style="width:38px; height:38px; flex:none; border-radius:50%; border:1px solid #451212; background:#fff7f2; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-close-line" style="font-size:20px; color:#451212;"></i></button>
+          </div>
+          <div style="border-bottom:1px solid #451212; margin-top:14px;"></div>
+        </div>
+        <div style="flex:1; overflow:auto; padding:16px 20px 24px;">
+          <sc-if value="{{ mePublicRow }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ profCopyUrl }}" style="display:block; width:100%; margin-bottom:16px; font:500 11px 'Saans Mono',monospace; letter-spacing:.03em; background:#fdece4; color:#c0361c; border:none; padding:11px; cursor:pointer; text-align:center;">{{ profPublicUrl }} — share it</button>
+          </sc-if>
+          <sc-if value="{{ foldersAny }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ folders }}" as="fo" hint-placeholder-count="1">
+              <div style="margin-bottom:14px;">
+                <button onClick="{{ fo.toggle }}" style="display:flex; align-items:center; gap:8px; width:100%; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:8px; background:none; border:none; cursor:pointer; padding:2px 0; text-align:left;">
+                  <i class="{{ fo.icon }}" style="font-size:14px;"></i><span style="flex:1;">{{ fo.title }}</span><i class="{{ fo.chev }}" style="font-size:15px;"></i>
+                </button>
+                <sc-if value="{{ fo.showItems }}" hint-placeholder-val="{{ false }}">
+                  <div style="border:1px solid #f2d3c6;">
+                    <sc-for list="{{ fo.items }}" as="sv" hint-placeholder-count="2">
+                      <div onClick="{{ sv.open }}" style="display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #f2d3c6; cursor:pointer;">
+                        <div style="flex:1; min-width:0;">
+                          <div style="font:700 15px 'Saans',sans-serif; color:#451212;">{{ sv.name }}</div>
+                          <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ sv.meta }}</div>
+                        </div>
+                        <i class="ri-arrow-right-s-line" style="font-size:18px; color:#d1401f; flex:none;"></i>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
     <!-- friend sheet (z below the detail sheet so tapped places open above it) -->
     <sc-if value="{{ fvOpen }}" hint-placeholder-val="{{ false }}">
       <div style="position:absolute; inset:0; z-index:55; background:#fff7f2; display:flex; flex-direction:column;">
@@ -512,6 +560,7 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
               <div style="font:500 9.5px 'Saans Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#c0361c;">@{{ fvHandle }}</div>
               <div style="font:400 28px/1.05 'Serrif VF',Georgia,serif; letter-spacing:-0.02em; color:#451212; margin-top:6px;">{{ fvName }}</div>
               <sc-if value="{{ fvHasBio }}" hint-placeholder-val="{{ false }}"><div style="font:italic 400 13.5px/1.45 'Serrif VF',Georgia,serif; color:#38100c; margin-top:6px;">{{ fvBio }}</div></sc-if>
+              <sc-if value="{{ fvStats }}" hint-placeholder-val="{{ false }}"><div style="font:500 10px 'Saans Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:#676c79; margin-top:8px;">{{ fvStats }}</div></sc-if>
             </div>
             <button onClick="{{ fvClose }}" aria-label="Close friend view" style="width:38px; height:38px; flex:none; border-radius:50%; border:1px solid #451212; background:#fff7f2; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-close-line" style="font-size:20px; color:#451212;"></i></button>
           </div>
@@ -521,19 +570,21 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
           <sc-if value="{{ fvLoading }}" hint-placeholder-val="{{ false }}">
             <div style="text-align:center; font:italic 400 14px 'Serrif VF',Georgia,serif; color:#676c79; padding:12px; border:1px dashed #f2d3c6;">Rifling through their folder…</div>
           </sc-if>
-          <sc-if value="{{ fvHasHearts }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;"><i class="ri-folder-heart-line" style="font-size:14px;"></i>Saved for later</div>
-            <div style="border:1px solid #f2d3c6; margin-bottom:18px;">
-              <sc-for list="{{ fvHearts }}" as="fh" hint-placeholder-count="2">
-                <div onClick="{{ fh.open }}" style="display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #f2d3c6; cursor:pointer;">
-                  <div style="flex:1; min-width:0;">
-                    <div style="font:700 15px 'Saans',sans-serif; color:#451212;">{{ fh.name }}</div>
-                    <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ fh.meta }}</div>
+          <sc-if value="{{ fvHasSections }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ fvSections }}" as="fs" hint-placeholder-count="1">
+              <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;"><i class="{{ fs.icon }}" style="font-size:14px;"></i>{{ fs.title }}</div>
+              <div style="border:1px solid #f2d3c6; margin-bottom:18px;">
+                <sc-for list="{{ fs.rows }}" as="fh" hint-placeholder-count="2">
+                  <div onClick="{{ fh.open }}" style="display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #f2d3c6; cursor:pointer;">
+                    <div style="flex:1; min-width:0;">
+                      <div style="font:700 15px 'Saans',sans-serif; color:#451212;">{{ fh.name }}</div>
+                      <div style="font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-top:3px;">{{ fh.meta }}</div>
+                    </div>
+                    <i class="ri-arrow-right-s-line" style="font-size:18px; color:#d1401f; flex:none;"></i>
                   </div>
-                  <i class="ri-arrow-right-s-line" style="font-size:18px; color:#d1401f; flex:none;"></i>
-                </div>
-              </sc-for>
-            </div>
+                </sc-for>
+              </div>
+            </sc-for>
           </sc-if>
           <sc-if value="{{ fvHasLikes }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;"><i class="ri-heart-3-line" style="font-size:14px;"></i>Swiped right on</div>
@@ -1056,6 +1107,7 @@ class Component extends DCLogic {
     expos: {},
     lists: {}, listOf: {}, listDraft: '', listAdding: false,
     openFolders: {}, listPickerOpen: false,
+    meView: false,
     isPublic: false,
     toPulse: [],
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
@@ -1537,10 +1589,11 @@ class Component extends DCLogic {
   async openFriend(f) {
     if (!this._sb) return;
     this.setState({ friendView: { ...f, loading: true, hearts: [], likes: [] } });
-    const [ht, sw] = await Promise.all([
-      this._sb.from('hearts').select('place_id,place,created_at').eq('user_id', f.id),
+    const [ht0, sw] = await Promise.all([
+      this._sb.from('hearts').select('place_id,place,created_at,list').eq('user_id', f.id),
       this._sb.from('swipes').select('place_id,place').eq('user_id', f.id).eq('direction', 'like'),
     ]);
+    const ht = ht0.error ? await this._sb.from('hearts').select('place_id,place,created_at').eq('user_id', f.id) : ht0;
     const gplaces = { ...this.state.gplaces };
     [...(ht.data || []), ...(sw.data || [])].forEach(r => { if (r.place && !gplaces[r.place_id]) gplaces[r.place_id] = { ...r.place, id: r.place_id }; });
     this.setState({
@@ -1548,6 +1601,7 @@ class Component extends DCLogic {
       friendView: {
         ...f, loading: false,
         hearts: (ht.data || []).sort((x, y) => Date.parse(x.created_at) - Date.parse(y.created_at)).map(r => r.place_id),
+        heartRows: (ht.data || []).sort((x, y) => Date.parse(x.created_at) - Date.parse(y.created_at)).map(r => ({ id: r.place_id, list: r.list || '' })),
         likes: (sw.data || []).map(r => r.place_id),
       },
     });
@@ -3202,6 +3256,30 @@ class Component extends DCLogic {
       fvLoading: !!(S.friendView && S.friendView.loading),
       fvClose: () => this.closeFriend(),
       fvHearts, fvLikes,
+      fvStats: S.friendView && !S.friendView.loading ? `${((S.friendView.heartRows) || S.friendView.hearts || []).length} saves · ${(S.friendView.likes || []).length} liked` : '',
+      fvSections: (() => {
+        const rows = (S.friendView && S.friendView.heartRows) || ((S.friendView && S.friendView.hearts) || []).map(id => ({ id, list: '' }));
+        const by = new Map();
+        rows.forEach(r => { const k = r.list || ''; if (!by.has(k)) by.set(k, []); by.get(k).push(r.id); });
+        return [...by.entries()].map(([k, ids]) => ({
+          title: `${k || 'Saved for later'} (${ids.length})`,
+          icon: k ? 'ri-folder-3-line' : 'ri-folder-heart-line',
+          rows: ids.map(id => this.friendRow(id)).filter(Boolean),
+        })).filter(s => s.rows.length);
+      })(),
+      get fvHasSections() { return this.fvSections.length > 0; },
+      meOpen: !!S.meView,
+      meGo: () => this.setState({ meView: true }),
+      meClose: () => this.setState({ meView: false }),
+      meName: S.name || 'You',
+      meHandle: S.username ? `@${S.username}` : 'no handle yet',
+      meBio: S.bio || '',
+      meHasBio: !!S.bio,
+      meHasAvatar: !!S.avatar,
+      meAvatarStyle: S.avatar ? avStyle(S.avatar, 74) : null,
+      meInitial: (S.name || '?').trim().charAt(0).toUpperCase() || '?',
+      meStats: `${Object.keys(S.hearts).length} saves · ${Object.values(S.swiped).filter(v => v === 'like').length} liked · ${Object.keys(S.myReviews).length} reviews · ${S.swipeCount} swipes`,
+      mePublicRow: !!(S.isPublic && S.username),
       fvHasHearts: fvHearts.length > 0,
       fvHasLikes: fvLikes.length > 0,
       fvEmpty: !!(S.friendView && !S.friendView.loading && !fvHearts.length && !fvLikes.length),
