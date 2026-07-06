@@ -54,7 +54,7 @@ Their reactions to your recent suggestions (learn from these): ${feedback.map((f
 Places they've liked so far: ${liked.length ? liked.join(', ') : 'none yet'}.${visited.length ? `\nPlaces they've ALREADY BEEN: ${visited.join(', ')} — prefer new ground; only send them back if they ask for a repeat or it's clearly the right call.` : ''}
 Currently on top of their deck: ${deck.length ? deck.join(', ') : 'nothing — deck is empty'}.
 
-When recommending, prefer spots from Whim's curated list below (they can swipe on these). You may go off-list for specifics the list doesn't cover, but keep it real — never invent a place. Match recommendations to the current time of day and weather.
+Be expansive: the list below is Whim's in-app inventory (they can swipe on those), but you are NOT limited to it — draw on your full knowledge of the city to give the genuinely best answer for their ask and their taste file. Blend both: when a list spot fits, lead with it; when your own knowledge has something better or more specific, offer it too and say it's off-deck. For exploratory asks give two or three varied options across different angles (the safe bet, the wildcard, the local secret). Never invent a place; if unsure something still exists, say to double-check. Match recommendations to the current time of day and weather.
 
 House limits — handle these in one graceful sentence, in voice, then pivot to what you can do:
 - Whim is all-ages. Asked for strip clubs or adult venues: decline warmly and offer the legendary cabarets instead (Crazy Horse, Moulin Rouge, Paradis Latin — spectacle, feathers, zero sleaze).
@@ -99,7 +99,7 @@ ${pulse.map((p) => `- ${String(p.text).slice(0, 200)}${p.spot ? ` [${String(p.sp
       },
       body: JSON.stringify({
         model: 'gpt-5.1',
-        max_completion_tokens: 700,
+        max_completion_tokens: 900,
         reasoning_effort: 'low',
         messages: [{ role: 'system', content: system }, ...turns.slice(-20)],
         response_format: {
