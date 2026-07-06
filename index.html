@@ -396,13 +396,13 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
         <sc-if value="{{ foldersAny }}" hint-placeholder-val="{{ false }}">
           <sc-for list="{{ folders }}" as="fo" hint-placeholder-count="1">
             <div style="margin-top:24px;">
-              <div style="display:flex; align-items:center; gap:8px; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px;">
-                <i class="{{ fo.icon }}" style="font-size:14px;"></i>{{ fo.title }}
-              </div>
-              <sc-if value="{{ fo.empty }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ fo.toggle }}" style="display:flex; align-items:center; gap:8px; width:100%; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px; background:none; border:none; cursor:pointer; padding:2px 0; text-align:left;">
+                <i class="{{ fo.icon }}" style="font-size:14px;"></i><span style="flex:1;">{{ fo.title }}</span><i class="{{ fo.chev }}" style="font-size:15px;"></i>
+              </button>
+              <sc-if value="{{ fo.showEmpty }}" hint-placeholder-val="{{ false }}">
                 <div style="border:1px dashed #f2d3c6; padding:14px; font:400 12.5px 'Saans',sans-serif; color:#676c79;">Empty. Open any card and file it here.</div>
               </sc-if>
-              <sc-if value="{{ fo.any }}" hint-placeholder-val="{{ true }}">
+              <sc-if value="{{ fo.showItems }}" hint-placeholder-val="{{ true }}">
                 <div style="border:1px solid #f2d3c6;">
                   <sc-for list="{{ fo.items }}" as="sv" hint-placeholder-count="2">
                     <div style="display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #f2d3c6;">
@@ -625,14 +625,30 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
           <div style="display:flex; gap:10px; margin:14px 0 6px;">
             <button onClick="{{ dHeart }}" style="{{ dHeartStyle }}"><i class="{{ dHeartIcon }}" style="font-size:16px;"></i>{{ dHeartLabel }}</button>
             <button onClick="{{ dPlan }}" style="{{ dPlanStyle }}">{{ dPlanLabel }}</button>
+            <button onClick="{{ dListPick }}" aria-label="Save to list" style="flex:none; width:46px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="{{ dBookIcon }}" style="font-size:17px;"></i></button>
             <button onClick="{{ dShare }}" aria-label="Share this spot" style="flex:none; width:46px; font:500 14px 'Saans',sans-serif; background:#ffffff; color:#451212; border:1px solid #451212; border-radius:58px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-share-forward-line" style="font-size:17px;"></i></button>
           </div>
-          <sc-if value="{{ dListRow }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex; gap:6px; align-items:center; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; margin-bottom:10px;">
-              <span style="flex:none; font:500 9px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#676c79;">File under</span>
-              <sc-for list="{{ dListChips }}" as="lc" hint-placeholder-count="2">
-                <button onClick="{{ lc.go }}" style="{{ lc.style }}">{{ lc.label }}</button>
+          <sc-if value="{{ dListOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid #451212; background:#fff7f2; margin-bottom:10px;">
+              <sc-for list="{{ dListOpts }}" as="lo" hint-placeholder-count="2">
+                <button onClick="{{ lo.go }}" style="display:flex; align-items:center; gap:10px; width:100%; padding:12px 14px; border:none; border-bottom:1px solid #f2d3c6; background:none; cursor:pointer; text-align:left;">
+                  <i class="{{ lo.icon }}" style="font-size:15px; color:#c0361c; flex:none;"></i>
+                  <span style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; color:#451212;">{{ lo.label }}</span>
+                  <sc-if value="{{ lo.active }}" hint-placeholder-val="{{ false }}"><i class="ri-check-line" style="font-size:16px; color:#e8432c; flex:none;"></i></sc-if>
+                </button>
               </sc-for>
+              <sc-if value="{{ dListAddClosed }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ listAddOpen }}" style="display:flex; align-items:center; gap:10px; width:100%; padding:12px 14px; border:none; background:none; cursor:pointer; text-align:left;">
+                  <i class="ri-folder-add-line" style="font-size:15px; color:#c0361c; flex:none;"></i>
+                  <span style="font:500 12px 'Saans Mono',monospace; letter-spacing:.05em; text-transform:uppercase; color:#451212;">New list</span>
+                </button>
+              </sc-if>
+              <sc-if value="{{ dListAddShown }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; gap:8px; padding:10px 12px;">
+                  <input value="{{ listDraft }}" onChange="{{ onListDraft }}" onKeyDown="{{ dNewListKey }}" placeholder="Name it something unique" autofocus style="flex:1; min-width:0; font:400 14px 'Saans',sans-serif; background:#ffffff; border:1px solid #f2d3c6; color:#451212; padding:10px 12px; outline:none; border-radius:0; -webkit-appearance:none;">
+                  <button onClick="{{ dNewListGo }}" aria-label="Create list and file here" style="width:42px; flex:none; border:none; background:#e8432c; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="ri-check-line" style="font-size:17px; color:#fff5ee;"></i></button>
+                </div>
+              </sc-if>
             </div>
           </sc-if>
           <sc-if value="{{ dMyReview }}" hint-placeholder-val="{{ false }}">
@@ -1039,6 +1055,7 @@ class Component extends DCLogic {
     planMood: 'mix', planSkips: {}, planDay: '',
     expos: {},
     lists: {}, listOf: {}, listDraft: '', listAdding: false,
+    openFolders: {}, listPickerOpen: false,
     isPublic: false,
     toPulse: [],
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
@@ -1863,7 +1880,7 @@ class Component extends DCLogic {
   }
 
   closeDetail() {
-    this.setState({ detail: null, revEdit: false });
+    this.setState({ detail: null, revEdit: false, listPickerOpen: false, listAdding: false });
   }
 
   ensureDetails(p) {
@@ -2053,6 +2070,11 @@ class Component extends DCLogic {
     this.setState(s => ({ lists: { ...s.lists, [lid]: { name } }, listDraft: '', listAdding: false }));
     this.showToast(`\u201c${name}\u201d exists. Fill it wisely.`);
     return lid;
+  }
+
+  createListAndFile(id) {
+    const lid = this.createList(this.state.listDraft);
+    if (lid) setTimeout(() => this.assignList(id, lid), 50);
   }
 
   assignList(id, lid) {
@@ -2771,22 +2793,20 @@ class Component extends DCLogic {
       get dRedditAny() { return this.dReddit.length > 0; },
       dShare: () => this.shareCard(p.id),
       dHeart: () => this.toggleHeart(p.id),
-      dListRow: Object.keys(S.lists).length > 0,
-      dListChips: [
-        { lid: null, label: 'Main folder' },
-        ...Object.entries(S.lists).map(([lid, l]) => ({ lid, label: l.name })),
-      ].map(c => {
-        const active = (S.listOf[p.id] || null) === c.lid && !!S.hearts[p.id];
-        return {
-          label: c.label,
-          go: () => this.assignList(p.id, c.lid),
-          style: {
-            flex: 'none', font: "500 11px 'Saans Mono',monospace", letterSpacing: '.04em', textTransform: 'uppercase',
-            background: active ? '#451212' : '#ffffff', color: active ? '#fff5ee' : '#451212',
-            border: '1px solid #451212', borderRadius: '58px', padding: '8px 12px', cursor: 'pointer', whiteSpace: 'nowrap',
-          },
-        };
-      }),
+      dListOpen: !!S.listPickerOpen,
+      dListPick: () => this.setState(s => ({ listPickerOpen: !s.listPickerOpen, listAdding: false })),
+      dBookIcon: S.hearts[p.id] ? 'ri-bookmark-fill' : 'ri-bookmark-line',
+      dListAddShown: S.listAdding, dListAddClosed: !S.listAdding,
+      dNewListKey: (e) => { if (e.key === 'Enter') this.createListAndFile(p.id); },
+      dNewListGo: () => this.createListAndFile(p.id),
+      dListOpts: [
+        { lid: null, label: `${(S.city && S.city.name) || 'Paris'} · Saved for later`, icon: 'ri-folder-heart-line' },
+        ...Object.entries(S.lists).map(([lid, l]) => ({ lid, label: l.name, icon: 'ri-folder-3-line' })),
+      ].map(c => ({
+        label: c.label, icon: c.icon,
+        active: (S.listOf[p.id] || null) === c.lid && !!S.hearts[p.id],
+        go: () => { this.assignList(p.id, c.lid); this.setState({ listPickerOpen: false }); },
+      })),
       dPlan: () => this.togglePlan(p.id),
       dClose: () => this.closeDetail(),
       dMaps: (dd && dd.gmaps) || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + ' Paris')}`,
@@ -3244,12 +3264,21 @@ class Component extends DCLogic {
         const inList = new Set(Object.keys(S.listOf).filter(id => S.lists[S.listOf[id]]));
         const main = savedAll.filter(x => !inList.has(x.id));
         return [
-          { icon: 'ri-folder-heart-line', title: `${(S.city && S.city.name) || 'Paris'} · Saved for later (${main.length})`, items: main, any: main.length > 0, empty: main.length === 0 },
+          { fid: 'main', icon: 'ri-folder-heart-line', title: `${(S.city && S.city.name) || 'Paris'} · Saved for later (${main.length})`, items: main },
           ...Object.entries(S.lists).map(([lid, l]) => {
             const items = savedAll.filter(x => S.listOf[x.id] === lid);
-            return { icon: 'ri-folder-3-line', title: `${l.name} (${items.length})`, items, any: items.length > 0, empty: items.length === 0 };
+            return { fid: lid, icon: 'ri-folder-3-line', title: `${l.name} (${items.length})`, items };
           }),
-        ];
+        ].map(f => {
+          const open = !!S.openFolders[f.fid];
+          return {
+            ...f, any: f.items.length > 0,
+            showItems: open && f.items.length > 0,
+            showEmpty: open && f.items.length === 0,
+            chev: open ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line',
+            toggle: () => this.setState(s => ({ openFolders: { ...s.openFolders, [f.fid]: !s.openFolders[f.fid] } })),
+          };
+        });
       })(),
       foldersAny: PLACES.concat(Object.values(S.gplaces)).filter(p => S.hearts[p.id]).length > 0 || Object.keys(S.lists).length > 0,
       listAddShown: S.listAdding, listAddClosed: !S.listAdding,

@@ -421,6 +421,10 @@ try {
   // file the deep-linked bar under it from its sheet
   await page.goto('http://127.0.0.1:8199/?place=p13&n=Le%20Baron%20Rouge&k=Wine%20bar', { waitUntil: 'networkidle2' });
   await new Promise((r) => setTimeout(r, 800));
+  await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => x.getAttribute('aria-label') === 'Save to list'); b && b.click(); });
+  await new Promise((r) => setTimeout(r, 300));
+  const pickerRows = await page.evaluate(() => [...document.querySelectorAll('button')].map((b) => b.innerText.trim().toLowerCase()).filter((t) => t && t.length < 30).join('|'));
+  check('bookmark opens list picker', /saved for later/.test(pickerRows) && /honeymoon/.test(pickerRows), pickerRows.slice(0, 120));
   await page.evaluate(() => {
     const b = [...document.querySelectorAll('button')].find((x) => x.innerText.trim().toLowerCase() === 'honeymoon');
     if (b) b.click();
@@ -472,6 +476,11 @@ try {
     b && b.click();
   });
   await new Promise((r) => setTimeout(r, 400));
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll('button')].find((x) => /saved for later/i.test(x.innerText));
+    if (b) b.click(); // folders are collapsed by default now
+  });
+  await new Promise((r) => setTimeout(r, 300));
   const repTxt = await page.evaluate(() => document.body.innerText.toLowerCase());
   check('own spot lands in saved folder', repTxt.includes('chez testeur') && /saved for later \(\s*3\s*\)/.test(repTxt));
 
