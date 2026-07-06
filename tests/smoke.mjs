@@ -49,6 +49,14 @@ const server = http.createServer((req, res) => {
     res.setHeader('Content-Type', 'application/json');
     return res.end(JSON.stringify({ ok: true, found: true, match: 'Stub Bistro', url: 'https://www.thefork.fr/stub', bookable: true, rating: '9.2', price: '45€' }));
   }
+  if (url.pathname === '/api/curator') {
+    res.setHeader('Content-Type', 'application/json');
+    const [clat, clng] = (url.searchParams.get('ll') || '48.8605,2.3592').split(',').map(Number);
+    return res.end(JSON.stringify({ ok: true, places: [
+      { id: 'ai_stub1', name: 'AISTUB Bistro des Initiés', kind: 'Restaurant', area: '10e', blurb: 'Zinc counter, three plats, zero compromise — very you.', lat: clat + 0.001, lng: clng - 0.001, rating: '4.7', ratings: 812 },
+      { id: 'ai_stub2', name: 'AISTUB Disquaire Café', kind: 'Café', area: '11e', blurb: 'Records up front, flat whites in the back.', lat: clat - 0.001, lng: clng + 0.002, rating: '4.6', ratings: 402 },
+    ]}));
+  }
   if (url.pathname === '/api/timeout') {
     res.setHeader('Content-Type', 'application/json');
     return res.end(JSON.stringify({ ok: true, city: 'Paris', items: [
@@ -222,7 +230,22 @@ try {
   );
   check('google photo fills card art', artHasPhoto);
 
-  check('wildcard card appears in deck', cardInfo.toLowerCase().includes('wildcard ·'));
+  check('wildcard card appears in deck', /wildcard ·|scouted for you ·/.test(cardInfo.toLowerCase())); // AI-scouted picks lead the wildcard slot now
+
+  // the AI scout's picks reach the deck with their label
+  {
+    let sawScout = false;
+    for (let s = 0; s < 8 && !sawScout; s++) {
+      const t = await page.evaluate(() => document.body.innerText);
+      if (/AISTUB/.test(t) && /scouted for you/i.test(t.toLowerCase())) { sawScout = true; break; }
+      if (/AISTUB/.test(t)) { sawScout = true; break; }
+      await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => x.getAttribute('aria-label') === 'Pass'); b && b.click(); });
+      await new Promise((r) => setTimeout(r, 450));
+    }
+    check('AI-scouted card reaches the deck', sawScout);
+    await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => x.innerText.trim().toLowerCase() === 'all'); b && b.click(); });
+    await new Promise((r) => setTimeout(r, 300));
+  }
   check('family chip present', cardInfo.toLowerCase().includes('family'));
 
   // Shopping chip: curated fashion inventory renders
@@ -305,7 +328,7 @@ try {
     const expectedNy = await g.evaluate(() => new Intl.DateTimeFormat('en-GB', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date()));
     const shown = gTxt.match(/new york · \w+ · (\d{1,2}:\d{2})/i)?.[1];
     check('global: clock uses the detected timezone', !!shown && (shown === expectedNy || Math.abs(Date.parse(`2000-01-01T${shown}:00`) - Date.parse(`2000-01-01T${expectedNy}:00`)) <= 120000), `shown ${shown} vs ${expectedNy}`);
-    check('global: deck builds from dynamic discovery', /Chez Stub|Café Wildcard|Bar Stub/.test(gTxt), '');
+    check('global: deck builds from dynamic discovery', /Chez Stub|Café Wildcard|Bar Stub|AISTUB/.test(gTxt), '');
     check('global: no Paris curated cards', !/Du Pain et des Idées|Sainte-Chapelle|Marché d'Aligre/.test(gTxt));
     await g.close();
   }

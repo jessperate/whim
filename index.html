@@ -1868,6 +1868,43 @@ class Component extends DCLogic {
         .catch(() => {});
     }
 
+    // the AI scout: web-searched, taste-tailored, Google-verified picks
+    if (!this._aiLoaded) {
+      this._aiLoaded = true;
+      const flags = Object.entries(T).filter(([, v]) => v === true).map(([k]) => k).slice(0, 14).join(',');
+      const cityName = global ? ((this.state.city && this.state.city.name) || 'this city') : 'Paris';
+      const aiMeta = (kind) => {
+        const night = ['Wine bar', 'Bar', 'Cocktail bar', 'Club'].includes(kind);
+        const morning = ['Café', 'Bakery', 'Market', 'Park'].includes(kind);
+        const accent = ['Restaurant', 'Bakery', 'Street food'].includes(kind) ? 'pink'
+          : ['Museum', 'Gallery', 'Landmark'].includes(kind) ? 'indigo'
+          : ['Vintage shop', 'Bookshop', 'Concept store', 'Market'].includes(kind) ? 'lilac'
+          : ['Park'].includes(kind) ? 'green' : 'yellow';
+        const times = night ? ['evening', 'night'] : morning ? ['morning', 'afternoon'] : ['morning', 'afternoon', 'evening'];
+        if (kind === 'Restaurant') times.push('night');
+        return { accent, times };
+      };
+      fetch(`/api/curator?city=${encodeURIComponent(cityName)}&ll=${ll}&taste=${encodeURIComponent(flags)}&d=${day}`)
+        .then(r => (r.ok ? r.json() : null))
+        .then(j => {
+          if (!j || !j.ok || !Array.isArray(j.places)) return;
+          const gplaces = { ...this.state.gplaces };
+          j.places.forEach(w => {
+            if (gplaces[w.id] || PLACES.some(p => p.name.toLowerCase() === w.name.toLowerCase())) return;
+            const m = aiMeta(w.kind);
+            gplaces[w.id] = {
+              id: w.id, name: w.name, kind: w.kind, icon: kindIcon(w.kind),
+              area: w.area || cityName, lat: w.lat, lng: w.lng,
+              blurb: w.blurb, rating: w.rating, ratings: w.ratings,
+              times: m.times, weather: 'any', accent: m.accent, slot: 70,
+              wild: true, ai: true,
+            };
+          });
+          this.setState({ gplaces });
+        })
+        .catch(() => {});
+    }
+
     // Atlas Obscura layer for the hidden-gem and macabre crowd
     if ((T.offPath || T.macabre) && !this._aoLoaded && !global) { // Atlas Obscura run is Paris-scoped
       this._aoLoaded = true;
@@ -2333,6 +2370,7 @@ class Component extends DCLogic {
     if (T.photoLover && (p.kind === 'Viewpoint' || p.kind === 'Landmark' || p.kind === 'Passage')) s += 2;
     if (p.custom) s += 2; // their own finds deserve airtime
     if (this.state.visited[p.id]) s -= 1.5; // been there; new ground first
+    if (p.ai) s += 2; // the scout picked it for this exact taste file
     if (T.withKids && p.kids) s += 3;
     if (T.withKids && ['Bar', 'Wine bar', 'Cocktail bar', 'Jazz club'].includes(p.kind)) s -= 2;
     if (T.couple && (p.kind === 'Viewpoint' || p.kind === 'Wine bar' || p.id === 'p36')) s += 2;
@@ -2385,7 +2423,7 @@ class Component extends DCLogic {
       )
       .map(p => ({ ...p, ...this.distFor(p) }))
       .filter(p => p.km <= maxKm)
-      .sort((a, b) => strHash(a.id + this._seed) - strHash(b.id + this._seed))
+      .sort((a, b) => ((b.ai ? 1 : 0) - (a.ai ? 1 : 0)) || (strHash(a.id + this._seed) - strHash(b.id + this._seed)))
       .slice(0, 12);
 
     let deck = places
@@ -2995,7 +3033,7 @@ class Component extends DCLogic {
           return S.geo === 'ok' ? `${mins} min from you` : `${mins} min walk`;
         })(),
         // 2b: time-dash meta line
-        meta: isQuiz ? '' : (c.happening ? `${ctx.clock} — This week · via ${c.src || 'Instagram'}${c.spot ? ` · ${c.spot}` : ''}` : `${ctx.clock} — ${c.custom ? 'Yours · ' : (c.wild ? 'Wildcard · ' : '')}${c.kind} · ${c.dist}${c.notNow ? ` · A ${c.times[0]} thing` : (c.score >= 2 ? ' · Very you' : '')}${openBit}`),
+        meta: isQuiz ? '' : (c.happening ? `${ctx.clock} — This week · via ${c.src || 'Instagram'}${c.spot ? ` · ${c.spot}` : ''}` : `${ctx.clock} — ${c.custom ? 'Yours · ' : c.ai ? 'Scouted for you · ' : (c.wild ? 'Wildcard · ' : '')}${c.kind} · ${c.dist}${c.notNow ? ` · A ${c.times[0]} thing` : (c.score >= 2 ? ' · Very you' : '')}${openBit}`),
         rating: isQuiz ? '' : (c.happening ? '✶' : ((live && live.rating) || c.grating || fallback[0])),
         reviews: isQuiz ? '' : (c.happening ? 'spotted this week' : (live && live.ratings != null ? `${fmtCount(live.ratings)} Google reviews` : (c.wild ? `${fmtCount(c.greviews)} Google reviews` : `${fallback[1]} reviews`))),
         gmaps: isQuiz ? null : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' Paris')}`,
