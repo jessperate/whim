@@ -3312,7 +3312,7 @@ class Component extends DCLogic {
         },
       })),
 
-      rangeLabel: S.range === 'walk' ? 'Near me' : 'All Paris',
+      rangeLabel: S.range === 'walk' ? 'Near me' : `All ${(S.city && S.city.name && S.city.name.length <= 12 ? S.city.name : S.city && S.city.name ? 'city' : 'Paris')}`,
       rangeIcon: S.range === 'walk' ? 'ri-walk-line' : 'ri-map-2-line',
       rangeToggle: () => this.setState(s => ({ range: s.range === 'walk' ? 'city' : 'walk' })),
       rangeStyle: {
