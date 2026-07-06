@@ -296,6 +296,22 @@ try {
   const tabBar = await page.evaluate(() => [...document.querySelectorAll('button')].map(b => b.innerText.trim()).filter(Boolean).slice(-6).join('|'));
   results.push('DEBUG tab bar after likes: ' + tabBar);
 
+  // ---- returning visitor: splash moment first, then the app ----
+  await new Promise((r) => setTimeout(r, 700)); // let the persist debounce flush before navigating
+  await page.goto('http://127.0.0.1:8199/', { waitUntil: 'domcontentloaded' });
+  await new Promise((r) => setTimeout(r, 600));
+  const splashTxt = await page.evaluate(() => document.body.innerText.toLowerCase());
+  check('return visit opens on the splash', splashTxt.includes('bonjour again') && !splashTxt.includes('allons-y'));
+  await page.waitForFunction(() => document.body.innerText.toLowerCase().includes('discover'), { timeout: 8000 });
+  check('splash auto-advances into the app', true);
+  // the reload dropped the in-memory time override; re-pin it
+  await clickByText('You');
+  await new Promise((r) => setTimeout(r, 300));
+  await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => x.innerText.trim().toLowerCase() === 'afternoon'); if (b) b.click(); });
+  await new Promise((r) => setTimeout(r, 200));
+  await clickByText('Discover');
+  await new Promise((r) => setTimeout(r, 400));
+
   // ---- global mode: same app, geolocated to Manhattan ----
   {
     const g = await browser.newPage();

@@ -65,13 +65,18 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
 
   <!-- ===== ONBOARDING ===== -->
   <sc-if value="{{ showSplash }}" hint-placeholder-val="{{ true }}">
-    <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; padding:28px 32px calc(34px + env(safe-area-inset-bottom)); background-image:url('/whim-splash-bg.jpg'); background-size:cover; background-position:center 30%;">
+    <div onClick="{{ splashSkip }}" style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; padding:28px 32px calc(34px + env(safe-area-inset-bottom)); background-image:url('/whim-splash-bg.jpg'); background-size:cover; background-position:center 30%;">
       <div style="font:500 11.5px 'Saans Mono',monospace; letter-spacing:.16em; color:#451212; text-transform:uppercase; text-shadow:0 1px 8px rgba(255,247,242,.7);">Est. 2026 · Paris edition</div>
       <div style="flex:1;"></div>
       <img src="/whim-logo.png" alt="{{ appName }}" style="width:270px; max-width:76%; height:auto; display:block; margin-bottom:26px;">
       <div style="font:italic 400 21px/1.4 'Serrif VF',Georgia,serif; color:#451212; margin-bottom:22px; max-width:280px; text-shadow:0 1px 10px rgba(255,247,242,.75);">Swipe right on Paris.<br>Left on regret.</div>
-      <button onClick="{{ startQuiz }}" style="font:500 17px 'Saans',sans-serif; background:#cc3418; color:#fff5ee; border:none; border-radius:58px; padding:18px 46px; cursor:pointer; box-shadow:0 8px 26px rgba(69,18,18,.28);">Allons-y</button>
-      <div style="font:400 13px/1.5 'Saans',sans-serif; color:#451212; margin-top:14px; max-width:280px; text-shadow:0 1px 8px rgba(255,247,242,.7);">Ten questions. Then I know you better than your mother does.</div>
+      <sc-if value="{{ splashGate }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ startQuiz }}" style="font:500 17px 'Saans',sans-serif; background:#cc3418; color:#fff5ee; border:none; border-radius:58px; padding:18px 46px; cursor:pointer; box-shadow:0 8px 26px rgba(69,18,18,.28);">Allons-y</button>
+        <div style="font:400 13px/1.5 'Saans',sans-serif; color:#451212; margin-top:14px; max-width:280px; text-shadow:0 1px 8px rgba(255,247,242,.7);">Ten questions. Then I know you better than your mother does.</div>
+      </sc-if>
+      <sc-if value="{{ splashHolding }}" hint-placeholder-val="{{ false }}">
+        <div style="font:500 10.5px 'Saans Mono',monospace; letter-spacing:.14em; text-transform:uppercase; color:#451212; padding:18px 0 4px; text-shadow:0 1px 8px rgba(255,247,242,.7);">Bonjour again</div>
+      </sc-if>
       <div style="flex:none; height:9%;"></div>
     </div>
   </sc-if>
@@ -1130,6 +1135,7 @@ class Component extends DCLogic {
     openFolders: {}, listPickerOpen: false,
     meView: false,
     visited: {},
+    splashHold: false,
     isPublic: false,
     toPulse: [],
     ...Object.fromEntries(Object.entries(restoreState()).filter(([, v]) => v !== undefined)),
@@ -1159,6 +1165,16 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
+    // returning visitors get the opening screen for a beat before the app
+    try {
+      const qs0 = new URLSearchParams(location.search);
+      const returning = this.state.obStep >= OB.length && !qs0.get('place');
+      if (returning) {
+        this.setState({ splashHold: true });
+        setTimeout(() => this.setState({ splashHold: false }), 2600);
+      }
+    } catch (e) { /* never block boot on theatrics */ }
+
     // shared-link landing: /p/<id> redirects here with ?place=
     try {
       const qs = new URLSearchParams(location.search);
@@ -3020,7 +3036,8 @@ class Component extends DCLogic {
     const skipOb = this.props.skipOnboarding ?? false;
 
     const booted = skipOb || S.obStep >= OB.length || S.sharedBoot;
-    const showSplash = !booted && S.obStep === -1 && !S.nameStep;
+    const splashGate = !booted && S.obStep === -1 && !S.nameStep; // logged-out front door: stays until they tap
+    const showSplash = splashGate || S.splashHold;
     const showName = !booted && S.nameStep;
     const pendingDeep = DEEP.filter(q => !S.quizAnswers[q.id]);
     const deepActive = booted && S.deepMode && pendingDeep.length > 0;
@@ -3147,7 +3164,8 @@ class Component extends DCLogic {
 
     return {
       appName,
-      showSplash, showQuiz, showApp: booted && !deepActive,
+      showSplash, splashGate, splashHolding: !!S.splashHold, splashSkip: () => S.splashHold && this.setState({ splashHold: false }),
+      showQuiz, showApp: booted && !deepActive && !S.splashHold,
       startQuiz: () => this.setState({ nameStep: true }),
       showName,
       nameDraft: S.nameDraft,
