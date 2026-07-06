@@ -2530,8 +2530,13 @@ class Component extends DCLogic {
             };
             const dyn = Object.values(S.gplaces)
               .filter(g => g.lat && !String(g.id).startsWith('hp_'))
-              .map(spotFor).sort((a, b) => a.km - b.km).slice(0, 25);
-            return [...PLACES.map(spotFor), ...dyn];
+              .map(spotFor).slice(0, 60);
+            // nearest first: the model reads order as relevance
+            const all = [...(S.global ? [] : PLACES.map(spotFor)), ...dyn]
+              .sort((a, b) => a.km - b.km)
+              .slice(0, 80);
+            // Near me mode is a hard promise, not a hint
+            return S.range === 'walk' ? all.filter(x => x.km <= 1.6) : all;
           })(),
         },
       }),
