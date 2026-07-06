@@ -418,9 +418,14 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
         <sc-if value="{{ foldersAny }}" hint-placeholder-val="{{ false }}">
           <sc-for list="{{ folders }}" as="fo" hint-placeholder-count="1">
             <div style="margin-top:24px;">
-              <button onClick="{{ fo.toggle }}" style="display:flex; align-items:center; gap:8px; width:100%; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:10px; background:none; border:none; cursor:pointer; padding:2px 0; text-align:left;">
-                <i class="{{ fo.icon }}" style="font-size:14px;"></i><span style="flex:1;">{{ fo.title }}</span><i class="{{ fo.chev }}" style="font-size:15px;"></i>
-              </button>
+              <div style="display:flex; align-items:center; gap:4px; margin-bottom:10px;">
+                <button onClick="{{ fo.toggle }}" style="display:flex; align-items:center; gap:8px; flex:1; min-width:0; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; background:none; border:none; cursor:pointer; padding:2px 0; text-align:left;">
+                  <i class="{{ fo.icon }}" style="font-size:14px;"></i><span style="flex:1;">{{ fo.title }}</span><i class="{{ fo.chev }}" style="font-size:15px;"></i>
+                </button>
+                <sc-if value="{{ fo.canShare }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ fo.share }}" aria-label="Share this list" style="flex:none; background:none; border:none; cursor:pointer; padding:6px;"><i class="ri-share-forward-line" style="font-size:15px; color:#c0361c;"></i></button>
+                </sc-if>
+              </div>
               <sc-if value="{{ fo.showEmpty }}" hint-placeholder-val="{{ false }}">
                 <div style="border:1px dashed #f2d3c6; padding:14px; font:400 12.5px 'Saans',sans-serif; color:#676c79;">Empty. Open any card and file it here.</div>
               </sc-if>
@@ -568,9 +573,14 @@ body { margin:0; background:#efe3dc; font-family:'Saans',system-ui,sans-serif; o
           <sc-if value="{{ foldersAny }}" hint-placeholder-val="{{ false }}">
             <sc-for list="{{ folders }}" as="fo" hint-placeholder-count="1">
               <div style="margin-bottom:14px;">
-                <button onClick="{{ fo.toggle }}" style="display:flex; align-items:center; gap:8px; width:100%; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; margin-bottom:8px; background:none; border:none; cursor:pointer; padding:2px 0; text-align:left;">
-                  <i class="{{ fo.icon }}" style="font-size:14px;"></i><span style="flex:1;">{{ fo.title }}</span><i class="{{ fo.chev }}" style="font-size:15px;"></i>
-                </button>
+                <div style="display:flex; align-items:center; gap:4px; margin-bottom:8px;">
+                  <button onClick="{{ fo.toggle }}" style="display:flex; align-items:center; gap:8px; flex:1; min-width:0; font:500 11px 'Saans Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; background:none; border:none; cursor:pointer; padding:2px 0; text-align:left;">
+                    <i class="{{ fo.icon }}" style="font-size:14px;"></i><span style="flex:1;">{{ fo.title }}</span><i class="{{ fo.chev }}" style="font-size:15px;"></i>
+                  </button>
+                  <sc-if value="{{ fo.canShare }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ fo.share }}" aria-label="Share this list" style="flex:none; background:none; border:none; cursor:pointer; padding:6px;"><i class="ri-share-forward-line" style="font-size:15px; color:#c0361c;"></i></button>
+                  </sc-if>
+                </div>
                 <sc-if value="{{ fo.showItems }}" hint-placeholder-val="{{ false }}">
                   <div style="border:1px solid #f2d3c6;">
                     <sc-for list="{{ fo.items }}" as="sv" hint-placeholder-count="2">
@@ -1605,9 +1615,22 @@ class Component extends DCLogic {
         plan_status: next.planStatus ?? S.planStatus, swipe_count: next.swipeCount ?? S.swipeCount, display_name: (next.name ?? S.name) || '',
       });
     }
-    // repair pass: early rows synced without place snapshots render as raw
-    // ids on public/friend pages — re-push any we can resolve locally
-    rows.ht.filter(r => !r.place || !r.place.name).forEach(r => { if (this.findPlace(r.place_id) || PLACES.find(x => x.id === r.place_id)) this.pushHeart(r.place_id); });
+    // repair pass: rows that synced without place snapshots OR whose list
+    // assignment only exists locally (made before the list column) get
+    // re-pushed so public/friend pages match what the owner sees
+    if (rows.ht.length) {
+      const listsM = next.lists || S.lists, listOfM = next.listOf || S.listOf;
+      rows.ht.forEach(r => {
+        const lid = listOfM[r.place_id];
+        const expected = (lid && listsM[lid] && listsM[lid].name) || null;
+        const missingName = !r.place || !r.place.name;
+        const listDrift = this._heartsV2 && (r.list || null) !== expected;
+        if (!missingName && !listDrift) return;
+        const snap = this.placeSnapshot(r.place_id) || r.place || null;
+        if (!snap && !expected) return;
+        this.dbPush('hearts', { place_id: r.place_id, place: snap, ...(this._heartsV2 ? { list: expected } : {}) });
+      });
+    }
     this.setState(next);
     this.loadFriends();
   }
@@ -2301,6 +2324,16 @@ class Component extends DCLogic {
     this.setState(s => ({ lists: { ...s.lists, [lid]: { name } }, listDraft: '', listAdding: false }));
     this.showToast(`\u201c${name}\u201d exists. Fill it wisely.`);
     return lid;
+  }
+
+  shareList(lid) {
+    const l = this.state.lists[lid];
+    if (!l) return;
+    if (!this.state.user || !this.state.username) return this.showToast('Sign in first \u2014 shared lists live on your profile.');
+    if (!this.state.isPublic) return this.showToast('Your profile is private. Flip it public in the You tab, then share away.');
+    const url = `${location.origin}/u/${this.state.username}?list=${encodeURIComponent(l.name)}`;
+    if (navigator.share) { navigator.share({ title: `${l.name} \u2014 a Whim list`, url }).catch(() => {}); return; }
+    navigator.clipboard && navigator.clipboard.writeText(url).then(() => this.showToast('List link copied.')).catch(() => {});
   }
 
   createListAndFile(id) {
@@ -3633,6 +3666,8 @@ class Component extends DCLogic {
             showEmpty: open && f.items.length === 0,
             chev: open ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line',
             toggle: () => this.setState(s => ({ openFolders: { ...s.openFolders, [f.fid]: !s.openFolders[f.fid] } })),
+            canShare: f.fid !== 'been' && f.fid !== 'main',
+            share: () => this.shareList(f.fid),
           };
         });
       })(),

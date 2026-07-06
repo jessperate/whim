@@ -66,6 +66,7 @@ export default async function handler(req, res) {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_ANON_KEY;
   const handle = String(req.query.handle || '').toLowerCase().replace(/^@/, '').slice(0, 20);
+  const onlyList = String(req.query.list || '').slice(0, 30);
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
   const privatePage = () => page('Whim — a private profile', `
@@ -110,9 +111,11 @@ export default async function handler(req, res) {
       .sort((a, b) => (b[1].at || 0) - (a[1].at || 0))
       .map(([id, v]) => `<a class="row" href="/p/${encodeURIComponent(id)}?n=${encodeURIComponent(v.name || id)}&k=${encodeURIComponent(v.kind || '')}"><b>${esc(v.name || id)}</b><span>${esc([v.kind, 'visited'].filter(Boolean).join(' · '))}</span></a>`)
       .join('');
-    const sections = [...folders.entries()]
-      .filter(([, items]) => items.length)
-      .map(([k, items]) => `<h2>${k ? esc(k) : 'Saved for later'} (${items.length})</h2><div class="list">${items.map(rowFor).join('')}</div>`)
+    const sectionFor = (k, items, open) => `<details${open ? ' open' : ''} style="margin-top:26px;"><summary style="display:flex; align-items:center; gap:8px; cursor:pointer; font:500 12px ui-monospace,monospace; letter-spacing:.08em; text-transform:uppercase; color:#c0361c; list-style:none;"><i class="${k ? 'ri-folder-3-line' : 'ri-folder-heart-line'}"></i>${k ? esc(k) : 'Saved for later'} (${items.length})${k ? ` <a href="?list=${encodeURIComponent(k)}" style="margin-left:auto; color:#676c79; text-decoration:none; font-size:11px;" title="Link to just this list">share ↗</a>` : ''}</summary><div class="list" style="margin-top:10px;">${items.map(rowFor).join('')}</div></details>`;
+    const entries = [...folders.entries()].filter(([, items]) => items.length);
+    const focused = onlyList ? entries.filter(([k]) => k.toLowerCase() === onlyList.toLowerCase()) : null;
+    const sections = (focused && focused.length ? focused : entries)
+      .map(([k, items], i) => sectionFor(k, items, (focused && focused.length) ? true : k === '' || i === 0))
       .join('');
 
     const answers = [
@@ -143,7 +146,19 @@ export default async function handler(req, res) {
       ? `<img class="avatar" src="${prof.avatar}" alt="">`
       : `<div class="initial">${esc(name.trim().charAt(0).toUpperCase())}</div>`;
 
+    const focusedName = onlyList && focused && focused.length ? focused[0][0] : null;
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=86400');
+    if (focusedName) {
+      return res.status(200).end(page(`${focusedName} — a Whim list by ${name}`, `
+      <div class="kicker">Whim · A list by ${esc(name)}</div>
+      <h1>${esc(focusedName)}</h1>
+      <div class="stats">${focused[0][1].length} places · curated by <a href="/u/${esc(prof.username)}" style="color:#c0361c;">@${esc(prof.username)}</a></div>
+      ${sections}
+      <a class="cta" href="/?add=${encodeURIComponent(prof.username)}">Add ${esc(name.split(' ')[0])} on Whim →</a>`,
+      `<meta property="og:title" content="${esc(focusedName)} — a Whim list by ${esc(name)}">
+<meta property="og:description" content="${esc(`${focused[0][1].length} places, hand-picked. Taste you can borrow.`)}">
+<meta property="og:image" content="https://${esc(req.headers.host || 'whim-eta.vercel.app')}/whim-og.jpg">`));
+    }
     return res.status(200).end(page(`${name} — Whim`, `
       <div class="kicker">Whim · Taste on record</div>
       <div class="head">${avatar}<div>
