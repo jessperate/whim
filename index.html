@@ -1068,7 +1068,8 @@ function restoreState() {
       planDay: typeof s.planDay === 'string' ? s.planDay : '',
       avatar: typeof s.avatar === 'string' && s.avatar.startsWith('data:image/') ? s.avatar : null,
       myReviews: s.myReviews || {},
-      gplaces: s.gplaces || {},
+      gplaces: Object.fromEntries(Object.entries(s.gplaces || {}).filter(([id, g]) =>
+        g && g.lat != null && Array.isArray(g.times) && !PLACES.some(p => p.id === id))),
       acctNudge: s.acctNudge !== false,
     };
   } catch (e) { return {}; }
@@ -1468,12 +1469,13 @@ class Component extends DCLogic {
     } else {
       // the server copy wins; local-only rows are adopted and pushed up
       const swiped = { ...S.swiped }, hearts = { ...S.hearts }, myReviews = { ...S.myReviews }, gplaces = { ...S.gplaces };
-      rows.sw.forEach(r => { swiped[r.place_id] = r.direction; if (r.place) gplaces[r.place_id] = { ...r.place, id: r.place_id }; });
+      const adoptable = r => r.place && r.place.lat != null && Array.isArray(r.place.times) && !PLACES.some(x => x.id === r.place_id);
+      rows.sw.forEach(r => { swiped[r.place_id] = r.direction; if (adoptable(r)) gplaces[r.place_id] = { ...r.place, id: r.place_id }; });
       this._heartsV2 = !ht._v1;
       const lists = { ...S.lists }, listOf = { ...S.listOf };
       rows.ht.forEach(r => {
         hearts[r.place_id] = Date.parse(r.created_at) || Date.now();
-        if (r.place) gplaces[r.place_id] = { ...r.place, id: r.place_id };
+        if (adoptable(r)) gplaces[r.place_id] = { ...r.place, id: r.place_id };
         if (r.list) {
           const lid = 'l' + strHash(String(r.list).toLowerCase());
           if (!lists[lid]) lists[lid] = { name: String(r.list).slice(0, 30) };
@@ -1732,6 +1734,7 @@ class Component extends DCLogic {
 
   distFor(p) {
     if (p.fixedDist) return { km: 0.12, dist: p.fixedDist };
+    if (p.lat == null || p.lng == null) return { km: 0, dist: '' };
     const loc = this.state.userLoc || PARIS;
     const km = haversineKm(loc, { lat: p.lat, lng: p.lng });
     const dist = km < 1 ? `${Math.max(50, Math.round(km * 1000 / 50) * 50)}m` : `${km.toFixed(1)}km`;
@@ -2392,7 +2395,7 @@ class Component extends DCLogic {
     const nearMode = this.state.range === 'walk';
     const maxKm = nearMode ? 1.2 : 8;
     const inRange = p => !nearMode || this.distFor(p).km <= maxKm;
-    const fitsNow = p => p.times.includes(ctx.timeOfDay) && (p.weather === 'any' || p.weather === ctx.weather);
+    const fitsNow = p => Array.isArray(p.times) && p.times.includes(ctx.timeOfDay) && (p.weather === 'any' || p.weather === ctx.weather);
     const liveFlag = p => {
       const l = this.state.live[p.id];
       if (l && typeof l.openNow === 'boolean') return l.openNow;
