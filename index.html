@@ -1939,6 +1939,18 @@ class Component extends DCLogic {
       .forEach(t => this.fetchWildcards(`/api/discover?ll=${ll}&d=${day}&q=${encodeURIComponent(t.q)}`, t));
   }
 
+  kindMeta(kind) {
+    const night = ['Wine bar', 'Bar', 'Cocktail bar', 'Club'].includes(kind);
+    const morning = ['Café', 'Bakery', 'Market', 'Park'].includes(kind);
+    const accent = ['Restaurant', 'Bakery', 'Street food'].includes(kind) ? 'pink'
+      : ['Museum', 'Gallery', 'Landmark'].includes(kind) ? 'indigo'
+      : ['Vintage shop', 'Bookshop', 'Concept store', 'Market'].includes(kind) ? 'lilac'
+      : ['Park'].includes(kind) ? 'green' : 'yellow';
+    const times = night ? ['evening', 'night'] : morning ? ['morning', 'afternoon'] : ['morning', 'afternoon', 'evening'];
+    if (kind === 'Restaurant') times.push('night');
+    return { accent, times };
+  }
+
   loadWildcards(loc) {
     const T = this.getTaste();
     const global = haversineKm(loc, PARIS) > 30;
@@ -2003,17 +2015,7 @@ class Component extends DCLogic {
       this._aiLoaded = true;
       const flags = Object.entries(T).filter(([, v]) => v === true).map(([k]) => k).slice(0, 14).join(',');
       const cityName = global ? ((this.state.city && this.state.city.name) || 'this city') : 'Paris';
-      const aiMeta = (kind) => {
-        const night = ['Wine bar', 'Bar', 'Cocktail bar', 'Club'].includes(kind);
-        const morning = ['Café', 'Bakery', 'Market', 'Park'].includes(kind);
-        const accent = ['Restaurant', 'Bakery', 'Street food'].includes(kind) ? 'pink'
-          : ['Museum', 'Gallery', 'Landmark'].includes(kind) ? 'indigo'
-          : ['Vintage shop', 'Bookshop', 'Concept store', 'Market'].includes(kind) ? 'lilac'
-          : ['Park'].includes(kind) ? 'green' : 'yellow';
-        const times = night ? ['evening', 'night'] : morning ? ['morning', 'afternoon'] : ['morning', 'afternoon', 'evening'];
-        if (kind === 'Restaurant') times.push('night');
-        return { accent, times };
-      };
+      const aiMeta = (kind) => this.kindMeta(kind);
       fetch(`/api/curator?city=${encodeURIComponent(cityName)}&ll=${ll}&taste=${encodeURIComponent(flags)}&d=${day}`)
         .then(r => (r.ok ? r.json() : null))
         .then(j => {
@@ -2762,14 +2764,50 @@ class Component extends DCLogic {
     const liked = PLACES.concat(Object.values(S.gplaces)).filter(p => S.swiped[p.id] === 'like').map(p => p.name);
     const deck = this.getDeck(ctx).filter(p => !p.q).slice(0, 5).map(p => p.name);
     const taste = [...S.obAnswers, ...Object.values(S.quizAnswers).filter(v => v !== 'skipped')];
-    const done = (reply) => {
+    const done = (reply, mentions) => {
       this._chatBusy = false;
       const low = reply.toLowerCase();
       const placeIds = PLACES.concat(Object.values(this.state.gplaces)).filter(p => low.includes(p.name.toLowerCase())).slice(0, 3).map(p => p.id);
+      const msgId = 'msg' + (this._msgSeq = (this._msgSeq || 0) + 1);
       this.setState(s => ({
-        chat: s.chat.map(m => (m.typing ? { who: 'bot', text: reply, placeIds } : m)),
+        chat: s.chat.map(m => (m.typing ? { who: 'bot', text: reply, placeIds, msgId } : m)),
         replyIx: s.replyIx + 1,
       }));
+      // named venues the pool doesn't know yet: Google confirms them, then a
+      // real card slides into the message
+      (mentions || []).filter(mm => mm && mm.name).slice(0, 3).forEach(mm => {
+        const nameLow = mm.name.toLowerCase();
+        const alreadyCarded = placeIds.some(pid => { const p = this.findPlace(pid); return p && p.name.toLowerCase() === nameLow; });
+        if (alreadyCarded) return;
+        const loc = this.state.userLoc || PARIS;
+        fetch(`/api/places?name=${encodeURIComponent(mm.name)}&ll=${loc.lat},${loc.lng}&h=${Math.floor(Date.now() / 36e5)}`)
+          .then(r => (r.ok ? r.json() : null))
+          .then(j => {
+            if (!j || !j.ok || j.lat == null) return;
+            const id = 'cc_' + strHash(nameLow);
+            const km = haversineKm(loc, { lat: j.lat, lng: j.lng });
+            if (km > 80) return; // wrong city match — not our venue
+            this.setState(s => {
+              const meta = this.kindMeta(mm.kind || 'Spot');
+              const gplaces = s.gplaces[id] ? s.gplaces : {
+                ...s.gplaces,
+                [id]: {
+                  id, name: j.match || mm.name, kind: mm.kind || 'Spot', icon: kindIcon(mm.kind || 'Spot'),
+                  area: (s.city && s.city.name) || 'Paris', lat: j.lat, lng: j.lng,
+                  rating: j.rating, ratings: j.ratings, openNow: j.openNow,
+                  blurb: 'The concierge vouches for this one personally.',
+                  times: ['morning', 'afternoon', 'evening', 'night'], weather: 'any',
+                  accent: meta.accent, slot: 65, wild: true,
+                },
+              };
+              const photos = j.photo && !s.photos[id] ? { ...s.photos, [id]: j.photo } : s.photos;
+              const chat = s.chat.map(m => (m.msgId === msgId && !(m.placeIds || []).includes(id)
+                ? { ...m, placeIds: [...(m.placeIds || []), id].slice(0, 3) } : m));
+              return { gplaces, photos, chat };
+            });
+          })
+          .catch(() => {});
+      });
     };
 
     fetch('/api/concierge', {
@@ -2814,7 +2852,7 @@ class Component extends DCLogic {
       .then(r => (r.ok ? r.json() : null))
       .then(j => {
         if (j && Array.isArray(j.tasteNotes) && j.tasteNotes.length) this.absorbTasteNotes(j.tasteNotes);
-        done((j && j.reply) || OFFLINE[S.replyIx % OFFLINE.length]);
+        done((j && j.reply) || OFFLINE[S.replyIx % OFFLINE.length], j && j.mentions);
       })
       .catch(() => done(OFFLINE[S.replyIx % OFFLINE.length]));
   }

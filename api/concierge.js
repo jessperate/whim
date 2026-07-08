@@ -110,10 +110,18 @@ ${pulse.map((p) => `- ${String(p.text).slice(0, 200)}${p.spot ? ` [${String(p.sp
             schema: {
               type: 'object',
               additionalProperties: false,
-              required: ['reply', 'taste_notes'],
+              required: ['reply', 'taste_notes', 'mentions'],
               properties: {
                 reply: { type: 'string', description: 'The concierge reply, plain prose' },
                 taste_notes: { type: 'array', items: { type: 'string' }, description: '0-3 new durable taste facts learned this turn; usually empty' },
+                mentions: {
+                  type: 'array',
+                  items: {
+                    type: 'object', additionalProperties: false, required: ['name', 'kind'],
+                    properties: { name: { type: 'string' }, kind: { type: 'string' } },
+                  },
+                  description: 'Every specific real venue named in the reply (max 3), name exactly as written, kind like Restaurant/Café/Wine bar/Museum/Bar/Vintage shop/Bookshop/Landmark/Park/Club. Not neighborhoods or cities. Empty if none.',
+                },
               },
             },
           },
@@ -128,14 +136,17 @@ ${pulse.map((p) => `- ${String(p.text).slice(0, 200)}${p.spot ? ` [${String(p.sp
     const data = await r.json();
     const raw = (data.choices?.[0]?.message?.content || '').trim();
     if (!raw) return res.status(502).json({ error: 'concierge_unavailable' });
-    let reply = raw, tasteNotes = [];
+    let reply = raw, tasteNotes = [], mentions = [];
     try {
       const parsed = JSON.parse(raw);
       reply = String(parsed.reply || '').trim() || raw;
       tasteNotes = (Array.isArray(parsed.taste_notes) ? parsed.taste_notes : [])
         .map((n) => String(n).trim().slice(0, 80)).filter(Boolean).slice(0, 3);
+      mentions = (Array.isArray(parsed.mentions) ? parsed.mentions : [])
+        .map((m) => ({ name: String(m.name || '').trim().slice(0, 80), kind: String(m.kind || '').trim().slice(0, 30) }))
+        .filter((m) => m.name).slice(0, 3);
     } catch (e) { /* model fell back to prose; use it as-is */ }
-    return res.status(200).json({ reply, tasteNotes });
+    return res.status(200).json({ reply, tasteNotes, mentions });
   } catch (e) {
     console.error('concierge error', e?.message);
     return res.status(502).json({ error: 'concierge_unavailable' });

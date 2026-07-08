@@ -97,6 +97,7 @@ const server = http.createServer((req, res) => {
       const msg = (parsed.messages || []).slice(-1)[0]?.text || '';
       if (/wine/i.test(msg)) return res.end(JSON.stringify({ reply: 'MENTION REPLY: try Le Baron Rouge, obviously.' }));
       if (/shopping/i.test(msg)) return res.end(JSON.stringify({ reply: 'FOLLOWUP: what is the budget, and what are we hunting?', tasteNotes: ['Vintage and friperies', 'Budget under 50 euros'] }));
+      if (/septime/i.test(msg)) return res.end(JSON.stringify({ reply: 'SPECIFIC REPLY: Septime La Cave is exactly your speed.', tasteNotes: [], mentions: [{ name: 'Septime La Cave', kind: 'Wine bar' }] }));
       res.end(JSON.stringify({ reply: `STUB REPLY (${n} curated places received, taste: ${parsed.context?.taste?.length ?? '?'}, pulse: ${parsed.context?.pulse?.length ?? 0})` }));
     });
   }
@@ -617,6 +618,21 @@ try {
   });
   check('concierge asks shopping follow-up', true);
   check('taste notes saved to profile', absorbed.includes('Vintage and friperies') && absorbed.includes('Budget under 50 euros'), absorbed.join('|'));
+
+  // a specific off-deck ask resolves into a live card in the chat
+  await page.evaluate(() => {
+    const input = document.querySelector('input');
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+    setter.call(input, 'tell me about septime');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await new Promise((r) => setTimeout(r, 150));
+  await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => x.getAttribute('aria-label') === 'Send message'); b && b.click(); });
+  await page.waitForFunction(() => document.body.innerText.includes('SPECIFIC REPLY'), { timeout: 8000 });
+  await new Promise((r) => setTimeout(r, 900)); // /api/places resolution + card attach
+  const chatCardTxt = await page.evaluate(() => document.body.innerText.toLowerCase());
+  check('specific ask populates its card in chat', chatCardTxt.includes('chez testeur'), (chatCardTxt.match(/chez[^\n]*/) || ['no card'])[0]); // stub /api/places canonicalizes to Chez Testeur
   const fbIcons = await page.evaluate(() => ({
     up: !!document.querySelector('button[aria-label="Good recommendation"]'),
     down: !!document.querySelector('button[aria-label="Bad recommendation"]'),
